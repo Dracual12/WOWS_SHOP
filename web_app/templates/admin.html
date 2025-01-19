@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Админ-панель</h1>
+        <a href="/">Вернуться в магазин</a>
+    </header>
+    <main>
+        <section>
+            <h2>Список товаров</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Название</th>
+                        <th>Цена</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.id }}</td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.price }} дублонов</td>
+                        <td>
+                            <button class="edit-product" data-id="{{ product.id }}">Редактировать</button>
+                            <button class="delete-product" data-id="{{ product.id }}">Удалить</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+        <section>
+            <a href="/admin/add_product" class="button">Добавить товар</a>
+        </section>
+    </main>
+</body>
+</html>
