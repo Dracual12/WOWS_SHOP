@@ -401,3 +401,11 @@ form button:hover {
 .product-carousel::-webkit-scrollbar {
     display: none; /* Chrome, Safari */
 }
+
+#checkout-steps {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}

@@ -19,7 +19,14 @@
                     <ul id="cart-items">
                         <!-- Товары в корзине будут добавляться динамически -->
                     </ul>
+                    <input type="text" id="email" name="email" value="Введите email" required>
                     <button id="checkout-button">Оформить заказ</button>
+                    <div id="checkout-steps" class="hidden">
+                    <p id="checkout-instructions"></p>
+                    <div id="checkout-fields"></div>
+                    <button id="checkout-next" class="hidden">Далее</button>
+                    <button id="checkout-submit" class="hidden">Оплатить</button>
+                </div>
                 </div>
             </div>
         </div>
@@ -33,5 +40,6 @@
 
     <script src="/static/js/main.js"></script>
     <script src="/static/js/cart.js"></script>
+    <script src="/static/js/order.js"></script>
 </body>
 </html>

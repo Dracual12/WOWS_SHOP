@@ -274,6 +274,25 @@ def edit_section(section_id):
         conn.close()
         return render_template('edit_section.html', section=section)
 
+@app.route('/api/checkout', methods=['POST'])
+def checkout():
+    data = request.json
+    # Здесь вы можете сохранить данные заказа в базе
+    user_id = 1456241115
+    contact_info = data.get("contactInfo")
+    otp_code = data.get("otpCode")
+    telegram_link = data.get("telegramLink")
+
+    # Сохранение данных в базу данных
+    conn = get_db_connection()
+    conn.execute(
+        'INSERT INTO orders (user_id, contact_info, otp_code, telegram_link) VALUES (?, ?, ?, ?)',
+        (user_id, contact_info, otp_code, telegram_link),
+    )
+    conn.commit()
+    conn.close()
+
+    return jsonify({"success": True})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, debug=True)
