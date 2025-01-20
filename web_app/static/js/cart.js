@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     cartItems.forEach(item => {
                         const cartItem = `
-                            <li data-product-id="${item.product_id}">
+                            <li data-product-id="${item.id}">
                                 <span class="item-name">${item.name}</span>
                                 <span class="item-quantity">
                                     <button class="quantity-btn decrease">-</button>

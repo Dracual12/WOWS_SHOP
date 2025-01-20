@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добавить секцию</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Добавить секцию</h1>
+        <a href="/">Вернуться в магазин</a>
+    </header>
+    <main>
+        <form action="/admin/add_section" method="POST" enctype="multipart/form-data">
+            <label for="name">Название:</label>
+            <input type="text" id="name" name="name" required>
+
+            <button type="submit">Добавить</button>
+        </form>
+    </main>
+</body>
+</html>

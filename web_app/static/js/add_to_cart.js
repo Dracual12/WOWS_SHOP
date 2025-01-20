@@ -2,7 +2,7 @@ const addToCartButtons = document.querySelectorAll('.add_to_cart');
 addToCartButtons.forEach(button => {
     button.addEventListener('click', async () => {
         const productId = button.getAttribute('data-id');
-        const userTelegramId =
+        const userTelegramId = 1456241115
         if (!userTelegramId) {
             alert('Ошибка: Telegram ID не найден!');
             return;

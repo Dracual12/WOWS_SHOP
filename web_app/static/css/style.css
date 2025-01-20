@@ -3,19 +3,19 @@ body {
     font-family: 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
-    background: linear-gradient(to bottom, #121212, #1e1e1e); /* Темный градиент */
-    color: #e0e0e0; /* Светло-серый */
-    overflow-x: hidden; /* Убираем горизонтальную прокрутку */
+    background: linear-gradient(to bottom, #121212, #1e1e1e);
+    color: #e0e0e0;
+    overflow-x: hidden;
 }
 
 header {
-    background: linear-gradient(90deg, #0d47a1, #42a5f5); /* Синий к голубому */
+    background: linear-gradient(90deg, #0d47a1, #42a5f5);
     color: white;
     padding: 20px;
     text-align: center;
     font-size: 2em;
     font-weight: bold;
-    border-bottom: 4px solid #42a5f5; /* Голубая линия */
+    border-bottom: 4px solid #42a5f5;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
@@ -27,7 +27,7 @@ header .search-bar-container {
     gap: 10px;
     padding: 10px;
     border: 2px solid #42a5f5;
-    border-radius: 25px; /* Скругленные края для внешнего вида */
+    border-radius: 25px;
     background-color: #212121;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
@@ -79,12 +79,12 @@ header .floating-cart .cart-count {
 
 main {
     padding: 20px;
-    background-color: #1e1e1e; /* Темный фон */
+    background-color: #1e1e1e;
     min-height: calc(100vh - 80px);
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center; /* Центрирование содержимого */
+    justify-content: center;
 }
 
 /* Секции товаров */
@@ -94,7 +94,7 @@ main {
     background: #212121;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    text-align: center; /* Центрирование текста */
+    text-align: center;
     width: 100%;
     max-width: 800px;
 }
@@ -102,64 +102,63 @@ main {
 .product-section h2 {
     color: #42a5f5;
     font-size: 1.8em;
-    margin-bottom: 10px; /* Уменьшен отступ от карточек */
+    margin-bottom: 10px;
 }
 
-/* Горизонтальная прокрутка */
 .scroll-container {
     display: flex;
-    overflow-x: auto; /* Горизонтальная прокрутка */
-    scroll-snap-type: x mandatory; /* Обязательная фиксация на карточке */
-    gap: 50px; /* Увеличиваем расстояние между карточками */
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 50px;
     padding: 10px;
     justify-content: center;
     align-items: center;
-    height: 100%; /* Высота контейнера */
+    height: 100%;
     width: 100%;
-    box-sizing: border-box; /* Учитываем отступы и границы в размере */
+    box-sizing: border-box;
 }
 
 .scroll-container::-webkit-scrollbar {
-    height: 0; /* Полностью убираем скроллбар */
+    height: 0;
 }
 
 .scroll-container::-webkit-scrollbar-thumb {
-    display: none; /* Убираем "ползунок" скроллбара */
+    display: none;
 }
 
 .scroll-card {
-    flex: 0 0 80%; /* Ширина карточки 80% от ширины экрана */
-    max-width: 800px; /* Ограничиваем максимальную ширину */
-    height: auto; /* Автоматическая высота в зависимости от содержимого */
-    border-radius: 15px; /* Закругленные углы */
-    overflow: hidden; /* Обрезаем контент, выходящий за границы */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Тень */
-    background: #f9f9f9; /* Светлый фон */
+    flex: 0 0 80%;
+    max-width: 800px;
+    height: auto;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background: #f9f9f9;
     text-align: center;
-    position: relative; /* Для позиционирования текста поверх изображения */
+    position: relative;
     cursor: pointer;
-    scroll-snap-align: center; /* Центровка карточки при прокрутке */
+    scroll-snap-align: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .scroll-card:hover {
-    transform: scale(1.05); /* Увеличение при наведении */
+    transform: scale(1.05);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
 .scroll-card img {
-    width: 100%; /* Изображение на всю ширину карточки */
+    width: 100%;
     height: auto;
-    display: block; /* Убираем лишние пробелы */
+    display: block;
 }
 
 .scroll-card h3 {
     font-size: 1.2em;
-    color: white; /* Белый текст */
+    color: white;
     font-weight: bold;
-    text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.7); /* Тень для текста */
+    text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.7);
     position: absolute;
-    top: 50%; /* Центрируем текст */
+    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 2;
@@ -171,14 +170,13 @@ main {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.8)); /* Градиент сверху вниз */
-    z-index: 1; /* Под текстом, но над изображением */
+    background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.8));
+    z-index: 1;
 }
 
-/* Корзина */
 .cart {
     background: #212121;
-    border: 2px solid #42a5f5; /* Голубая */
+    border: 2px solid #42a5f5;
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
@@ -196,24 +194,72 @@ main {
 }
 
 .cart table th {
-    background: #0d47a1; /* Темно-синий */
+    background: #0d47a1;
     color: white;
 }
 
-/* Плавающая корзина */
-.floating-cart {
-    position: relative;
-    width: 40px;
-    height: 40px;
+/* Обновления для корзины */
+.cart-dropdown {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    width: 300px;
+    max-width: 90vw;
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: grey;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     z-index: 1000;
-    cursor: pointer;
-    margin-left: auto; /* Закрепляем корзину справа внутри поисковой строки */
 }
 
-.cart-icon {
+.cart-dropdown.hidden {
+    display: none;
+}
+
+.cart-dropdown ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.cart-dropdown ul li {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.cart-dropdown ul li:last-child {
+    border-bottom: none;
+}
+
+.cart-dropdown::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    right: 15px;
+    width: 20px;
+    height: 10px;
+    background-color: white;
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+.cart-dropdown ul li:hover {
+    background: #f5f5f5;
+}
+
+.cart-dropdown button {
+    background-color: #42a5f5;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
     width: 100%;
-    height: 100%;
-    object-fit: contain;
+}
+
+.cart-dropdown button:hover {
+    background-color: #0d47a1;
 }
 
 /* Медиа-запросы для мобильных устройств */
@@ -278,4 +324,80 @@ form button:hover {
 }
 .hidden {
     display: none;
+}
+
+
+.button-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    text-align: center;
+    cursor: pointer;
+}
+.button-link:hover {
+    background-color: #0056b3;
+}
+
+.sections-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Контейнер секции */
+.section {
+    margin-bottom: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+/* Заголовок секции */
+.section h2 {
+    margin-bottom: 15px;
+}
+/* Контейнер карусели */
+.product-carousel {
+    display: flex;
+    overflow-x: auto; /* Включаем горизонтальный скроллинг */
+    scroll-snap-type: x mandatory; /* Привязка к элементам */
+    gap: 20px; /* Расстояние между карточками */
+    padding: 20px 0;
+    justify-content: center; /* Центрируем карточки */
+}
+
+/* Карточка товара */
+.carousel-item {
+    flex: 0 0 100%; /* Карточка занимает всю ширину контейнера */
+    scroll-snap-align: center; /* Центрируем карточку при скролле */
+    max-width: 400px; /* Максимальная ширина карточки */
+    margin: 0 auto; /* Выравнивание по центру */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    background-color: #ffffff;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Изображение товара */
+.carousel-item img {
+    width: 100%; /* Ширина изображения адаптируется к карточке */
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+/* Скрываем горизонтальный скроллбар */
+.product-carousel {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE и Edge */
+}
+
+.product-carousel::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
 }

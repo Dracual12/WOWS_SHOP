@@ -3,22 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Добавить товар</title>
+    <title>Редактировать товар</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
     <header>
-        <h1>Добавить товар</h1>
-        <a href="/">Вернуться в магазин</a>
+        <h1>Редактировать товар</h1>
+        <a href="/admin">Вернуться в админ-панель</a>
     </header>
     <main>
-        <form action="/admin/add_product" method="POST" enctype="multipart/form-data">
+        <form action="/admin/edit_product/{{ product.id }}" method="POST" enctype="multipart/form-data">
             <label for="name">Название:</label>
-            <input type="text" id="name" name="name" required>
+            <input type="text" id="name" name="name" value="{{ product.name }}" required>
 
             <label for="price">Цена:</label>
-            <input type="number" id="price" name="price" step="0.01" required>
-
+            <input type="number" id="price" name="price" value="{{ product.price }}" required>
 
             <label for="product-section">Секция:</label>
             <select id="product-section" name="section_id" required>
@@ -26,12 +25,12 @@
             </select>
 
             <label for="description">Описание:</label>
-            <input type="text" id="description" name="description" required>
+            <textarea id="description" name="description" required>{{ product.description }}</textarea>
 
-            <label for="image">Изображение:</label>
-            <input type="file" id="image" name="image" accept="image/*" required>
+            <label for="image">Изображение (оставьте пустым, чтобы не менять):</label>
+            <input type="file" id="image" name="image">
 
-            <button type="submit">Добавить</button>
+            <button type="submit">Сохранить изменения</button>
         </form>
     </main>
     <script>

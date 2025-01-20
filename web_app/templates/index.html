@@ -26,45 +26,11 @@
     </header>
 
     <main>
-        <section class="product-section">
-            <h2>Список товаров</h2>
-            <div id="product-carousel" class="product-carousel">
-                <!-- Товары будут динамически загружаться -->
-            </div>
-        </section>
+        <section class="sections-container" id="sections-container">
+        <!-- Секции и товары будут загружаться динамически -->
+         </section>
     </main>
 
-    <script>
-        // Загрузка товаров из API
-        fetch('/api/products')
-            .then(response => response.json())
-            .then(products => {
-                const productCarousel = document.getElementById('product-carousel');
-                products.forEach(product => {
-                    const productCard = `
-                        <div class="carousel-item">
-                            <img src="${product.image}" alt="${product.name}" class="carousel-image">
-                            <h3>${product.name}</h3>
-                        </div>`;
-                    productCarousel.innerHTML += productCard;
-                });
-
-                // Добавляем обработчики для открытия страницы товара
-                document.querySelectorAll('.carousel-item').forEach(item => {
-                    item.addEventListener('click', () => {
-                        const productName = item.querySelector('h3').textContent;
-                        fetch('/api/products')
-                            .then(response => response.json())
-                            .then(products => {
-                                const product = products.find(p => p.name === productName);
-                                if (product) {
-                                    window.location.href = `/product/${product.id}`;
-                                }
-                            });
-                    });
-                });
-            });
-    </script>
     <script src="/static/js/main.js"></script>
     <script src="/static/js/cart.js"></script>
 </body>
