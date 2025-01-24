@@ -4,7 +4,6 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, s
 app = Flask(__name__)
 
 # Корзина (временно хранится в памяти)
-cart = []
 
 
 

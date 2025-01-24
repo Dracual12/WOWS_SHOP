@@ -50,6 +50,17 @@ def add_user(telegram_id):
 
     conn.close()
 
+def add_order_id(order_id, user_id):
+    conn = get_db_connection()
+    orders_history = conn.execute("SELECT orders_historu FROM users WHERE user_id = ?", (user_id,)).fetchone()
+    print(orders_history)
+    if orders_history != None:
+        orders_history += f', {order_id}'
+    else:
+        orders_history += order_id
+    conn.execute('UPDATE users SET orders_history = ? WHERE user_id = ?', (orders_history, user_id))
+
+
 def get_user(telegram_id):
     conn = get_db_connection()
     user = conn.execute('SELECT * FROM users WHERE telegram_id = ?', (telegram_id,)).fetchone()
