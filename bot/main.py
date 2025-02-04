@@ -1,21 +1,25 @@
-from aiogram.types import WebAppInfo
 from aiogram import Bot, Dispatcher, types
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.utils import executor
+from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo, InputFile, FSInputFile
+from aiogram.filters import Command
+import asyncio
+import asyncio
 import config
+import os
 from db import add_user
 
 bot = Bot(token=config.BOT_TOKEN)
-dp = Dispatcher(bot)
 
-@dp.message_handler(commands=['start'])
+dp = Dispatcher()
+
+@dp.message(Command("start"))
 async def send_welcome(message: types.Message):
     telegram_id = message.from_user.id
     add_user(telegram_id)
-    with open("bot/assets/welcome_image.jpeg", "rb") as image:
+    with open(f"{os.getcwd()}/assets/welcome_image.jpeg", "rb") as image:
+        photo = FSInputFile(f"{os.getcwd()}/assets/welcome_image.jpeg")
         await bot.send_photo(
             chat_id=message.chat.id,
-            photo=image,
+            photo=photo,
             caption=(
                 f"Представляем новый обновленный бот от сервиса <>, где каждый игрок World of Warships: Legends сможет легко и быстро приобрести дублоны для своей учетной записи на любой платформе!\n\n"
 
@@ -36,12 +40,15 @@ async def send_welcome(message: types.Message):
 
 def main_menu():
     buttons = [
-        InlineKeyboardButton("Открыть Магазин", web_app=WebAppInfo(url=config.WEB_APP_URL)),
-        InlineKeyboardButton("\U0001F4DD Отзывы", url="https://example.com/reviews"),
-        InlineKeyboardButton("\U0001F4E9 Задать вопрос", url="https://t.me/admin_contact")
+        [InlineKeyboardButton(text="Открыть Магазин", web_app=WebAppInfo(url=config.WEB_APP_URL))],
+        [InlineKeyboardButton(text="\U0001F4DD Отзывы", url="https://example.com/reviews")],
+        [InlineKeyboardButton(text="\U0001F4E9 Задать вопрос", url="https://t.me/admin_contact")]
     ]
-    return InlineKeyboardMarkup(row_width=1).add(*buttons)
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
 
-if __name__ == "__main__":
+
+async def main():
     print("Bot is running...")
-    executor.start_polling(dp, skip_updates=True)
+    await dp.start_polling(bot)
+
+asyncio.run(main())

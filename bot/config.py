@@ -1,3 +1,3 @@
-BOT_TOKEN = "7593342796:AAH8YWpRWA_8qThnn-Z1JwBWsWPmPIR6B24"
+BOT_TOKEN = "8042025980:AAGxbqLuCeYmAMAihFsv9TrnwSLAeHbO-94"
 ADMIN_ID = 1456241115
-WEB_APP_URL = "https://фпвыпвытатывпровыиапрфиывапи.рф/"
+WEB_APP_URL = "https://b0f4-77-221-154-91.ngrok-free.app"
