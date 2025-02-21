@@ -13,11 +13,42 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/api/log_telegram_id', methods=['POST'])
+def log_telegram_id():
+    telegram_id = request.json.get('telegram_id')
+    print("Telegram ID received:", telegram_id)
+    return jsonify({"message": "Telegram ID logged"}), 200
+
+
+
+@app.route('/api/order/latest', methods=['POST'])
+def get_latest_order():
+    data = request.get_json()
+    telegram_id = data.get('telegram_id')
+    if not telegram_id:
+        return jsonify({"error": "Telegram ID не передан"}), 400
+
+    conn = get_db_connection()
+    # Получаем последнюю запись заказа по telegram_id, сортируя по id в порядке убывания
+    order = conn.execute('''
+        SELECT id, user_id, cart, otp_code, telegram_link
+        FROM orders
+        WHERE user_id = ?
+        ORDER BY id DESC
+        LIMIT 1
+    ''', (telegram_id,)).fetchone()
+    conn.close()
+
+    if order is None:
+        return jsonify({"error": "Заказ не найден"}), 404
+
+    return jsonify(dict(order))
+
 # API для добавления товара в корзину
 @app.route('/api/cart', methods=['POST'])
 def add_to_cart():
     data = request.get_json()
-    telegram_id = data.get("userTelegramId")  # Telegram ID передаётся через запрос
+    telegram_id = data.get('telegram_id')
     product_id = data.get("product_id")
     quantity = data.get("quantity", 1)
 
@@ -37,7 +68,6 @@ def add_to_cart():
     ''', (user_id, product_id, quantity, quantity))
     conn.commit()
     conn.close()
-
     return jsonify({"message": "Product added to cart"})
 
 
@@ -103,36 +133,57 @@ def admin_panel():
 # API для управления секциями и товарами
 @app.route('/admin/add_product', methods=['GET', 'POST'])
 def add_product():
+    conn = get_db_connection()
+
     if request.method == 'POST':
-        conn = get_db_connection()
-        name = request.form.get('name')
-        price = request.form.get('price')
-        description = request.form.get('description')
-        image = request.files.get('image')
-        section = [dict(row) for row in
-                   conn.execute("SELECT name FROM sections WHERE id = ?", (request.form['section_id'],)).fetchall()][0][
-            'name']
-
-        if not name or not price or not image:
-            return "Все поля обязательны!", 400
-
-        # Сохранение изображения
-        image_path = f'static/images/{image.filename}'
-        image.save(image_path)
-
-        # Добавление товара в базу данных
-        conn = get_db_connection()
-
         try:
-            conn.execute('INSERT INTO products (name, price, description, image, section) VALUES (?, ?, ?, ?, ?)', (name, float(price), description, image_path, section))
+            name = request.form.get('name')
+            price = request.form.get('price')
+            description = request.form.get('description')
+            image = request.files.get('image')
+            review_link = request.form.get('review_link', '')  # Получаем ссылку на обзор (по умолчанию пустая)
+            alternative_goods = request.form.getlist('alternative_goods')  # Получаем список альтернативных товаров
+            section_id = request.form.get('section_id')
+
+            # Проверяем, выбрана ли секция и существует ли она
+            section_row = conn.execute("SELECT name FROM sections WHERE id = ?", (section_id,)).fetchone()
+            if not section_row:
+                return "Ошибка: выбранная секция не найдена.", 400
+            section = section_row['name']
+
+            # Проверка обязательных полей
+            if not name or not price or not image or not section_id:
+                return "Все обязательные поля должны быть заполнены!", 400
+
+            # Сохранение изображения
+            image_path = f'static/images/{image.filename}'
+            image.save(image_path)
+
+            # Преобразуем список альтернативных товаров в строку (через запятую)
+            alternative_goods_str = ','.join(alternative_goods) if alternative_goods else None
+
+            # Добавляем товар в базу данных
+            conn.execute(
+                '''INSERT INTO products (name, price, description, image, section, review_link, alternative_goods)
+                   VALUES (?, ?, ?, ?, ?, ?, ?)''',
+                (name, float(price), description, image_path, section, review_link, alternative_goods_str)
+            )
             conn.commit()
-            conn.close()
+            return redirect('/admin')
+
         except Exception as e:
             print(f"Ошибка при добавлении товара: {e}")
+            return "Ошибка на сервере", 500
 
-        return redirect('/admin')
+        finally:
+            conn.close()
 
-    return render_template('add_product.html')
+    # Динамическая загрузка секций для отображения в форме
+    sections = conn.execute("SELECT id, name FROM sections").fetchall()
+    conn.close()
+
+    return render_template('add_product.html', sections=sections)
+
 
 
 # Маршрут для редактирования товара
@@ -277,7 +328,7 @@ def edit_section(section_id):
 def checkout():
     data = request.json
     # Здесь вы можете сохранить данные заказа в базе
-    user_id = 1456241115
+    user_id = request.json.get('telegram_id')
     contact_info = data.get("contactInfo")
     otp_code = data.get("otpCode")
     telegram_link = data.get("telegramLink")

@@ -3,15 +3,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const cartDropdown = document.querySelector('.cart-dropdown');
     const cartIcon = document.querySelector('.cart-icon');
 
-    // Загружаем товары корзины при открытии
+    // При клике по значку корзины переключаем класс "active" и загружаем товары
     cartIcon.addEventListener('click', () => {
-        cartDropdown.classList.toggle('hidden');
-        if (!cartDropdown.classList.contains('hidden')) {
+        cartDropdown.classList.toggle('active');
+        if (cartDropdown.classList.contains('active')) {
             loadCartItems();
         }
     });
 
-    // Загружаем товары корзины
+    // Функция загрузки товаров корзины
     function loadCartItems() {
         fetch('/api/cart')
             .then(response => response.json())
@@ -21,55 +21,62 @@ document.addEventListener('DOMContentLoaded', () => {
                     cartItemsContainer.innerHTML = '<li>Корзина пуста</li>';
                 } else {
                     cartItems.forEach(item => {
-                        const cartItem = `
-                            <li data-product-id="${item.id}">
+                        const li = document.createElement('li');
+                        li.setAttribute('data-product-id', item.id);
+                        // Вычисляем цену за единицу: если quantity > 0, то unitPrice = total / quantity, иначе 0
+                        const unitPrice = item.quantity > 0 ? parseFloat(item.total) / parseFloat(item.quantity) : 0;
+                        li.setAttribute('data-unit-price', unitPrice);
+                        li.innerHTML = `
+                            <div class="cart-item-top">
                                 <span class="item-name">${item.name}</span>
-                                <span class="item-quantity">
-                                    <button class="quantity-btn decrease">-</button>
-                                    <span class="quantity-value">${item.quantity}</span>
-                                    <button class="quantity-btn increase">+</button>
-                                </span>
-                                <span class="item-total">${item.total} дублонов</span>
-                                <button class="remove-btn">Удалить</button>
-                            </li>`;
-                        cartItemsContainer.innerHTML += cartItem;
+                                <button class="remove-btn">
+                                    <img src="/static/images/delete_good.png" alt="Удалить">
+                                </button>
+                            </div>
+                            <div class="item-quantity">
+                                <button class="quantity-btn decrease">-</button>
+                                <span class="quantity-value">${item.quantity}</span>
+                                <button class="quantity-btn increase">+</button>
+                            </div>
+                            <div class='item-price'>
+                            <span class="item-total">${(unitPrice * item.quantity).toFixed(2)} дублонов</span>
+                            </div>
+                        `;
+
+                        // Привязываем обработчики для этого элемента
+                        const increaseBtn = li.querySelector('.quantity-btn.increase');
+                        const decreaseBtn = li.querySelector('.quantity-btn.decrease');
+                        const removeBtn = li.querySelector('.remove-btn img');
+
+                        increaseBtn.addEventListener('click', () => {
+                            const currentQuantity = parseInt(li.querySelector('.quantity-value').textContent);
+                            updateCartQuantity(item.id, currentQuantity + 1, li);
+                        });
+
+                        decreaseBtn.addEventListener('click', () => {
+                            const currentQuantity = parseInt(li.querySelector('.quantity-value').textContent);
+                            if (currentQuantity > 1) {
+                                updateCartQuantity(item.id, currentQuantity - 1, li);
+                            }
+                        });
+
+                        removeBtn.addEventListener('click', () => {
+                            removeCartItem(item.id, li);
+                        });
+
+                        cartItemsContainer.appendChild(li);
                     });
                 }
             })
             .catch(error => console.error('Ошибка загрузки корзины:', error));
     }
 
-    // Обработка нажатий в корзине
-    cartItemsContainer.addEventListener('click', (event) => {
-        const button = event.target;
-        const listItem = button.closest('li');
-        const productId = listItem.getAttribute('data-product-id');
-        const quantityElement = listItem.querySelector('.quantity-value');
-
-        if (button.classList.contains('increase')) {
-            // Увеличить количество
-            let quantity = parseInt(quantityElement.textContent);
-            quantity += 1;
-            updateCartQuantity(productId, quantity);
-        } else if (button.classList.contains('decrease')) {
-            // Уменьшить количество
-            let quantity = parseInt(quantityElement.textContent);
-            if (quantity > 1) {
-                quantity -= 1;
-                updateCartQuantity(productId, quantity);
-            }
-        } else if (button.classList.contains('remove-btn')) {
-            // Удалить товар из корзины
-            removeCartItem(productId);
-        }
-    });
-
-    // Обновить количество товара
-    function updateCartQuantity(productId, quantity) {
+    // Функция обновления количества товара
+    function updateCartQuantity(productId, newQuantity, li) {
         fetch(`/api/cart/${productId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ quantity: quantity }),
+            body: JSON.stringify({ quantity: newQuantity }),
         })
             .then(response => {
                 if (!response.ok) {
@@ -78,13 +85,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 return response.json();
             })
             .then(() => {
-                loadCartItems(); // Обновляем корзину
+                const unitPrice = parseFloat(li.getAttribute('data-unit-price'));
+                li.querySelector('.quantity-value').textContent = newQuantity;
+                li.querySelector('.item-total').textContent = (unitPrice * newQuantity).toFixed(2) + ' дублонов';
             })
             .catch(error => console.error('Ошибка:', error));
     }
 
-    // Удалить товар из корзины
-    function removeCartItem(productId) {
+    // Функция удаления товара из корзины
+    function removeCartItem(productId, li) {
         fetch(`/api/cart/${productId}`, {
             method: 'DELETE',
         })
@@ -95,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return response.json();
             })
             .then(() => {
-                loadCartItems(); // Обновляем корзину
+                li.remove();
             })
             .catch(error => console.error('Ошибка:', error));
     }

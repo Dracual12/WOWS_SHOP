@@ -1,395 +1,775 @@
-/* Общие стили */
+/* === Общие стили === */
 body {
-    font-family: 'Roboto', sans-serif;
-    margin: 0;
-    padding: 0;
-    background: linear-gradient(to bottom, #121212, #1e1e1e);
-    color: #e0e0e0;
-    overflow-x: hidden;
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #121212;
+  color: #e0e0e0;
+  overflow-x: hidden;
 }
 
+/* === Заголовок страницы === */
 header {
-    background: linear-gradient(90deg, #0d47a1, #42a5f5);
-    color: white;
-    padding: 20px;
-    text-align: center;
-    font-size: 1.2em;
-    font-weight: bold;
-    border-bottom: 4px solid #42a5f5;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  background: #0d47a1;
+  color: white;
+  padding: 2vw;
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: bold;
+  border-bottom: 0.5vw solid #42a5f5;
+  box-shadow: 0 0.3vw 0.5vw rgba(0, 0, 0, 0.2);
+  position: relative; /* для позиционирования return-btn */
 }
 
-header .search-bar-container {
-    margin-top: 10px;
-    display: flex;
-    justify-content: space-between; /* Распределение по краям */
-    align-items: center;
-    padding: 10px;
-    border: 2px solid #42a5f5;
-    border-radius: 25px;
-    background-color: #212121;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-header input[type="text"] {
-    padding: 10px;
-    font-size: 1em;
-    border: none;
-    outline: none;
-    flex-grow: 1; /* Поле ввода расширяется на оставшееся пространство */
-    color: #e0e0e0;
-    background: transparent;
-}
-
-header .floating-cart {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #42a5f5;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    flex-shrink: 0; /* Не сжимать */
-    margin-left: 10px; /* Добавим небольшой отступ слева */
-}
-
-header .floating-cart img {
-    width: 20px;
-    height: 20px;
-}
-
-header .floating-cart .cart-count {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background: #ff5722;
-    color: white;
-    font-size: 12px;
-    border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-}
-
+/* === Основной контейнер === */
 main {
-    padding: 20px;
-    background-color: #1c1c1c;
-    min-height: calc(100vh - 80px);
+  max-width: 80vw;
+  margin: 5vw auto;
+  padding: 2vw;
+  background: #121212;
+  border-radius: 2vw;
+  box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.3);
+}
+
+/* === Секции с товарами === */
+.sections-container {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 2vw;
+}
+
+.section {
+  background: #121212;
+  padding: 1.5vw;
+  border-radius: 1.5vw;
+  box-shadow: 0 0.3vw 0.5vw rgba(0, 0, 0, 0.2);
+  border: none;
+}
+
+/* === Центрирование заголовков секций в index.html === */
+.section h2 {
+  text-align: center;
+  font-size: 1.5em;
+  color: #42a5f5;
+  margin-bottom: 1.5vw;
+}
+
+/* === Таблица для страниц с таблицами === */
+.table-container {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5vw;
+}
+
+.table-container th,
+.table-container td {
+  padding: 1.2vw;
+  border: 0.1vw solid #424242;
+  text-align: left;
+}
+
+.table-container th {
+  background: #0d47a1;
+  color: white;
+}
+
+/* === Карусель товаров === */
+.product-carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 2vw; /* промежуток между товарами */
+  padding: 2vw 0;
+  justify-content: center;
+  border-radius: 3vw;
+  align-items: center;
+  width: 105%;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+.product-carousel::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+/* === Карточка товара === */
+.carousel-item {
+  flex: 0 0 75%; /* Каждая карточка занимает 75% ширины контейнера */
+  max-width: 75%;
+  scroll-snap-align: center;
+  border-radius: 3vw;
+  padding: 2vw;
+  background-color: #121212;
+  text-align: center;
+  box-shadow: 0 0.5vw 0.8vw rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+}
+.carousel-item:hover {
+  transform: scale(1.05);
+  border-radius: 3vw;
+}
+.carousel-image {
+  flex: 0 0 80%;
+  max-width: 80%;
+}
+
+/* === Стили страницы add_product === */
+.add-product-form {
+  max-width: 70vw;
+  margin: 5vw auto;
+  padding: 2.5vw;
+  background: #1e1e1e;
+  border-radius: 2vw;
+  box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.3);
+}
+
+/* Таблица формы */
+.form-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5vw;
+}
+.form-table th,
+.form-table td {
+  padding: 1.2vw;
+  border: 0.1vw solid #424242;
+  text-align: left;
+}
+.form-table th {
+  background: #0d47a1;
+  color: white;
+  width: 35%;
+  text-align: right;
+  padding-right: 1vw;
+  font-weight: bold;
+}
+.form-table td {
+  background: #252525;
+}
+
+/* Поля ввода */
+input[type="text"],
+input[type="number"],
+input[type="url"],
+input[type="file"],
+select {
+  width: 100%;
+  padding: 1vw;
+  font-size: 1em;
+  border: 0.1vw solid #555;
+  border-radius: 0.5vw;
+  background: #333;
+  color: #e0e0e0;
+  outline: none;
+  transition: border 0.3s;
+}
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="url"]:focus,
+input[type="file"]:focus,
+select:focus {
+  border-color: #42a5f5;
+}
+
+/* Поле выбора альтернативных товаров */
+select[multiple] {
+  height: auto;
+  max-height: 12vw;
+  overflow-y: auto;
+  background: #2c2c2c;
+  border: 0.1vw solid #555;
+  color: #e0e0e0;
+}
+
+/* Кнопка отправки */
+button {
+  width: 100%;
+  padding: 1vw;
+  font-size: 1.1em;
+  font-weight: bold;
+  border: none;
+  border-radius: 0.5vw;
+  background: linear-gradient(90deg, #42a5f5, #0d47a1);
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+button:hover {
+  background: linear-gradient(90deg, #0d47a1, #42a5f5);
+  transform: scale(1.02);
+}
+
+/* === Контейнер строки поиска и корзины === */
+.search-bar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1vw;
+  border: 0.4vw solid #42a5f5;
+  border-radius: 2.5vw;
+  background-color: #212121;
+  box-shadow: 0 0.5vw 0.8vw rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 90vw;
+  margin: 0 auto;
+}
+#search-bar {
+  flex-grow: 1;
+  padding: 1vw;
+  font-size: 1em;
+  border: none;
+  outline: none;
+  color: #e0e0e0;
+  background: transparent;
+}
+
+/* === Значок корзины === */
+.floating-cart {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #42a5f5;
+  border-radius: 50%;
+  width: 3vw;
+  height: 3vw;
+  cursor: pointer;
+  margin-left: 1vw;
+}
+.floating-cart img {
+  width: 1.8vw;
+  height: 1.8vw;
+}
+
+/* === Выпадающая корзина === */
+.cart-dropdown {
+  position: absolute;
+  right: 0;
+  top: 3.5vw;
+  width: 50vw;
+  max-width: 90vw;
+  max-height: 55vw;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: #2c2c2c;
+  border: 0.1vw solid #ccc;
+  border-radius: 2vw;
+  box-shadow: 0 0.5vw 0.8vw rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  padding: 1.5vw;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-2vw);
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+  white-space: normal;
+  display: flex;
+  flex-direction: column;
+}
+.cart-dropdown.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* === Стили для списка товаров в корзине === */
+#cart-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+#cart-items li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1vw;
+  border-bottom: 0.1vw solid #444;
+  text-align: center;
+  width: 100%;
+  overflow-x: hidden;
+}
+.cart-item-top {
+    overflow: visible; /* Вместо hidden */
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
-}
-
-/* Секции товаров */
-.product-section {
-    margin: 20px 0;
-    padding: 20px;
-    background: #212121;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    text-align: center;
-    width: 100%;
-    max-width: 800px;
-}
-
-.product-section h2 {
-    color: #42a5f5;
-    font-size: 1.8em;
-    margin-bottom: 10px;
-}
-
-.scroll-container {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    gap: 50px;
-    padding: 10px;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.8vw;
     width: 100%;
     box-sizing: border-box;
 }
-
-.scroll-container::-webkit-scrollbar {
-    height: 0;
+.cart-item-top .item-name {
+  flex: 0 0 auto;
+  min-width: 0;
+  overflow-wrap: break-word;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.scroll-container::-webkit-scrollbar-thumb {
-    display: none;
+.item-total {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 50%;
 }
 
-.scroll-card {
-    flex: 0 0 80%;
-    max-width: 800px;
-    height: auto;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    background: #f9f9f9;
-    text-align: center;
-    position: relative;
-    cursor: pointer;
-    scroll-snap-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+/* === Стили для всплывающего окна сообщения о добавлении товара в корзину === */
+.popup-message {
+  position: fixed;
+  top: 20vh;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #212121;
+  border: 0.2vw solid #42a5f5;
+  border-radius: 1vw;
+  padding: 2vw 4vw 2vw 2vw;
+  box-shadow: 0 0.5vw 0.8vw rgba(0, 0, 0, 0.3);
+  color: #e0e0e0;
+  font-size: 1em;
+  z-index: 10000;
+  text-align: center;
+}
+.popup-message .close-btn {
+  position: absolute;
+  top: 0.8vw;
+  right: 0.8vw;
+  background: #42a5f5;
+  border: none;
+  border-radius: 50%;
+  padding: 0.5vw;
+  cursor: pointer;
+  width: 3vw;
+  height: 3vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.popup-message .close-btn img {
+  width: 1.5vw;
+  height: 1.5vw;
+  display: block;
+}
+.hidden {
+  display: none !important;
 }
 
-.scroll-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+/* === Стили для поля ввода email и кнопки в корзине === */
+.cart-dropdown #cart-items {
+  margin-bottom: 1.5vw;
+}
+.cart-dropdown #email {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 1vw;
+  padding: 1vw;
+  font-size: 1em;
+  border: 0.1vw solid #555;
+  border-radius: 0.5vw;
+  background: #333;
+  color: #e0e0e0;
+  outline: none;
+}
+.cart-dropdown #checkout-button {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 0;
+  padding: 1vw;
+  font-size: 1.1em;
+  font-weight: bold;
+  border: none;
+  border-radius: 0.5vw;
+  background: linear-gradient(90deg, #42a5f5, #0d47a1);
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
 }
 
-.scroll-card img {
+/* === Стили для всплывающего окна оформления заказа === */
+.order-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #212121;
+  border: 0.2vw solid #42a5f5;
+  border-radius: 1vw;
+  box-shadow: 0 0.5vw 0.8vw rgba(0,0,0,0.3);
+  z-index: 10000;
+  padding: 2vw;
+  width: 90%;
+  max-width: 40vw;
+}
+.order-popup h2 {
+  margin-bottom: 1.5vw;
+  color: #e0e0e0;
+}
+.order-popup input[type="text"] {
+  width: 100%;
+  padding: 1vw;
+  font-size: 1em;
+  border: 0.1vw solid #555;
+  border-radius: 0.5vw;
+  background: #333;
+  color: #e0e0e0;
+  margin-top: 1vw;
+  box-sizing: border-box;
+}
+.order-popup-close {
+  position: absolute;
+  top: 0.8vw;
+  right: 0.8vw;
+  background: #42a5f5;
+  border: none;
+  border-radius: 50%;
+  width: 3vw;
+  height: 3vw;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.order-popup-close img {
+  width: 1.5vw;
+  height: 1.5vw;
+  display: block;
+}
+
+/* === Дополнительные стили для окна оформления заказа (Order Step) === */
+.order-input-container {
+  display: flex;
+  align-items: center;
+  gap: 1vw;
+  width: 100%;
+  margin-top: 1.5vw;
+}
+.order-input-container input[type="text"] {
+  flex: 1;
+  padding: 0.8vw;
+  font-size: 1em;
+  border: 0.1vw solid #555;
+  border-radius: 0.5vw 0 0 0.5vw;
+  background: #333;
+  color: #e0e0e0;
+  box-sizing: border-box;
+}
+
+
+/* === Стили для блока обзора на YouTube в product.html === */
+.review-container {
+  margin-top: 2vw;
+  padding: 1vw;
+  background: #1e1e1e;
+  border-radius: 0.8vw;
+  text-align: center;
+}
+.review-container h3 {
+  color: #42a5f5;
+  font-size: 1.2em;
+  margin-bottom: 1vw;
+}
+.review-video {
+  width: 100%;
+  max-width: 56vw;
+  height: 31.5vw;
+  border-radius: 0.8vw;
+  box-shadow: 0 0.5vw 0.8vw rgba(0, 0, 0, 0.3);
+}
+
+/* === Стили для изображения товара в product.html === */
+.product-image {
+  display: block;
+  margin: 2vw auto;
+  max-width: 90%;
+  height: auto;
+  border-radius: 3vw;
+  box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.3);
+}
+
+/* === Контейнер строки поиска и корзины === */
+.search-bar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1vw;
+  border: 0.4vw solid #42a5f5;
+  border-radius: 2.5vw;
+  background-color: #212121;
+  box-shadow: 0 0.5vw 0.8vw rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 90vw;
+  margin: 0 auto;
+}
+#search-bar {
+  flex-grow: 1;
+  padding: 1vw;
+  font-size: 1em;
+  border: none;
+  outline: none;
+  color: #e0e0e0;
+  background: transparent;
+}
+
+/* === Значок корзины === */
+.floating-cart {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #42a5f5;
+  border-radius: 50%;
+  width: 3vw;
+  height: 3vw;
+  cursor: pointer;
+  margin-left: 1vw;
+}
+.floating-cart img {
+  width: 1.8vw;
+  height: 1.8vw;
+}
+
+/* === Кнопка "Назад" (return-btn) === */
+.return-btn {
+  position: absolute;
+  top: 3vw;
+  left: 3vw;
+  width: 10vw;
+  height: auto;
+  /* Дополнительные стили, если необходимо */
+}
+
+/* === Медиа-запросы для адаптивности === */
+
+/* Для устройств с шириной до 1200px (большие экраны) */
+@media screen and (min-width: 1200px) {
+  main {
+    max-width: 80vw;
+  }
+  .search-bar-container {
+    max-width: 70vw;
+  }
+  .carousel-item {
+    max-width: 75vw;
+  }
+}
+
+/* Для устройств с шириной до 1024px */
+@media screen and (max-width: 1024px) {
+  main {
+    width: 90vw;
+  }
+  header {
+    font-size: 1.1em;
+  }
+  .search-bar-container {
+    max-width: 90vw;
+  }
+  .floating-cart {
+    width: 4vw;
+    height: 4vw;
+  }
+  .floating-cart img {
+    width: 3vw;
+    height: 3vw;
+  }
+}
+
+/* Для устройств с шириной до 768px */
+@media screen and (max-width: 768px) {
+  main {
+    width: 95vw;
+  }
+  .form-table th {
+    text-align: left;
+    display: block;
     width: 100%;
-    height: auto;
+    padding-bottom: 0.5vw;
+  }
+  .form-table td {
+    display: block;
+    width: 100%;
+  }
+  button {
+    font-size: 1em;
+  }
+  .carousel-item {
+    flex: 0 0 100%;
+    max-width: 90vw;
+  }
+}
+
+/* Для устройств с шириной до 480px */
+@media screen and (max-width: 480px) {
+  main {
+    width: 95vw;
+    padding: 2vw;
+  }
+  header {
+    padding: 2vw;
+    font-size: 1em;
+  }
+  .search-bar-container {
+    padding: 1vw;
+    border-radius: 5vw;
+  }
+  #search-bar {
+    padding: 1vw;
+    font-size: 0.9em;
+  }
+  .floating-cart {
+    width: 6vw;
+    height: 6vw;
+  }
+  .floating-cart img {
+    width: 4vw;
+    height: 4vw;
+  }
+  .carousel-item {
+    padding: 2vw;
+  }
+  .form-table th, .form-table td {
+    padding: 1vw;
+  }
+  button {
+    padding: 1vw;
+    font-size: 0.9em;
+  }
+  .order-popup {
+    width: 90vw;
+    max-width: 80vw;
+  }
+}
+
+
+/* Контейнер всплывающего окна */
+.order-popup-content {
+    position: relative;
+    display: flex;
+    flex-direction: column; /* Размещаем элементы вертикально */
+    align-items: center;
+    gap: 1rem;              /* Промежуток между элементами (заголовок, поле, кнопка) */
+}
+
+/* Кнопка "Вперед" */
+.order-popup-content .next-btn {
+    background: #42a5f5;
+    border: none;
+    border-radius: 2rem;    /* Скругленные края, настраивайте по вкусу */
+    width: 4rem;            /* Размер кнопки */
+    height: 4rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.order-popup-content .next-btn img {
+    width: 2rem;            /* Размер иконки */
+    height: 2rem;
     display: block;
 }
 
-.scroll-card h3 {
-    font-size: 1.2em;
-    color: white;
-    font-weight: bold;
-    text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.7);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 2;
-}
-
-.scroll-card .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.8));
-    z-index: 1;
-}
-
-.cart {
-    background: #212121;
-    border: 2px solid #42a5f5;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-}
-
-.cart table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.cart table th, .cart table td {
-    padding: 10px;
-    text-align: center;
-    border: 1px solid #424242;
-}
-
-.cart table th {
+/* Можно добавить hover-эффект */
+.order-popup-content .next-btn:hover {
     background: #0d47a1;
-    color: white;
-}
-
-/* Обновления для корзины */
-.cart-dropdown {
-    position: absolute;
-    right: 0;
-    top: 100%;
-    width: 300px;
-    max-width: 90vw;
-    max-height: 400px;
-    overflow-y: auto;
-    background-color: grey;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
-}
-
-.cart-dropdown.hidden {
-    display: none;
-}
-
-.cart-dropdown ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.cart-dropdown ul li {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-}
-
-.cart-dropdown ul li:last-child {
-    border-bottom: none;
-}
-
-.cart-dropdown::before {
-    content: '';
-    position: absolute;
-    top: -10px;
-    right: 15px;
-    width: 20px;
-    height: 10px;
-    background-color: white;
-    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-}
-
-.cart-dropdown ul li:hover {
-    background: #f5f5f5;
-}
-
-.cart-dropdown button {
-    background-color: #42a5f5;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%;
-}
-
-.cart-dropdown button:hover {
-    background-color: #0d47a1;
-}
-
-/* Медиа-запросы для мобильных устройств */
-.product-carousel {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    gap: 20px;
-    padding: 20px;
-    justify-content: center;
-    align-items: center;
-}
-
-.carousel-item {
-    flex: 0 0 90%;
-    max-width: 800px;
-    text-align: center;
-    scroll-snap-align: center;
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.carousel-item:hover {
     transform: scale(1.05);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
-.carousel-image {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
+
+/* --- Объединённый блок для цены и описания продукта --- */
+.product-details {
+  text-align: center;
+  background-color: #212121 /* Лёгкая рамка */
+  border-radius: 3vw;
+  padding: 2vw;
+  margin: 2vw auto;
+  max-width: 90%;
+  box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.4); /* Тень по краям */
+  font-size: 1.1em;
+  line-height: 1.5;
 }
 
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    max-width: 400px;
-    margin: 20px auto;
+.product-details p {
+  margin: 1vw 0;
 }
 
-form label {
-    font-size: 1.2em;
-    color: #42a5f5;
+
+/* Блок с информацией о товаре (название и цена) */
+.cart-item-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 0.5vw;
 }
 
-form input, form button {
-    padding: 10px;
-    font-size: 1em;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+/* Блок с элементами управления (кнопки -/+, количество, кнопка удаления) */
+.cart-item-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1vw; /* Отступ между кнопками */
+  width: 100%;
+  box-sizing: border-box;
 }
 
-form button {
-    background-color: #42a5f5;
-    color: white;
-    cursor: pointer;
+/* Кнопки уменьшения и увеличения (круглые) */
+.quantity-btn {
+  background: #42a5f5;
+  border: none;
+  color: white;
+  font-size: 1em;
+  width: 3vw;
+  height: 3vw;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.quantity-btn:hover {
+  background: #0d47a1;
 }
 
-form button:hover {
-    background-color: #0d47a1;
+/* Отображение количества */
+.quantity-value {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #ffffff;
 }
 
-.hidden {
-    display: none;
+/* Кнопка удаления */
+.remove-btn {
+  background: #42a5f5;
+  border: none;
+  border-radius: 50%;
+  width: 4.5vw;
+  height: 4.5vw;
+  cursor: pointer;
+  transition: background 0.3s ease;
 }
 
-.button-link {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    text-align: center;
-    cursor: pointer;
-}
-.button-link:hover {
-    background-color: #0056b3;
+.remove-btn:hover {
+  background: #ff3b30;
 }
 
-.sections-container {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+.remove-btn img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
-/* Контейнер секции */
-.section {
-    margin-bottom: 20px;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background-color: #f1f1f1;
+.item-quantity {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem; /* отступ между элементами, можно настроить */
 }
-
-/* Заголовок секции */
-.section h2 {
-    margin-bottom: 15px;
-}
-
-/* Контейнер карусели */
-.product-carousel {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    gap: 20px;
-    padding: 20px 0;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Карточка товара */
-.carousel-item {
-    flex: 0 0 100%;
-    scroll-snap-align: center;
-    max-width: 400px;
-    margin: 0 auto;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    background-color: #ffffff;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Изображение товара */
-.carousel-item img {
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
-    margin-bottom: 15px;
-}
-

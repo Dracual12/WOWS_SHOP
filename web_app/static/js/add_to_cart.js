@@ -2,26 +2,45 @@ const addToCartButtons = document.querySelectorAll('.add_to_cart');
 addToCartButtons.forEach(button => {
     button.addEventListener('click', async () => {
         const productId = button.getAttribute('data-id');
-        const userTelegramId = 1456241115
-        if (!userTelegramId) {
-            alert('Ошибка: Telegram ID не найден!');
-            return;
-        }
+        const telegram_id = 1456241115;
         try {
             const response = await fetch('/api/cart', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userTelegramId: userTelegramId, product_id: productId, quantity: 1 }),
+                body: JSON.stringify({product_id: productId, quantity: 1, telegram_id: telegram_id}),
             });
 
             if (!response.ok) {
                 const error = await response.json();
                 alert(`Ошибка: ${error.error}`);
             } else {
-                alert('Товар добавлен в корзину!');
+                // Вместо alert, показываем всплывающее окно
+                showAddedPopup();
             }
         } catch (err) {
             console.error('Ошибка при добавлении в корзину:', err);
         }
     });
+    function showAddedPopup() {
+    const popup = document.createElement('div');
+    popup.classList.add('popup-message');
+    popup.innerHTML = `
+        <button class="close-btn"><img src="/static/images/crest.png" alt="Закрыть"></button>
+        <p>Товар успешно добавлен в корзину!</p>
+    `;
+    document.body.appendChild(popup);
+
+    // Обработчик для закрытия окна
+    popup.querySelector('.close-btn').addEventListener('click', () => {
+        popup.remove();
+    });
+
+    // Автоматическое скрытие через 3 секунды (по желанию)
+    setTimeout(() => {
+        if (popup.parentNode) {
+            popup.remove();
+        }
+    }, 3000);
+}
+
 });

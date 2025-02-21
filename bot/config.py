@@ -1,3 +1,3 @@
-BOT_TOKEN = "8042025980:AAGxbqLuCeYmAMAihFsv9TrnwSLAeHbO-94"
+BOT_TOKEN = "7574071837:AAFE0A2rW27YmxOi40AG68577fK3zluinu4"
 ADMIN_ID = 1456241115
-WEB_APP_URL = "https://b0f4-77-221-154-91.ngrok-free.app"
+WEB_APP_URL = "https://0db5-2001-ac8-31-597c-c07e-3b5e-c58-10.ngrok-free.app"

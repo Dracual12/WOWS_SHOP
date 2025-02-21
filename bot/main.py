@@ -41,8 +41,8 @@ async def send_welcome(message: types.Message):
 def main_menu():
     buttons = [
         [InlineKeyboardButton(text="Открыть Магазин", web_app=WebAppInfo(url=config.WEB_APP_URL))],
-        [InlineKeyboardButton(text="\U0001F4DD Отзывы", url="https://example.com/reviews")],
-        [InlineKeyboardButton(text="\U0001F4E9 Задать вопрос", url="https://t.me/admin_contact")]
+        [InlineKeyboardButton(text="\U0001F4DD Отзывы", url="https://t.me/armada_feedback")],
+        #[InlineKeyboardButton(text="\U0001F4E9 Задать вопрос", url="@armada_support")]
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 

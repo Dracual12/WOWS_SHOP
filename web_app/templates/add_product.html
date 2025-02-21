@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; font-src 'self' https://cdn.ngrok.com; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline';">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Добавить товар</title>
@@ -8,6 +10,9 @@
 </head>
 <body>
     <header>
+        <a href="/" class="return-link">
+            <img src="/static/images/return.png" alt="Вернуться в магазин" class="return-btn">
+        </a>
         <h1>Добавить товар</h1>
         <a href="/">Вернуться в магазин</a>
     </header>
@@ -18,7 +23,6 @@
 
             <label for="price">Цена:</label>
             <input type="number" id="price" name="price" step="0.01" required>
-
 
             <label for="product-section">Секция:</label>
             <select id="product-section" name="section_id" required>
@@ -31,27 +35,48 @@
             <label for="image">Изображение:</label>
             <input type="file" id="image" name="image" accept="image/*" required>
 
+            <label for="review_link">Ссылка на обзор:</label>
+            <input type="url" id="review_link" name="review_link">
+
+            <label for="alternative-goods">Альтернативные товары:</label>
+            <select id="alternative-goods" name="alternative_goods" multiple>
+                <!-- Товары будут загружаться динамически -->
+            </select>
+
             <button type="submit">Добавить</button>
         </form>
     </main>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-        const sectionSelect = document.getElementById("product-section");
+            const sectionSelect = document.getElementById("product-section");
+            const alternativeGoodsSelect = document.getElementById("alternative-goods");
 
-        // Загружаем список секций из API
-        fetch('/api/viewsections')
-            .then(response => response.json())
-            .then(sections => {
-                sections.forEach(section => {
-                    const option = document.createElement("option");
-                    option.value = section.id;
-                    option.textContent = section.name;
-                    sectionSelect.appendChild(option);
-                });
-            })
-            .catch(error => console.error("Ошибка загрузки секций:", error));
-    });
+            // Загружаем список секций из API
+            fetch('/api/viewsections')
+                .then(response => response.json())
+                .then(sections => {
+                    sections.forEach(section => {
+                        const option = document.createElement("option");
+                        option.value = section.id;
+                        option.textContent = section.name;
+                        sectionSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Ошибка загрузки секций:", error));
 
+            // Загружаем список товаров для альтернатив
+            fetch('/api/products')
+                .then(response => response.json())
+                .then(products => {
+                    products.forEach(product => {
+                        const option = document.createElement("option");
+                        option.value = product.id;
+                        option.textContent = product.name;
+                        alternativeGoodsSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Ошибка загрузки товаров:", error));
+        });
     </script>
 </body>
 </html>

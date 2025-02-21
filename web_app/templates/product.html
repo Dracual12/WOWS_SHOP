@@ -1,25 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; font-src 'self' https://cdn.ngrok.com; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline';">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ product.name }}</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
     <header>
-        <a href="/">Вернуться в магазин</a>
-        <h1>{{ product.name }}</h1>
+        <a href="/" class="return-link">
+            <img src="/static/images/return.png" alt="Вернуться в магазин" class="return-btn">
+        </a>
     </header>
     <main>
-        <img src="/{{ product.image }}" alt="{{ product.name }}">
-        <p>Цена: {{ product.price }} дублонов</p>
-        <p>{{ product.description }}</p>
-        <button class="add_to_cart" data-id="{{ product.id }}">Добавить в корзину</button>
 
+        <img src="/{{ product.image }}" alt="{{ product.name }}" class="product-image">
+
+        <div class="product-details">
+            <p>Цена: {{ product.price }} дублонов</p>
+            <p>{{ product.description }}</p>
+        </div>
+
+        <!-- Проверяем, есть ли ссылка на обзор -->
+        {% if product.review_link %}
+        <div class="review-container">
+            <h3>Обзор на YouTube:</h3>
+            <iframe class="review-video" src="{{ product.review_link }}" frameborder="0" allowfullscreen></iframe>
+        </div>
+        {% endif %}
+
+        <button class="add_to_cart" data-id="{{ product.id }}">Добавить в корзину</button>
     </main>
+
     <!-- Скрипты -->
     <script src="/static/js/add_to_cart.js"></script>
+
 
 </body>
 </html>

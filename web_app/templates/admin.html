@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; font-src 'self' https://cdn.ngrok.com; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline';">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Админ-панель</title>
@@ -8,73 +10,77 @@
 </head>
 <body>
     <header>
+        <a href="/" class="return-link">
+            <img src="/static/images/return.png" alt="Вернуться в магазин" class="return-btn">
+        </a>
         <h1>Админ-панель</h1>
-        <a href="/">Вернуться в магазин</a>
     </header>
-    <main>
-        <section>
-            <h2>Управление секциями</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Название секции</th>
-                        <th>Действия</th>
-                    </tr>
-                </thead>
-                <tbody id="sections-table">
-                    {% for section in sections %}
-                    <tr>
-                        <td>{{ section.id }}</td>
-                        <td>{{ section.name }}</td>
-                        <td>
-                            <<a href="/admin/edit_section/{{ section.id }}" class="button-link">Редактировать</a>
-                            <form action="/admin/delete_section/{{ section.id }}" method="POST" style="display:inline;">
-                                <button type="submit" class="button-link">Удалить</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <a href="/admin/add_section" class="button-link">Добавить секцию</a>
-        </section>
 
-        <section>
-            <h2>Список товаров</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Название</th>
-                        <th>Цена</th>
-                        <th>Описание</th>
-                        <th>Действия</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for product in products %}
-                    <tr>
-                        <td>{{ product.id }}</td>
-                        <td>{{ product.name }}</td>
-                        <td>{{ product.price }}</td>
-                        <td>{{ product.description }}</td>
-                        <td>
-                            <a href="/admin/edit_product/{{ product.id }}" class="button-link">Редактировать</a>
-                            <form action="/admin/delete_product/{{ product.id }}" method="POST" style="display:inline;">
-                                <button type="submit" class="button-link">Удалить</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </section>
-        <section>
-            <a href="/admin/add_product" class="button-link">Добавить товар</a>
-        </section>
+    <main>
+        <div class="container">
+            <!-- Управление секциями -->
+            <section>
+                <h2>Управление секциями</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Название секции</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sections-table">
+                        {% for section in sections %}
+                        <tr>
+                            <td>{{ section.id }}</td>
+                            <td>{{ section.name }}</td>
+                            <td>
+                                <a href="/admin/edit_section/{{ section.id }}" class="button-link">Редактировать</a>
+                                <form action="/admin/delete_section/{{ section.id }}" method="POST">
+                                    <button type="submit">Удалить</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <a href="/admin/add_section" class="button-link">Добавить секцию</a>
+            </section>
+
+            <!-- Список товаров -->
+            <section>
+                <h2>Список товаров</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Название</th>
+                            <th>Цена</th>
+                            <th>Описание</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>{{ product.id }}</td>
+                            <td>{{ product.name }}</td>
+                            <td>{{ product.price }}</td>
+                            <td>{{ product.description }}</td>
+                            <td>
+                                <a href="/admin/edit_product/{{ product.id }}" class="button-link">Редактировать</a>
+                                <form action="/admin/delete_product/{{ product.id }}" method="POST">
+                                    <button type="submit">Удалить</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <a href="/admin/add_product" class="button-link">Добавить товар</a>
+            </section>
+        </div>
     </main>
+
 </body>
 </html>
-
-

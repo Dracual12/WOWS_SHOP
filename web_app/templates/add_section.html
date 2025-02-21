@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; font-src 'self' https://assets.ngrok.com; style-src 'self' 'unsafe-inline';">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Добавить секцию</title>
@@ -8,8 +9,10 @@
 </head>
 <body>
     <header>
+        <a href="/" class="return-link">
+            <img src="/static/images/return.png" alt="Вернуться в магазин" class="return-btn">
+        </a>
         <h1>Добавить секцию</h1>
-        <a href="/">Вернуться в магазин</a>
     </header>
     <main>
         <form action="/admin/add_section" method="POST" enctype="multipart/form-data">
@@ -19,5 +22,6 @@
             <button type="submit">Добавить</button>
         </form>
     </main>
+
 </body>
 </html>

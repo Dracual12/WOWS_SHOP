@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; font-src 'self' https://cdn.ngrok.com; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline';">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Редактировать секцию</title>
@@ -8,6 +10,9 @@
 </head>
 <body>
     <header>
+        <a href="/admin" class="return-link">
+            <img src="/static/images/return.png" alt="Вернуться в admin панель" class="return-btn">
+        </a>
         <h1>Редактировать секцию</h1>
         <a href="/admin">Вернуться в админ-панель</a>
     </header>
@@ -19,5 +24,6 @@
             <button type="submit">Сохранить изменения</button>
         </form>
     </main>
+
 </body>
 </html>
