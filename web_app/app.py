@@ -1,5 +1,5 @@
-from db import get_db_connection
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session
+from web_app.db import get_db_connection
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 
 app = Flask(__name__)
 
