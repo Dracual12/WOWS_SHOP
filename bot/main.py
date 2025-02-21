@@ -1,10 +1,11 @@
 from aiogram import Bot, Dispatcher, types
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo, FSInputFile
+from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo, InputFile, FSInputFile
 from aiogram.filters import Command
+import asyncio
 import asyncio
 import config
 import os
-from web_app.db import add_user
+from db import add_user
 
 bot = Bot(token=config.BOT_TOKEN)
 
