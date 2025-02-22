@@ -1,6 +1,6 @@
 import requests
 
-from db import get_db_connection
+from bot.db import get_db_connection
 
 
 def get_link():
