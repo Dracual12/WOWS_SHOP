@@ -4,10 +4,10 @@ from aiogram.filters import Command
 import asyncio
 import config
 import os
-from bot.db import add_user
+from db import add_user
 import requests
 
-from bot.db import get_db_connection
+from db import get_db_connection
 
 
 def get_link():
