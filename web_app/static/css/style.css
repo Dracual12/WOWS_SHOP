@@ -348,8 +348,8 @@ button:hover {
   overflow: hidden;
 }
 .popup-message .close-btn img {
-  width: 1.5vw;
-  height: 1.5vw;
+  width: 2.5vw;
+  height: 2.5vw;
   display: block;
 }
 .hidden {

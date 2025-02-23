@@ -35,8 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <button class="order-popup-close">
                 <img src="/static/images/crest.png" alt="Закрыть">
             </button>
-            <h2>Пришлите телефон/электронную почту и одноразовый код доступа (OTP) от Facebook.
-            Вы их можете найти в переписке в Telegram, если ранее делали заказ через человека. Если не делали или есть другие причины – напишите администратору.</h2>
+            <h2>Пришлите через пробел данные от Google/Facebook* для входа в мобильную версию.</h2>
             <div class="order-input-container">
                 <input type="text" id="order-input" placeholder="Введите данные..." />
             </div>
