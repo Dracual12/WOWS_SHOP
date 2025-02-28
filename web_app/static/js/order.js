@@ -4,13 +4,14 @@ document.addEventListener("DOMContentLoaded", () => {
     checkoutButton.addEventListener("click", async () => {
     if (window.Telegram && window.Telegram.WebApp) {
         try {
-                const response = await fetch('/api/log_telegram_id', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ telegram_id: Telegram.WebApp.initDataUnsafe.user.id; })
-                });
-                const data = await response.json();
-                console.log("Server response:", data);
+            console.log("Server response:", data);
+            const response = await fetch('/api/log_telegram_id', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telegram_id: Telegram.WebApp.initDataUnsafe.user.id; })
+            });
+            const data = await response.json();
+            console.log("Server response:", data);
             } catch (err) {
                 console.error("Ошибка при отправке Telegram ID:", err);
             }}
