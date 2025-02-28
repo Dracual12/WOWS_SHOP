@@ -1,12 +1,21 @@
-from bot.db import get_db_connection
-from flask import Flask, render_template, request, jsonify, redirect, url_for
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+# Добавляем корневую директорию в sys.path
+if project_root not in sys.path:
+    sys.path.append(project_root)
+
+
+
+
+from bot.db import get_db_connection
+from flask import Flask, render_template, request, jsonify, redirect, url_for
+
 
 app = Flask(__name__)
 
-# Корзина (временно хранится в памяти)
 
 
 
