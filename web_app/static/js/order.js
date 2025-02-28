@@ -4,23 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
     checkoutButton.addEventListener("click", async () => {
         alert('window.Telegram.WebApp.initDataUnsafe.user.id');
         // Выводим Telegram ID в консоль сервера, отправив его через fetch
-        if (window.userTelegramId) {
-            try {
-                const response = await fetch('/api/log_telegram_id', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ telegram_id: Telegram.WebApp.initDataUnsafe.user; })
-                });
-                const data = await response.json();
-                console.log("Server response:", data);
-            } catch (err) {
-                console.error("Ошибка при отправке Telegram ID:", err);
-            }
-        } else {
-            console.error("Telegram ID не определён");
-        }
-
-
         // Закрываем окно корзины
         const cartDropdown = document.querySelector('.cart-dropdown');
         cartDropdown.classList.remove('active');
