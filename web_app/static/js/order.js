@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Показываем всплывающее окно оформления заказа (первый шаг)
         showOrderPopup();
-    });
+    };
 
     function showOrderPopup() {
         const popup = document.createElement("div");
