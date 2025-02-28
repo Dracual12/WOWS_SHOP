@@ -2,10 +2,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const checkoutButton = document.getElementById("checkout-button");
 
     checkoutButton.addEventListener("click", async () => {
-     if (window.Telegram && window.Telegram.WebApp) {
-        console.log("Telegram WebApp script is loaded!");
-        alert(window.Telegram.WebApp.initDataUnsafe.user.id);}
+    if (window.Telegram && window.Telegram.WebApp) {
+        try {
+                const response = await fetch('/api/log_telegram_id', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegram_id: Telegram.WebApp.initDataUnsafe.user.id; })
+                });
+                const data = await response.json();
+                console.log("Server response:", data);
+            } catch (err) {
+                console.error("Ошибка при отправке Telegram ID:", err);
+            }}
         // Выводим Telegram ID в консоль сервера, отправив его через fetch
+
+
+
         // Закрываем окно корзины
         const cartDropdown = document.querySelector('.cart-dropdown');
         cartDropdown.classList.remove('active');
