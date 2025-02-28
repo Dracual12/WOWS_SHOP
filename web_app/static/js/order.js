@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const checkoutButton = document.getElementById("checkout-button");
 
     checkoutButton.addEventListener("click", async () => {
-        alert(window.Telegram.WebApp.initDataUnsafe.user.id);
+        alert('window.Telegram.WebApp.initDataUnsafe.user.id');
         // Выводим Telegram ID в консоль сервера, отправив его через fetch
         if (window.userTelegramId) {
             try {
