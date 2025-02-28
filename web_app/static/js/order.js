@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             console.error("Telegram ID не определён");
         }
-        alert(Telegram.WebApp.initDataUnsafe.user.id;)
+        alert(window.Telegram.WebApp.initDataUnsafe.user.id);
 
         // Закрываем окно корзины
         const cartDropdown = document.querySelector('.cart-dropdown');
