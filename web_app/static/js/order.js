@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const checkoutButton = document.getElementById("checkout-button");
 
     checkoutButton.addEventListener("click", async () => {
+        alert(window.Telegram.WebApp.initDataUnsafe.user.id);
         // Выводим Telegram ID в консоль сервера, отправив его через fetch
         if (window.userTelegramId) {
             try {
@@ -18,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             console.error("Telegram ID не определён");
         }
-        alert(window.Telegram.WebApp.initDataUnsafe.user.id);
+
 
         // Закрываем окно корзины
         const cartDropdown = document.querySelector('.cart-dropdown');
