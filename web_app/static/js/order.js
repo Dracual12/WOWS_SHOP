@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const response = await fetch('/api/log_telegram_id', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ telegram_id: 11456241115 })
+                    body: JSON.stringify({ telegram_id: Telegram.WebApp.initDataUnsafe.user; })
                 });
                 const data = await response.json();
                 console.log("Server response:", data);
@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             console.error("Telegram ID не определён");
         }
+        alert(Telegram.WebApp.initDataUnsafe.user.id;)
 
         // Закрываем окно корзины
         const cartDropdown = document.querySelector('.cart-dropdown');
