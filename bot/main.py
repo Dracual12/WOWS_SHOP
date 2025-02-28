@@ -20,8 +20,8 @@ def get_link():
     url = f"https://alfa.rbsuat.com/payment/rest/register.do?token=157t7528u3o9bg0o9rljvu7dqs&orderNumber={order_id}&amount={cart}&returnUrl=192.168.0.1"
     try:
         response = requests.post(url)
-        if response.status_code == 200:
-            return response.json()['formUrl']
+        #if response.status_code == 200:
+            #return response.json()['formUrl']
     except requests.RequestException as e:
         return {"error": f"Ошибка соединения: {str(e)}"}
 
