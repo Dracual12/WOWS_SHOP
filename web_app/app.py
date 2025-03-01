@@ -1,7 +1,6 @@
 import sys
 import os
-from crypt import methods
-from turtledemo.clock import datum
+
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
