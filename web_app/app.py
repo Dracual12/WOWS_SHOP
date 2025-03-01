@@ -114,7 +114,9 @@ def add_to_cart():
 @app.route('/api/cart', methods=['GET'])
 def get_cart():
     conn = get_db_connection()
-    user_id = 1456241115  # Используйте ID текущего пользователя
+    data = request.get_json()
+    user_id = data.get('tg_id')
+    print(user_id)# Используйте ID текущего пользователя
     cart = conn.execute('''
         SELECT p.id, p.name, c.quantity, (p.price * c.quantity) AS total
         FROM cart c
