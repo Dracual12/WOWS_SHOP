@@ -1,7 +1,6 @@
 import sys
 import os
 import json
-from bot.main import get_link
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -14,6 +13,7 @@ if project_root not in sys.path:
 
 from bot.db import get_db_connection
 from flask import Flask, render_template, request, jsonify, redirect, url_for
+from bot.main import get_link
 
 
 app = Flask(__name__)
