@@ -1,6 +1,6 @@
 import sys
 import os
-from crypt import methods
+import json
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -48,14 +48,14 @@ def save_otp():
             SET otp_code = ?
             WHERE user_id = ?
         """, (otp, user_id))
-    req2 = conn.execute("SELECT * FROM orders").fetchall()
     cart = conn.execute('''
                 SELECT p.id, p.name, c.quantity, (p.price * c.quantity) AS total
                 FROM cart c
                 JOIN products p ON c.product_id = p.id
                 WHERE c.user_id = ?
             ''', (user_id,)).fetchall()
-    conn.execute("UPDATE orders SET cart = ? WHERE user_id = ?", (cart, user_id))
+    cart2 = json.dumps([dict(row) for row in cart])
+    conn.execute("UPDATE orders SET cart = ? WHERE user_id = ?", (cart2, user_id))
     res = conn.execute("SELECT * FROM orders").fetchall()
     for e in res:
         print(dict(e))
