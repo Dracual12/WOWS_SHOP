@@ -1,27 +1,34 @@
+// Функция для обработки добавления в корзину
+async function handleAddToCart() {
+    const productId = this.getAttribute('data-id');
+    const telegram_id = window.Telegram.WebApp.initDataUnsafe.user.id;
+
+    try {
+        const response = await fetch('/api/cart', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ product_id: productId, quantity: 1, telegram_id: telegram_id }),
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            showNotification(`Ошибка: ${error.error}`, 'error');
+        } else {
+            showNotification('Товар успешно добавлен в корзину!', 'success');
+        }
+    } catch (err) {
+        console.error('Ошибка при добавлении в корзину:', err);
+        showNotification('Ошибка при добавлении в корзину', 'error');
+    }
+}
+
+// Добавляем обработчики событий
 const addToCartButtons = document.querySelectorAll('.add_to_cart');
 addToCartButtons.forEach(button => {
-    button.addEventListener('click', async () => {
-        const productId = button.getAttribute('data-id');
-        const telegram_id = window.Telegram.WebApp.initDataUnsafe.user.id;
-
-        try {
-            const response = await fetch('/api/cart', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ product_id: productId, quantity: 1, telegram_id: telegram_id }),
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                showNotification(`Ошибка: ${error.error}`, 'error'); // Показываем уведомление об ошибке
-            } else {
-                showNotification('Товар успешно добавлен в корзину!', 'success'); // Показываем уведомление об успехе
-            }
-        } catch (err) {
-            console.error('Ошибка при добавлении в корзину:', err);
-            showNotification('Ошибка при добавлении в корзину', 'error'); // Показываем уведомление об ошибке
-        }
-    });
+    // Удаляем старые обработчики (если они есть)
+    button.removeEventListener('click', handleAddToCart);
+    // Добавляем новый обработчик
+    button.addEventListener('click', handleAddToCart);
 });
 
 // Функция для показа уведомления
@@ -30,10 +37,8 @@ function showNotification(message, type = 'info') {
     notification.className = `notification ${type}`;
     notification.textContent = message;
 
-    // Добавляем уведомление в контейнер
     const container = document.getElementById('notification-container');
     if (!container) {
-        // Если контейнера нет, создаем его
         const newContainer = document.createElement('div');
         newContainer.id = 'notification-container';
         newContainer.style.position = 'fixed';
@@ -46,16 +51,14 @@ function showNotification(message, type = 'info') {
 
     container.appendChild(notification);
 
-    // Анимация появления
     setTimeout(() => {
         notification.classList.add('show');
     }, 10);
 
-    // Автоматическое скрытие через 3 секунды
     setTimeout(() => {
         notification.classList.remove('show');
         setTimeout(() => {
             notification.remove();
-        }, 300); // Ждем завершения анимации перед удалением
+        }, 300);
     }, 3000);
 }
