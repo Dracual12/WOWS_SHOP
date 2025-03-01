@@ -25,11 +25,14 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/api/log_telegram_id', methods=['POST'])
-def log_telegram_id():
-    telegram_id = request.json.get('telegram_id')
-    print("Telegram ID received:", telegram_id)
-    return jsonify({"message": "Telegram ID logged"}), 200
+@app.route("/save-tg-id", methods=["POST"])
+def save_tg_id():
+    global tg_id
+    data = request.get_json()  # Получаем данные из запроса
+    tg_id = data.get("tg_id")  # Извлекаем Telegram ID
+
+    # Возвращаем ответ клиенту
+    return tg_id
 
 
 
