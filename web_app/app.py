@@ -71,7 +71,6 @@ def save_link():
     data = request.get_json()  # Получаем данные из запроса
     user_id = data.get("tg_id")
     tg_link = data.get("link")
-    print(tg_link)
     conn = get_db_connection()
     conn.execute("""
             UPDATE orders
