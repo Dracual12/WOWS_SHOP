@@ -31,7 +31,7 @@ def save_tg_id():
     tg_id = data.get("tg_id")  # Извлекаем Telegram ID
     print(tg_id)
     conn = get_db_connection()
-    req = conn.execute("INSERT INTO orders user_id VALUES (?)", (tg_id,))
+    req = conn.execute("INSERT INTO orders (user_id) VALUES (?)", (tg_id,))
     conn.commit()
     req2 = conn.execute("SELECT * FROM orders").fetchall()
     print(req2)
