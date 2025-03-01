@@ -162,16 +162,18 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         popup.querySelector(".confirm-btn").addEventListener("click", () => {
+            const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+            fetch('/api/order/end', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telegram_id: userId })
+            }
             // Закрываем Telegram Web App
             if (window.Telegram && window.Telegram.WebApp) {
                 window.Telegram.WebApp.close();
-            const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+
             }
-            fetch('/api/order/end', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ telegram_id: userId })
-        })
+
         });
     }
 });

@@ -76,9 +76,6 @@ def save_link():
             WHERE user_id = ?
         """, (tg_link, user_id))
     conn.commit()
-    res = conn.execute("SELECT * FROM orders").fetchall()
-    for e in res:
-        print(dict(e))
     conn.close()
 
     return jsonify({'message': "cool"})
