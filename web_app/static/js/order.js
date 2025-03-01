@@ -99,7 +99,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert("Введите ссылку для связи в Telegram!");
                 return;
             }
-            alert("Ссылка для связи: " + telegramLink);
+            if (window.Telegram && window.Telegram.WebApp) {
+                const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+                // Выводим Telegram ID в консоль сервера, отправив его через fetch
+                 fetch("/save_tg_link", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ tg_id: userId, link: telegramLink}),
+                })}
             popup.remove();
 
             // После ввода ссылки, запрашиваем с сервера последнюю запись заказа для текущего Telegram ID

@@ -66,6 +66,25 @@ def save_otp():
     return jsonify({'message': "cool"})
 
 
+@app.route('/save-otp', methods=['POST'])
+def save_link():
+    data = request.get_json()  # Получаем данные из запроса
+    user_id = data.get("tg_id")
+    tg_link = data.get("link")
+    conn = get_db_connection()
+    conn.execute("""
+            UPDATE orders
+            SET telegram_link = ?
+            WHERE user_id = ?
+        """, (tg_link, user_id))
+    conn.commit()
+    res = conn.execute("SELECT * FROM orders").fetchall()
+    for e in res:
+        print(dict(e))
+    conn.close()
+
+    return jsonify({'message': "cool"})
+
 @app.route('/api/order/latest', methods=['POST'])
 def get_latest_order():
     data = request.get_json()
