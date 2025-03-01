@@ -36,7 +36,7 @@ def save_tg_id():
     req2 = conn.execute("SELECT * FROM orders").fetchall()
     print(req2)
     conn.close()
-
+    return jsonify({'message': "cool"})
 
 
 @app.route('/api/order/latest', methods=['POST'])
