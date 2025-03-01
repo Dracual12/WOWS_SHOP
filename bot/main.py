@@ -29,7 +29,7 @@ async def get_link(user):
     await bot.send_message(user, url)
 
 
-bot = Bot(token=bot.config.BOT_TOKEN)
+botik = Bot(token=bot.config.BOT_TOKEN)
 
 dp = Dispatcher()
 
@@ -39,7 +39,7 @@ async def send_welcome(message: types.Message):
     add_user(telegram_id)
     with open(f"{os.getcwd()}/assets/welcome.jpeg", "rb") as image:
         photo = FSInputFile(f"{os.getcwd()}/assets/welcome.jpeg")
-        await bot.send_photo(
+        await botik.send_photo(
             chat_id=message.chat.id,
             photo=photo,
             caption=(
@@ -71,12 +71,12 @@ def main_menu():
 
 
 async def send_link(message:types.Message):
-    await bot.send_message(chat_id=message.from_user.id, text=f'Ссфылка на оплату: {get_link()}')
+    await botik.send_message(chat_id=message.from_user.id, text=f'Ссфылка на оплату: {get_link()}')
 
 
 
 async def main():
     print("Bot is running...")
-    await dp.start_polling(bot)
+    await dp.start_polling(botik)
 
 asyncio.run(main())
