@@ -42,6 +42,7 @@ def save_tg_id():
 
 def format_order_summary(order_items):
     # Итоговая стоимость
+    print(order_items)
     total_sum = sum(int(item['total']) for item in order_items)
 
     # Формируем текст для каждого товара
