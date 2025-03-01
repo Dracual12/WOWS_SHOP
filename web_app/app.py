@@ -30,8 +30,12 @@ def save_tg_id():
     data = request.get_json()  # Получаем данные из запроса
     tg_id = data.get("tg_id")  # Извлекаем Telegram ID
     print(tg_id)
-    # Возвращаем ответ клиенту
-    return jsonify({"message": f"Telegram ID {tg_id} сохранён"})
+    conn = get_db_connection()
+    req = conn.execute("INSERT INTO orders user_id=?", (tg_id,))
+    conn.commit()
+    req2 = conn.execute("SELECT * FROM orders").fetchall()
+    print(req2)
+    conn.close()
 
 
 

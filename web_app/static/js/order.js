@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     checkoutButton.addEventListener("click", async () => {
     if (window.Telegram && window.Telegram.WebApp) {
         const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+        // Выводим Telegram ID в консоль сервера, отправив его через fetch
          fetch("/save-tg-id", {
             method: "POST",
             headers: {
@@ -11,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             body: JSON.stringify({ tg_id: userId }),
         })}
-        // Выводим Telegram ID в консоль сервера, отправив его через fetch
+
 
 
 
