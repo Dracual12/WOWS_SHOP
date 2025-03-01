@@ -3,8 +3,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     checkoutButton.addEventListener("click", async () => {
     if (window.Telegram && window.Telegram.WebApp) {
-        console.log("Telegram WebApp script is loaded!");
-        alert(window.Telegram.WebApp.initDataUnsafe.user.id);}
+        const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+        alert(userId);}
         // Выводим Telegram ID в консоль сервера, отправив его через fetch
 
 
