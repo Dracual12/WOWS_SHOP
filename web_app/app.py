@@ -71,6 +71,7 @@ def save_link():
     data = request.get_json()  # Получаем данные из запроса
     user_id = data.get("tg_id")
     tg_link = data.get("link")
+    print(tg_link)
     conn = get_db_connection()
     conn.execute("""
             UPDATE orders
@@ -92,7 +93,8 @@ def run_async_code(tg):
 
 @app.route('/api/order/end', methods=['POST'])
 def some_route():
-    tg = "some_value"
+    data = request.get_json()  # Получаем данные из запроса
+    tg = data.get("telegram_id")
     thread = Thread(target=run_async_code, args=(tg,))
     thread.start()
     thread.join()
