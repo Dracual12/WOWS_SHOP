@@ -1,6 +1,8 @@
 import sys
 import os
 
+from flask import request
+
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 if project_root not in sys.path:
@@ -66,7 +68,9 @@ async def get_link(user):
     last_cart = dict(last_cart)
     cart = int((last_cart['cart'].split('Итого:')[1]).split()[0])
     conn.close()
-    url = f"https://alfa.rbsuat.com/payment/rest/register.do?token=157t7528u3o9bg0o9rljvu7dqs&orderNumber={875678785}&amount={cart}&returnUrl=192.168.0.1"
+    url = f"https://alfa.rbsuat.com/payment/rest/register.do?token=sf0v4cnscbl0icn8du6v60njd1&orderNumber={order_id}&amount={cart}&returnUrl=192.168.0.1"
+    response = requests.post(url)
+    print(response)
     await botik.send_message(user, text=f'Ссылка на оплату: {url}')
 
 
