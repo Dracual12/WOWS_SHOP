@@ -24,11 +24,10 @@ async def get_link(user):
     conn = get_db_connection()
     last_order = conn.execute('SELECT id FROM orders WHERE user_id = ?', (user,)).fetchone()
     order_id = int(dict(last_order)['id'])
-    print(order_id)
     last_cart = conn.execute('SELECT cart FROM orders ORDER BY id DESC LIMIT 1').fetchone()
     last_cart = dict(last_cart)
     print(last_cart)
-    cart = int(last_cart['cart']['total'])
+    cart = int((last_cart['cart'].split('Итого:')[1]).split()[0])
     print(cart)
     conn.close()
     url = f"https://alfa.rbsuat.com/payment/rest/register.do?token=157t7528u3o9bg0o9rljvu7dqs&orderNumber={order_id}&amount={cart}&returnUrl=192.168.0.1"
