@@ -26,8 +26,10 @@ async def get_link(user):
     order_id = int(dict(last_order)['id'])
     print(order_id)
     last_cart = conn.execute('SELECT cart FROM orders ORDER BY id DESC LIMIT 1').fetchone()
+    last_cart = dict(last_cart)
     print(last_cart)
     cart = int(last_cart['cart']['total'])
+    print(cart)
     conn.close()
     url = f"https://alfa.rbsuat.com/payment/rest/register.do?token=157t7528u3o9bg0o9rljvu7dqs&orderNumber={order_id}&amount={cart}&returnUrl=192.168.0.1"
     await botik.send_message(user, url)
