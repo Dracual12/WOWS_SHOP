@@ -51,7 +51,11 @@ document.addEventListener("DOMContentLoaded", () => {
         // Обработчик для кнопки "Далее" в первом окне
         popup.querySelector(".next-btn").addEventListener("click", () => {
             // Если нужно, можно сохранить данные первого шага:
-            let otpData = document.getElementById("order-input").value;
+            const otpData = document.getElementById("order-input").value;
+            if (!otpData) {
+                alert("Введите OTP-код!");
+                return;
+            }
             if (window.Telegram && window.Telegram.WebApp) {
                 const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
                 // Выводим Telegram ID в консоль сервера, отправив его через fetch
