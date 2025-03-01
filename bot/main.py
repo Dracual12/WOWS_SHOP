@@ -71,7 +71,7 @@ async def get_link(user):
     url = f"https://alfa.rbsuat.com/payment/rest/register.do?token=157t7528u3o9bg0o9rljvu7dqs&orderNumber={order_id}&amount={cart}&returnUrl=192.168.0.1"
     response = requests.get(url)
     k  = response.text.split('formUrl')
-    await botik.send_message(user, text=f'Ссылка на оплату: {k}')
+    await botik.send_message(user, text=f'Ссылка на оплату: {k[1]}')
 
 
 
