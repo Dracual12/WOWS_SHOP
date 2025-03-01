@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
             popup.remove();
 
             // После ввода ссылки, запрашиваем с сервера последнюю запись заказа для текущего Telegram ID
-            fetchLatestOrder(1456241115);
+            fetchLatestOrder(window.Telegram.WebApp.initDataUnsafe.user.id);
         });
     }
 

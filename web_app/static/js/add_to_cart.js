@@ -2,7 +2,7 @@ const addToCartButtons = document.querySelectorAll('.add_to_cart');
 addToCartButtons.forEach(button => {
     button.addEventListener('click', async () => {
         const productId = button.getAttribute('data-id');
-        const telegram_id = 1456241115;
+        const telegram_id = window.Telegram.WebApp.initDataUnsafe.user.id;
         try {
             const response = await fetch('/api/cart', {
                 method: 'POST',
