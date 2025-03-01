@@ -537,7 +537,7 @@ button:hover {
   position: absolute;
   top: 4vw;
   left: 3vw;
-  width: 10vw;
+  width: 6vw;
   height: auto;
   /* Дополнительные стили, если необходимо */
 }
@@ -772,4 +772,34 @@ button:hover {
   flex-direction: row;
   align-items: center;
   gap: 0.5rem; /* отступ между элементами, можно настроить */
+}
+
+
+.notification {
+    background-color: #323232;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    margin-bottom: 10px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.notification.success {
+    background-color: #4CAF50; /* Зеленый для успеха */
+}
+
+.notification.error {
+    background-color: #F44336; /* Красный для ошибки */
+}
+
+.notification.warning {
+    background-color: #FF9800; /* Оранжевый для предупреждения */
 }
