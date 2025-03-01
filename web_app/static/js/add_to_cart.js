@@ -15,9 +15,6 @@ async function handleAddToCart() {
 // Добавляем обработчики событий
 const addToCartButtons = document.querySelectorAll('.add_to_cart');
 addToCartButtons.forEach(button => {
-    // Удаляем старые обработчики (если они есть)
-    button.removeEventListener('click', handleAddToCart);
-    // Добавляем новый обработчик
     button.addEventListener('click', handleAddToCart);
 });
 
