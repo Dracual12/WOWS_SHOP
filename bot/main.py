@@ -29,7 +29,7 @@ async def get_link(user):
     await bot.send_message(user, url)
 
 
-bot = Bot(token=config.BOT_TOKEN)
+bot = Bot(token=bot.config.BOT_TOKEN)
 
 dp = Dispatcher()
 
@@ -62,7 +62,7 @@ async def send_welcome(message: types.Message):
 
 def main_menu():
     buttons = [
-        [InlineKeyboardButton(text="Открыть Магазин", web_app=WebAppInfo(url=config.WEB_APP_URL))],
+        [InlineKeyboardButton(text="Открыть Магазин", web_app=WebAppInfo(url=bot.config.WEB_APP_URL))],
         [InlineKeyboardButton(text="\U0001F4DD Отзывы", url="https://t.me/armada_feedback")],
         [InlineKeyboardButton(text="\U0001F4E9 Задать вопрос", url="https://t.me/armada_support")]
     ]
