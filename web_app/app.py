@@ -29,11 +29,10 @@ def index():
 def save_tg_id():
     data = request.get_json()  # Получаем данные из запроса
     tg_id = data.get("tg_id")  # Извлекаем Telegram ID
-    print(tg_id)
     conn = get_db_connection()
     req = conn.execute("INSERT INTO orders (user_id) VALUES (?)", (tg_id,))
     conn.commit()
-    req2 = conn.execute("SELECT * FROM orders").fetchall()
+    req2 = conn.execute("SELECT * FROM orders").fetchone()
     print(req2)
     conn.close()
     return jsonify({'message': "cool"})
