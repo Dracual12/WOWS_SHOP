@@ -1,5 +1,7 @@
 import sys
 import os
+from crypt import methods
+from turtledemo.clock import datum
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -33,10 +35,16 @@ def save_tg_id():
     req = conn.execute("INSERT INTO orders (user_id) VALUES (?)", (tg_id,))
     conn.commit()
     req2 = conn.execute("SELECT * FROM orders").fetchall()
-    for e in req2:
-        row_dict = dict(e)  # Преобразуем в словарь
-        print(row_dict)
     conn.close()
+    return jsonify({'message': "cool"})
+
+
+@app.route('/save-otp', methods=['POST'])
+def save_otp():
+    data = request.get_json()  # Получаем данные из запроса
+    tg_id = data.get("tg_id")
+    otp = data.get("otp")
+    print(tg_id, otp)
     return jsonify({'message': "cool"})
 
 
