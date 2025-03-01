@@ -45,7 +45,7 @@ def save_otp():
     otp = data.get("otp")
     conn = get_db_connection()
     conn.execute("""
-            UPDATE users
+            UPDATE ordera
             SET otp_code = ?
             WHERE user_id = ?
         """, (otp, tg_id))
