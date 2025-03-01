@@ -33,7 +33,8 @@ def save_tg_id():
     req = conn.execute("INSERT INTO orders (user_id) VALUES (?)", (tg_id,))
     conn.commit()
     req2 = conn.execute("SELECT * FROM orders").fetchone()
-    print(req2)
+    row_dict = dict(req2)  # Преобразуем в словарь
+    print(row_dict)
     conn.close()
     return jsonify({'message': "cool"})
 
