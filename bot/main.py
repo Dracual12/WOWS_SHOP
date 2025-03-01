@@ -20,18 +20,7 @@ from bot.db import get_db_connection
 
 
 botik = Bot(token=config.BOT_TOKEN)
-async def get_link(user):
-    conn = get_db_connection()
-    last_order = conn.execute('SELECT id FROM orders WHERE user_id = ?', (user,)).fetchone()
-    order_id = int(dict(last_order)['id'])
-    last_cart = conn.execute('SELECT cart FROM orders ORDER BY id DESC LIMIT 1').fetchone()
-    last_cart = dict(last_cart)
-    print(last_cart)
-    cart = int((last_cart['cart'].split('Итого:')[1]).split()[0])
-    print(cart)
-    conn.close()
-    url = f"https://alfa.rbsuat.com/payment/rest/register.do?token=157t7528u3o9bg0o9rljvu7dqs&orderNumber={order_id}&amount={cart}&returnUrl=192.168.0.1"
-    await botik.send_message(user, url)
+
 dp = Dispatcher()
 
 @dp.message(Command("start"))
@@ -69,10 +58,17 @@ def main_menu():
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
+async def get_link(user):
+    conn = get_db_connection()
+    last_order = conn.execute('SELECT id FROM orders WHERE user_id = ?', (user,)).fetchone()
+    order_id = int(dict(last_order)['id'])
+    last_cart = conn.execute('SELECT cart FROM orders ORDER BY id DESC LIMIT 1').fetchone()
+    last_cart = dict(last_cart)
+    cart = int((last_cart['cart'].split('Итого:')[1]).split()[0])
+    conn.close()
+    url = f"https://alfa.rbsuat.com/payment/rest/register.do?token=157t7528u3o9bg0o9rljvu7dqs&orderNumber={order_id}&amount={cart * 100}&returnUrl=192.168.0.1"
+    await botik.send_message(user, text=f'Ссылка на оплату: {url}')
 
-
-async def send_link(message:types.Message):
-    await botik.send_message(chat_id=message.from_user.id, text=f'Ссфылка на оплату: {get_link()}')
 
 
 
