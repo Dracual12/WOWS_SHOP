@@ -9,17 +9,7 @@ async function handleAddToCart() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ product_id: productId, quantity: 1, telegram_id: telegram_id }),
         });
-
-        if (!response.ok) {
-            const error = await response.json();
-            showNotification(`Ошибка: ${error.error}`, 'error');
-        } else {
-            showNotification('Товар успешно добавлен в корзину!', 'success');
-        }
-    } catch (err) {
-        console.error('Ошибка при добавлении в корзину:', err);
-        showNotification('Ошибка при добавлении в корзину', 'error');
-    }
+        showNotification('Товар успешно добавлен в корзину!', 'success');
 }
 
 // Добавляем обработчики событий
