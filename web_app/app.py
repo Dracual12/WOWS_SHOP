@@ -196,7 +196,7 @@ def get_cart():
 @app.route('/api/cart/<int:product_id>', methods=['PUT'])
 def update_cart_quantity(product_id):
     data = request.get_json()
-    user = 1456241115
+    user = data.get('tg')
     quantity = data.get('quantity')
 
     if not quantity or quantity < 1:
@@ -211,11 +211,10 @@ def update_cart_quantity(product_id):
 
 
 
-@app.route('/api/cart/<int:product_id>', methods=['DELETE'])
-def delete_cart_item(product_id):
-    user = 1456241115
+@app.route('/api/cart/<int:tgId>/<int:product_id>', methods=['DELETE'])
+def delete_cart_item(tgId, product_id):
     conn = get_db_connection()
-    conn.execute('DELETE FROM cart WHERE user_id = ?', (user,))
+    conn.execute('DELETE FROM cart WHERE user_id = ?', (tgId,))
     conn.commit()
     conn.close()
 

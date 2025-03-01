@@ -76,10 +76,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Функция обновления количества товара
     function updateCartQuantity(productId, newQuantity, li) {
+        const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
         fetch(`/api/cart/${productId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ quantity: newQuantity }),
+            body: JSON.stringify({ quantity: newQuantity, tg: tgId }),
         })
             .then(response => {
                 if (!response.ok) {
@@ -97,7 +98,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Функция удаления товара из корзины
     function removeCartItem(productId, li) {
-        fetch(`/api/cart/${productId}`, {
+        const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
+        fetch(`/api/cart/${tgId}/${productId}`, {
             method: 'DELETE',
         })
             .then(response => {
