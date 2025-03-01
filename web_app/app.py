@@ -63,7 +63,7 @@ def save_otp():
     return jsonify({'message': "cool"})
 
 
-@app.route('/save-link', methods=['POST'])
+@app.route('/save_tg_link', methods=['POST'])
 def save_link():
     data = request.get_json()  # Получаем данные из запроса
     user_id = data.get("tg_id")
