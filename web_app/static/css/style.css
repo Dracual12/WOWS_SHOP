@@ -340,16 +340,16 @@ button:hover {
   border-radius: 50%;
   padding: 0.5vw;
   cursor: pointer;
-  width: 5vw;
-  height: 5vw;
+  width: 6vw;
+  height: 6vw;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
 }
 .popup-message .close-btn img {
-  width: 5vw;
-  height: 5vw;
+  width: 6vw;
+  height: 6vw;
   display: block;
 }
 .hidden {
