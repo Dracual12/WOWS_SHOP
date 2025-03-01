@@ -1,6 +1,7 @@
 import sys
 import os
 import json
+from bot.main import get_link
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -81,6 +82,15 @@ def save_link():
     conn.close()
 
     return jsonify({'message': "cool"})
+
+@app.route('/api/order/end', methods=['POST'])
+def end():
+    data = request.get_json()
+    tg = data['telegram_id']
+    get_link(tg)
+
+
+
 
 @app.route('/api/order/latest', methods=['POST'])
 def get_latest_order():

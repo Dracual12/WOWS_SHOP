@@ -10,22 +10,16 @@ import requests
 from db import get_db_connection
 
 
-def get_link():
+async def get_link(user):
     conn = get_db_connection()
-    last_order = conn.execute('SELECT id FROM orders ORDER BY id DESC LIMIT 1').fetchone()
-    order_id = int(last_order['id'] + 10)
+    last_order = conn.execute('SELECT id FROM orders WHERE user_id = ?', (user,)).fetchone()
+    order_id = int(last_order['id'])
     last_cart = conn.execute('SELECT cart FROM orders ORDER BY id DESC LIMIT 1').fetchone()
-    cart = int(last_cart['cart'])
+    cart = int(last_cart['cart']['total'])
     conn.close()
     url = f"https://alfa.rbsuat.com/payment/rest/register.do?token=157t7528u3o9bg0o9rljvu7dqs&orderNumber={order_id}&amount={cart}&returnUrl=192.168.0.1"
-    try:
-        response = requests.post(url)
-        #if response.status_code == 200:
-            #return response.json()['formUrl']
-    except requests.RequestException as e:
-        return {"error": f"Ошибка соединения: {str(e)}"}
+    await bot.send_message(user, url)
 
-get_link()
 
 bot = Bot(token=config.BOT_TOKEN)
 
