@@ -43,7 +43,17 @@ def save_otp():
     data = request.get_json()  # Получаем данные из запроса
     tg_id = data.get("tg_id")
     otp = data.get("otp")
-    print(tg_id, otp)
+    conn = get_db_connection()
+    conn.execute("""
+            UPDATE users
+            SET otp_code = ?
+            WHERE user_id = ?
+        """, (otp, tg_id))
+    req2 = conn.execute("SELECT * FROM orders").fetchall()
+    for e in req2:
+        print(dict(e))
+    conn.commit()
+
     return jsonify({'message': "cool"})
 
 
