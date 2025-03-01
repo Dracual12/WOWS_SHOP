@@ -23,6 +23,7 @@ botik = Bot(token=config.BOT_TOKEN)
 async def get_link(user):
     conn = get_db_connection()
     last_order = conn.execute('SELECT id FROM orders WHERE user_id = ?', (user,)).fetchone()
+    print(last_order)
     order_id = int(last_order['id'])
     last_cart = conn.execute('SELECT cart FROM orders ORDER BY id DESC LIMIT 1').fetchone()
     cart = int(last_cart['cart']['total'])
