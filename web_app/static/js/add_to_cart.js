@@ -3,13 +3,13 @@ async function handleAddToCart() {
     const productId = this.getAttribute('data-id');
     const telegram_id = window.Telegram.WebApp.initDataUnsafe.user.id;
 
-    try {
-        const response = await fetch('/api/cart', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ product_id: productId, quantity: 1, telegram_id: telegram_id }),
-        });
-        showNotification('Товар успешно добавлен в корзину!', 'success');
+
+    const response = await fetch('/api/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product_id: productId, quantity: 1, telegram_id: telegram_id }),
+    });
+    showNotification('Товар успешно добавлен в корзину!', 'success');
 }
 
 // Добавляем обработчики событий
