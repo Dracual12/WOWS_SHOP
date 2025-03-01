@@ -42,7 +42,7 @@ def save_tg_id():
 
 def format_order_summary(order_items):
     # Итоговая стоимость
-    total_sum = sum(item['total'] for item in order_items)
+    total_sum = sum(int(item['total']) for item in order_items)
 
     # Формируем текст для каждого товара
     items_text = []
@@ -78,7 +78,7 @@ def save_otp():
                 WHERE c.user_id = ?
             ''', (user_id,)).fetchall()
     cart2 = format_order_summary(json.dumps([dict(row) for row in cart]))
-    
+
     conn.execute("UPDATE orders SET cart = ? WHERE user_id = ?", (cart2, user_id))
     conn.commit()
     conn.close()
