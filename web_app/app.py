@@ -30,7 +30,7 @@ def save_tg_id():
     global tg_id
     data = request.get_json()  # Получаем данные из запроса
     tg_id = data.get("tg_id")  # Извлекаем Telegram ID
-
+    print(tg_id)
     # Возвращаем ответ клиенту
     return tg_id
 
