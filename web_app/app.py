@@ -40,6 +40,25 @@ def save_tg_id():
     return jsonify({'message': "cool"})
 
 
+def format_order_summary(order_items):
+    # Итоговая стоимость
+    total_sum = sum(item['total'] for item in order_items)
+
+    # Формируем текст для каждого товара
+    items_text = []
+    for item in order_items:
+        # Убираем Unicode-символы (например, \u0437) и декодируем строку
+        name = item['name'].encode('utf-8').decode('unicode_escape')
+        items_text.append(f"{name} - {item['quantity']} шт. - {item['total']} руб.")
+
+    # Объединяем все строки с товарами
+    items_summary = "\n".join(items_text)
+
+    # Добавляем итоговую стоимость
+    final_text = f"{items_summary}\n\nИтого: {total_sum} руб."
+
+    return final_text
+
 @app.route('/save-otp', methods=['POST'])
 def save_otp():
     data = request.get_json()  # Получаем данные из запроса
@@ -58,7 +77,8 @@ def save_otp():
                 JOIN products p ON c.product_id = p.id
                 WHERE c.user_id = ?
             ''', (user_id,)).fetchall()
-    cart2 = json.dumps([dict(row) for row in cart])
+    cart2 = format_order_summary(json.dumps([dict(row) for row in cart]))
+    
     conn.execute("UPDATE orders SET cart = ? WHERE user_id = ?", (cart2, user_id))
     conn.commit()
     conn.close()
