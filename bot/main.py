@@ -10,7 +10,7 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo, FSInputFile
 from aiogram.filters import Command
 import asyncio
-import config
+import bot.config
 import os
 from db import add_user
 import requests
