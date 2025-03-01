@@ -1,6 +1,8 @@
+import asyncio
 import sys
 import os
 import json
+from threading import Thread
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -80,11 +82,21 @@ def save_link():
 
     return jsonify({'message': "cool"})
 
+
+def run_async_code(tg):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    result = loop.run_until_complete(get_link(tg))
+    loop.close()
+    return result
+
 @app.route('/api/order/end', methods=['POST'])
-def end():
-    data = request.get_json()
-    tg = data['telegram_id']
-    get_link(tg)
+def some_route():
+    tg = "some_value"
+    thread = Thread(target=run_async_code, args=(tg,))
+    thread.start()
+    thread.join()
+    return "Запрос выполнен"
 
 
 
