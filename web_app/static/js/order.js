@@ -161,17 +161,39 @@ document.addEventListener("DOMContentLoaded", () => {
             popup.remove();
         });
 
-        popup.querySelector(".confirm-btn").addEventListener("click", () => {
-            // Закрываем Telegram Web App
+        popup.querySelector(".confirm-btn").addEventListener("click", async () => {
+    // Проверяем, что Telegram Web App инициализирован
             if (window.Telegram && window.Telegram.WebApp) {
-                window.Telegram.WebApp.close();
-            const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+                // Проверяем, что initDataUnsafe.user существует
+                const user = window.Telegram.WebApp.initDataUnsafe.user;
+                if (user && user.id) {
+                    const userId = user.id;
+
+                    try {
+                        // Отправляем запрос на сервер
+                        const response = await fetch('/api/order/end', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ telegram_id: userId })
+                        });
+
+                        // Проверяем, что запрос выполнен успешно
+                        if (response.ok) {
+                            console.log('Запрос выполнен успешно');
+                            // Закрываем Telegram Web App
+                            window.Telegram.WebApp.close();
+                        } else {
+                            console.error('Ошибка при выполнении запроса:', response.statusText);
+                        }
+                    } catch (error) {
+                        console.error('Ошибка при отправке запроса:', error);
+                    }
+                } else {
+                    console.error('Пользователь не определен в initDataUnsafe');
+                }
+            } else {
+                console.error('Telegram Web App не инициализирован');
             }
-            fetch('/api/order/end', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ telegram_id: userId })
-        })
         });
     }
 });
