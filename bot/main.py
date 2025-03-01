@@ -10,7 +10,7 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo, FSInputFile
 from aiogram.filters import Command
 import asyncio
-import bot.config
+import bot.config as config
 import os
 from bot.db import add_user
 import requests
@@ -18,6 +18,8 @@ import requests
 from bot.db import get_db_connection
 
 
+
+botik = Bot(token=config.BOT_TOKEN)
 async def get_link(user):
     conn = get_db_connection()
     last_order = conn.execute('SELECT id FROM orders WHERE user_id = ?', (user,)).fetchone()
@@ -26,11 +28,7 @@ async def get_link(user):
     cart = int(last_cart['cart']['total'])
     conn.close()
     url = f"https://alfa.rbsuat.com/payment/rest/register.do?token=157t7528u3o9bg0o9rljvu7dqs&orderNumber={order_id}&amount={cart}&returnUrl=192.168.0.1"
-    await bot.send_message(user, url)
-
-
-botik = Bot(token=bot.config.BOT_TOKEN)
-
+    await botik.send_message(user, url)
 dp = Dispatcher()
 
 @dp.message(Command("start"))
@@ -62,7 +60,7 @@ async def send_welcome(message: types.Message):
 
 def main_menu():
     buttons = [
-        [InlineKeyboardButton(text="Открыть Магазин", web_app=WebAppInfo(url=bot.config.WEB_APP_URL))],
+        [InlineKeyboardButton(text="Открыть Магазин", web_app=WebAppInfo(url=config.WEB_APP_URL))],
         [InlineKeyboardButton(text="\U0001F4DD Отзывы", url="https://t.me/armada_feedback")],
         [InlineKeyboardButton(text="\U0001F4E9 Задать вопрос", url="https://t.me/armada_support")]
     ]
@@ -75,8 +73,6 @@ async def send_link(message:types.Message):
 
 
 
-async def main():
+if __name__ == '__main__':
     print("Bot is running...")
-    await dp.start_polling(botik)
-
-asyncio.run(main())
+    dp.start_polling(botik)
