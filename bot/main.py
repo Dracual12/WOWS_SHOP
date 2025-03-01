@@ -26,6 +26,7 @@ async def get_link(user):
     print(last_order)
     order_id = int(last_order['id'])
     last_cart = conn.execute('SELECT cart FROM orders ORDER BY id DESC LIMIT 1').fetchone()
+    print(last_cart)
     cart = int(last_cart['cart']['total'])
     conn.close()
     url = f"https://alfa.rbsuat.com/payment/rest/register.do?token=157t7528u3o9bg0o9rljvu7dqs&orderNumber={order_id}&amount={cart}&returnUrl=192.168.0.1"
