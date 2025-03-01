@@ -61,12 +61,12 @@ def main_menu():
 async def get_link(user):
     conn = get_db_connection()
     last_order = conn.execute('SELECT id FROM orders WHERE user_id = ?', (user,)).fetchone()
-    order_id = int(dict(last_order)['id']) + 25000
+    order_id = int(dict(last_order)['id']) + 100000
     last_cart = conn.execute('SELECT cart FROM orders ORDER BY id DESC LIMIT 1').fetchone()
     last_cart = dict(last_cart)
     cart = int((last_cart['cart'].split('Итого:')[1]).split()[0])
     conn.close()
-    url = f"https://alfa.rbsuat.com/payment/rest/register.do?token=157t7528u3o9bg0o9rljvu7dqs&orderNumber={order_id}&amount={cart * 100}&returnUrl=192.168.0.1"
+    url = f"https://alfa.rbsuat.com/payment/rest/register.do?token=157t7528u3o9bg0o9rljvu7dqs&orderNumber={order_id}&amount={cart}&returnUrl=192.168.0.1"
     await botik.send_message(user, text=f'Ссылка на оплату: {url}')
 
 
