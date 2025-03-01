@@ -48,6 +48,7 @@ def save_otp():
             SET otp_code = ?
             WHERE user_id = ?
         """, (otp, user_id))
+    conn.commit()
     cart = conn.execute('''
                 SELECT p.id, p.name, c.quantity, (p.price * c.quantity) AS total
                 FROM cart c
@@ -56,11 +57,11 @@ def save_otp():
             ''', (user_id,)).fetchall()
     cart2 = json.dumps([dict(row) for row in cart])
     conn.execute("UPDATE orders SET cart = ? WHERE user_id = ?", (cart2, user_id))
+    conn.commit()
     res = conn.execute("SELECT * FROM orders").fetchall()
     for e in res:
         print(dict(e))
     conn.close()
-    conn.commit()
 
     return jsonify({'message': "cool"})
 
