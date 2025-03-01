@@ -73,6 +73,8 @@ async def send_link(message:types.Message):
 
 
 
-if __name__ == '__main__':
-    print("Bot is running...")
-    dp.start_polling(botik)
+async def main():
+    await dp.start_polling(botik)
+
+if __name__ == "__main__":
+    asyncio.run(main())
