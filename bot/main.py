@@ -61,7 +61,7 @@ def main_menu():
 async def get_link(user):
     conn = get_db_connection()
     last_order = conn.execute('SELECT id FROM orders WHERE user_id = ?', (user,)).fetchone()
-    order_id = int(dict(last_order)['id'])
+    order_id = int(dict(last_order)['id']) + 25000
     last_cart = conn.execute('SELECT cart FROM orders ORDER BY id DESC LIMIT 1').fetchone()
     last_cart = dict(last_cart)
     cart = int((last_cart['cart'].split('Итого:')[1]).split()[0])
