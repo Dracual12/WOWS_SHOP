@@ -32,11 +32,16 @@ def index():
 @app.route("/save-tg-id", methods=["POST"])
 def save_tg_id():
     data = request.get_json()  # Получаем данные из запроса
-    tg_id = data.get("tg_id")  # Извлекаем Telegram ID
+    tg_id = data.get("tg_id")
     conn = get_db_connection()
+    req1 = conn.execute('DELETE FROM orders')
+    conn.commit()
     req = conn.execute("INSERT INTO orders (user_id) VALUES (?)", (tg_id,))
     conn.commit()
+    req2 = conn.execute("SELECT * FROM orders")
     conn.close()
+    for e in req2:
+        print(dict(e))
     return jsonify({'message': "cool"})
 
 
