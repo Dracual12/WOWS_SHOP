@@ -1,6 +1,6 @@
 import sys
 import os
-
+from crypt import methods
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -33,7 +33,6 @@ def save_tg_id():
     conn = get_db_connection()
     req = conn.execute("INSERT INTO orders (user_id) VALUES (?)", (tg_id,))
     conn.commit()
-    req2 = conn.execute("SELECT * FROM orders").fetchall()
     conn.close()
     return jsonify({'message': "cool"})
 
@@ -41,17 +40,26 @@ def save_tg_id():
 @app.route('/save-otp', methods=['POST'])
 def save_otp():
     data = request.get_json()  # Получаем данные из запроса
-    tg_id = data.get("tg_id")
+    user_id = data.get("tg_id")
     otp = data.get("otp")
     conn = get_db_connection()
     conn.execute("""
             UPDATE orders
             SET otp_code = ?
             WHERE user_id = ?
-        """, (otp, tg_id))
+        """, (otp, user_id))
     req2 = conn.execute("SELECT * FROM orders").fetchall()
-    for e in req2:
+    cart = conn.execute('''
+                SELECT p.id, p.name, c.quantity, (p.price * c.quantity) AS total
+                FROM cart c
+                JOIN products p ON c.product_id = p.id
+                WHERE c.user_id = ?
+            ''', (user_id,)).fetchall()
+    conn.execute("UPDATE orders SET cart = ? WHERE user_id = ?", (cart, user_id))
+    res = conn.execute("SELECT * FROM orders").fetchall()
+    for e in res:
         print(dict(e))
+    conn.close()
     conn.commit()
 
     return jsonify({'message': "cool"})
@@ -115,7 +123,6 @@ def add_to_cart():
 def get_cart():
     conn = get_db_connection()
     user_id = request.args.get("tg_id")
-    print(user_id)
     cart = conn.execute('''
         SELECT p.id, p.name, c.quantity, (p.price * c.quantity) AS total
         FROM cart c
