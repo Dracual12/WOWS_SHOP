@@ -58,15 +58,12 @@ def save_otp():
     cart2 = json.dumps([dict(row) for row in cart])
     conn.execute("UPDATE orders SET cart = ? WHERE user_id = ?", (cart2, user_id))
     conn.commit()
-    res = conn.execute("SELECT * FROM orders").fetchall()
-    for e in res:
-        print(dict(e))
     conn.close()
 
     return jsonify({'message': "cool"})
 
 
-@app.route('/save-otp', methods=['POST'])
+@app.route('/save-link', methods=['POST'])
 def save_link():
     data = request.get_json()  # Получаем данные из запроса
     user_id = data.get("tg_id")
