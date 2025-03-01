@@ -66,7 +66,7 @@ async def get_link(user):
     last_cart = dict(last_cart)
     cart = int((last_cart['cart'].split('Итого:')[1]).split()[0])
     conn.close()
-    url = f"https://alfa.rbsuat.com/payment/rest/register.do?token=157t7528u3o9bg0o9rljvu7dqs&orderNumber={order_id}&amount={cart}&returnUrl=192.168.0.1"
+    url = f"https://alfa.rbsuat.com/payment/rest/register.do?token=157t7528u3o9bg0o9rljvu7dqs&orderNumber={875678785}&amount={cart}&returnUrl=192.168.0.1"
     await botik.send_message(user, text=f'Ссылка на оплату: {url}')
 
 
