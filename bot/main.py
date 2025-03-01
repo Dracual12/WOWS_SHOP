@@ -60,7 +60,7 @@ def main_menu():
 
 async def get_link(user):
     conn = get_db_connection()
-    last_order = conn.execute('SELECT id FROM orders WHERE user_id = ?', (user,)).fetchone()
+    last_order = conn.execute('SELECT id FROM orders WHERE user_id = ? ORDER BY id DESC LIMIT 1', (user,)).fetchone()
     order_id = int(dict(last_order)['id']) + 100000
     last_cart = conn.execute('SELECT cart FROM orders ORDER BY id DESC LIMIT 1').fetchone()
     last_cart = dict(last_cart)
