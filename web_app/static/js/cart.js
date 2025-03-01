@@ -14,12 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Функция загрузки товаров корзины
     function loadCartItems() {
         const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;  // Получаем tg_id
-        fetch('/api/cart', {
-        method: "GET",  // Используем GET для передачи тела
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ tg_id: tgId }),  // Передаём tg_id в теле запроса
+        fetch(`/api/cart?tg_id=${tgId}, {
+            method: "GET",  // Используем GET
         })
             .then(response => response.json())
             .then(cartItems => {
