@@ -66,10 +66,28 @@ def save_otp():
     user_id = data.get("tg_id")
     otp = data.get("otp")
     conn = get_db_connection()
+    UPDATE
+    my_table
+    SET
+    data = 'New Data'
+    WHERE
+    id = (
+        SELECT id
+    FROM my_table
+    WHERE user_id = 101
+    ORDER BY id DESC
+    LIMIT 1
+    );
     conn.execute("""
             UPDATE orders
             SET otp_code = ?
-            WHERE user_id = ?
+            WHERE user_id = 
+                    SELECT user_id
+                FROM orders
+                WHERE user_id = ?
+                ORDER BY id DESC
+                LIMIT 1
+                )
         """, (otp, user_id))
     conn.commit()
     cart = conn.execute('''
@@ -80,7 +98,13 @@ def save_otp():
             ''', (user_id,)).fetchall()
     cart2 = format_order_summary(json.dumps([dict(row) for row in cart]))
 
-    conn.execute("UPDATE orders SET cart = ? WHERE user_id = ?", (cart2, user_id))
+    conn.execute("""UPDATE orders SET cart = ? WHERE user_id = 
+        (SELECT user_id
+    FROM orders
+    WHERE user_id = ?
+    ORDER BY id DESC
+    LIMIT 1
+    )""", (cart2, user_id))
     conn.commit()
     conn.close()
 
@@ -96,7 +120,12 @@ def save_link():
     conn.execute("""
             UPDATE orders
             SET telegram_link = ?
-            WHERE user_id = ?
+            WHERE user_id = (SELECT user_id
+    FROM orders
+    WHERE user_id = ?
+    ORDER BY id DESC
+    LIMIT 1
+    )
         """, (tg_link, user_id))
     conn.commit()
     conn.close()
