@@ -1,7 +1,6 @@
 import sys
 import os
 
-from flask import request
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -60,6 +59,14 @@ def main_menu():
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
+def pay(link):
+    buttons =  [
+        [InlineKeyboardButton(text="Оплатить", url=link)],
+        [InlineKeyboardButton(text="Пользовательское соглашение", url="https://clck.ru/3GgzNq"),
+        InlineKeyboardButton(text="Политика конфиденциальности", url="https://clck.ru/3GHACe")]
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
 async def get_link(user):
     conn = get_db_connection()
     last_order = conn.execute('SELECT id FROM orders WHERE user_id = ? ORDER BY id DESC LIMIT 1', (user,)).fetchone()
@@ -71,7 +78,7 @@ async def get_link(user):
     url = f"https://alfa.rbsuat.com/payment/rest/register.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderNumber={order_id}&amount={cart*100}&returnUrl=192.168.0.1"
     response = requests.get(url)
     k  = response.text
-    await botik.send_message(user, text=f'Ссылка на оплату: {k}')
+    await botik.send_message(user, text=f"Нажимая <b>Оплатить</b> Вы принимаете пользовательское соглашение", reply_markup=pay(url))
 
 
 

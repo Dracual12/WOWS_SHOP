@@ -1,3 +1,9 @@
+Telegram.WebApp.ready();
+
+// Отключаем возможность закрытия жестом "pull-to-close"
+Telegram.WebApp.disableClosingConfirmation();
+
+
 document.addEventListener("DOMContentLoaded", () => {
     const checkoutButton = document.getElementById("checkout-button");
 

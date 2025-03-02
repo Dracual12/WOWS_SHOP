@@ -1,3 +1,8 @@
+Telegram.WebApp.ready();
+
+// Отключаем возможность закрытия жестом "pull-to-close"
+Telegram.WebApp.disableClosingConfirmation();
+
 document.addEventListener("DOMContentLoaded", () => {
     const searchInput = document.getElementById("search-bar");
   function blurIfOutside(event) {
