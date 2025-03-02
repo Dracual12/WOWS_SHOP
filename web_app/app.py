@@ -69,7 +69,7 @@ def save_otp():
     conn.execute("""
             UPDATE orders
             SET otp_code = ?
-            WHERE user_id = 
+            WHERE user_id = (
                     SELECT user_id
                 FROM orders
                 WHERE user_id = ?
