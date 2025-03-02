@@ -66,18 +66,6 @@ def save_otp():
     user_id = data.get("tg_id")
     otp = data.get("otp")
     conn = get_db_connection()
-    UPDATE
-    my_table
-    SET
-    data = 'New Data'
-    WHERE
-    id = (
-        SELECT id
-    FROM my_table
-    WHERE user_id = 101
-    ORDER BY id DESC
-    LIMIT 1
-    );
     conn.execute("""
             UPDATE orders
             SET otp_code = ?
