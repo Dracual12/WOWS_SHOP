@@ -75,7 +75,7 @@ async def get_link(user):
     last_cart = dict(last_cart)
     cart = int((last_cart['cart'].split('Итого:')[1]).split()[0])
     conn.close()
-    url = f"https://alfa.rbsuat.com/payment/rest/register.do?userName=r-club228829295-api&password=Gulnara18!!!&orderNumber={order_id}&amount={cart*100}&returnUrl=https://armada-wows-shop.ru/success"
+    url = f"https://payment.alfabank.ru/payment/rest/register.do?userName=r-club228829295-api&password=Gulnara18!!!&orderNumber={order_id}&amount={cart*100}&returnUrl=https://armada-wows-shop.ru/success"
     response = requests.get(url)
     k  = response.text
     print(k)
