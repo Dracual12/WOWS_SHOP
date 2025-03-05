@@ -114,7 +114,12 @@ async def check(orderId, user):
 
     conn = get_db_connection()
     if glag:
-        await botik.edit_message_text(user, conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)).fetchone()[0], 'Заказ успешно оплачен!')
+        await botik.edit_message_text(
+            chat_id=user,  # ID чата (telegram_id пользователя)
+            message_id=conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)).fetchone()[0],
+            # ID сообщения
+            text='Заказ успешно оплачен!'  # Текст сообщения (строка)
+        )
         conn.execute('UPDATE cart SET product_id = ? WHERE user_id = ?', ('', user))
         await botik.send_message(config.ADMIN_ID, 'Круто')
         conn.execute('UPDATE cart SET quantity = ? WHERE user_id = ?', ('', user))
