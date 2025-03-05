@@ -908,20 +908,20 @@ button:hover {
     justify-content: center;
     background: #42a5f5;
     border-radius: 50%;
-    width: 3vw;
-    height: 3vw;
+    width: 5vw;
+    height: 5vw;
     cursor: pointer;
 }
 
 .floating-cart-product img {
-    width: 1.8vw;
-    height: 1.8vw;
+    width: 2.5vw;
+    height: 2.5vw;
 }
 
 .cart-dropdown-product {
     position: absolute;
     right: 0;
-    top: 3.5vw;
+    top: 5vw;
     width: 50vw;
     max-width: 90vw;
     max-height: 55vw;
