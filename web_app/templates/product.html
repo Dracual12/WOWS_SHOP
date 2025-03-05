@@ -6,15 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>{{ product.name }}</title>
 </head>
 <body>
     <header>
         <a href="/" class="return-link">
             <img src="/static/images/return.png" alt="Вернуться в магазин" class="return-btn">
         </a>
+        <!-- Добавляем корзину в header -->
+        <div class="floating-cart">
+            <img src="/static/images/cart-icon.png" class="cart-icon">
+            <!-- Контейнер для выпадающей корзины -->
+            <div class="cart-dropdown">
+                <ul id="cart-items">
+                    <!-- Товары в корзине будут добавляться динамически -->
+                </ul>
+                <button id="checkout-button">Оформить заказ</button>
+            </div>
+        </div>
     </header>
-    <main>
 
+    <main>
         <img src="/{{ product.image }}" alt="{{ product.name }}" class="product-image">
 
         <div class="product-details">
@@ -32,12 +44,12 @@
 
         <button class="add_to_cart" data-id="{{ product.id }}">Добавить в корзину</button>
     </main>
+
     <!-- Контейнер для уведомлений -->
     <div id="notification-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;"></div>
 
-    <!-- Скрипты -->
+    <!-- Подключаем скрипты -->
     <script src="/static/js/add_to_cart.js"></script>
-
-
+    <script src="/static/js/cart.js"></script>
 </body>
 </html>

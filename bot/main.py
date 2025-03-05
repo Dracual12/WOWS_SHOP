@@ -1,5 +1,6 @@
 import sys
 import os
+import time
 from pyexpat.errors import messages
 
 from flask import request
@@ -81,18 +82,39 @@ async def get_link(user):
     response = requests.get(url)
     k  = response.json()
     a = k["formUrl"]
-    print(a)
     message_obj = await botik.send_message(user, text=f"Нажимая <b>Оплатить</b> Вы принимаете пользовательское соглашение", reply_markup=pay(a))
     conn = get_db_connection()
     order_message_id = conn.execute('UPDATE users SET message_id = ? WHERE telegram_id = ?', (message_obj.message_id, user))
     conn.close()
-    await check(k['orderId'])
+    await check(k['orderId'], user)
 
 
+async def check(orderId, user):
+    url = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
 
-async def check(orderId):
-   url = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
-   print(requests.get(url).text)
+    start_time = time.time()  # Запоминаем время начала
+    duration = 5 * 60  # 5 минут в секундах
+    interval = 5  # Интервал в секундах
+    glag = False
+    while time.time() - start_time < duration:
+        data = requests.get(url).json()
+        if data['OrderStatus'] == 2:
+            glag = True
+            break
+        time.sleep(interval)
+
+    conn = get_db_connection()
+    if glag:
+        await botik.edit_message_text(user, conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)).fetchone()[0], 'Заказ успешно оплачен!')
+        conn.execute('UPDATE cart SET product_id = ? WHERE user_id = ?', ('', user))
+        await botik.send_message(config.ADMIN_ID, 'Круто')
+        conn.execute('UPDATE cart SET quantity = ? WHERE user_id = ?', ('', user))
+    else:
+        await botik.edit_message_text(user, conn.execute('SELECT message_id FROM users WHERE telegram_id = ?',
+                                                         (user,)).fetchone()[0], 'Время на оплату истекло')
+        url2 = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
+        requests.get(url2)
+
 async def main():
     await dp.start_polling(botik)
 
