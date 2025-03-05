@@ -223,10 +223,11 @@ button:hover {
   background: transparent;
 }
 
-/* === Значок корзины === */
 .floating-cart {
-  position: relative;
-  left: 0;
+  position: fixed; /* Фиксированное позиционирование */
+  top: 3vh; /* Отступ сверху */
+  right: 2vw; /* Отступ справа */
+  z-index: 1000; /* Чтобы корзина была поверх других элементов */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -235,17 +236,17 @@ button:hover {
   width: 3vw;
   height: 3vw;
   cursor: pointer;
-  margin-left: 1vw;
 }
+
 .floating-cart img {
   width: 1.8vw;
   height: 1.8vw;
-}
+}}
 
 /* === Выпадающая корзина === */
 .cart-dropdown {
   position: absolute;
-  left: 0;
+  right: 0;
   top: 3.5vw;
   width: 50vw;
   max-width: 90vw;
