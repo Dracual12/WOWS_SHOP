@@ -81,8 +81,11 @@ async def get_link(user):
     url = f"https://payment.alfabank.ru/payment/rest/register.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderNumber={order_id}&amount={cart}&returnUrl=https://armada-wows-shop.ru/success"
     response = requests.get(url)
     k  = response.json()
-    print(k)
-    a = k["formUrl"]
+    if 'formUrl' in k:
+        a = k['formUrl']
+    else:
+        print("Ключ 'formUrl' отсутствует в словаре k:", k)
+        # Обработайте ситуацию, когда ключа нет
     message_obj = await botik.send_message(user, text=f"Нажимая «Оплатить» Вы принимаете пользовательское соглашение", reply_markup=pay(a))
     conn = get_db_connection()
     order_message_id = conn.execute('UPDATE users SET message_id = ? WHERE telegram_id = ?', (message_obj.message_id, user))
