@@ -245,7 +245,7 @@ button:hover {
 /* === Выпадающая корзина === */
 .cart-dropdown {
   position: absolute;
-  right: 0;
+  left: 0;
   top: 3.5vw;
   width: 50vw;
   max-width: 90vw;
