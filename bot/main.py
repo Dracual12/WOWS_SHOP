@@ -1,6 +1,8 @@
 import sys
 import os
+from pyexpat.errors import messages
 
+from flask import request
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -77,14 +79,20 @@ async def get_link(user):
     conn.close()
     url = f"https://payment.alfabank.ru/payment/rest/register.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderNumber={order_id}&amount={cart*100}&returnUrl=https://armada-wows-shop.ru/success"
     response = requests.get(url)
-    k  = response.text
-    a = k.split("formUrl")[1][2:-1]
-    b = a[1:-1]
-    await botik.send_message(user, text=f"Нажимая <b>Оплатить</b> Вы принимаете пользовательское соглашение", reply_markup=pay(b))
+    k  = response.json()
+    a = k["formUrl"]
+    print(a)
+    message_obj = await botik.send_message(user, text=f"Нажимая <b>Оплатить</b> Вы принимаете пользовательское соглашение", reply_markup=pay(b))
+    conn = get_db_connection()
+    order_message_id = conn.execute('UPDATE usere SET message_id = ? WHERE telegram_id = ?', (message_obj, user))
+    conn.close()
+    await check(k['orderId'])
 
 
 
-
+async def check(orderId):
+   url = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&{orderId}'
+   print(requests.get(url).text)
 async def main():
     await dp.start_polling(botik)
 
