@@ -107,6 +107,7 @@ async def check(orderId, user):
     glag = False
     while time.time() - start_time < duration:
         data = requests.get(url).json()
+        print(data)
         if data['OrderStatus'] == 2:
             glag = True
             break
