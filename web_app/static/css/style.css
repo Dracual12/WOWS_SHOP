@@ -225,59 +225,51 @@ button:hover {
 
 /* === Значок корзины === */
 .floating-cart {
-    position: fixed; /* Фиксированное позиционирование */
-    top: 3vh; /* Отступ сверху */
-    right: 2vw; /* Отступ справа */
-    z-index: 1000; /* Чтобы корзина была поверх других элементов */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #42a5f5;
-    border-radius: 50%;
-    width: 3vw;
-    height: 3vw;
-    cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #42a5f5;
+  border-radius: 50%;
+  width: 3vw;
+  height: 3vw;
+  cursor: pointer;
+  margin-left: 1vw;
 }
-
 .floating-cart img {
-    width: 1.8vw;
-    height: 1.8vw;
+  width: 1.8vw;
+  height: 1.8vw;
 }
 
+/* === Выпадающая корзина === */
 .cart-dropdown {
-    position: absolute;
-    right: 0;
-    top: 3.5vw;
-    width: 50vw;
-    max-width: 90vw;
-    max-height: 55vw;
-    overflow-y: auto;
-    overflow-x: hidden;
-    background-color: #2c2c2c;
-    border: 0.1vw solid #ccc;
-    border-radius: 2vw;
-    box-shadow: 0 0.5vw 0.8vw rgba(0, 0, 0, 0.3);
-    z-index: 1000;
-    padding: 1.5vw;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-2vw);
-    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
-    white-space: normal;
-    display: flex;
-    flex-direction: column;
+  position: absolute;
+  right: 0;
+  top: 3.5vw;
+  width: 50vw;
+  max-width: 90vw;
+  max-height: 55vw;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: #2c2c2c;
+  border: 0.1vw solid #ccc;
+  border-radius: 2vw;
+  box-shadow: 0 0.5vw 0.8vw rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  padding: 1.5vw;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-2vw);
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+  white-space: normal;
+  display: flex;
+  flex-direction: column;
 }
-
 .cart-dropdown.active {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
-
-
-
-
-
 
 /* === Стили для списка товаров в корзине === */
 #cart-items {
@@ -902,4 +894,98 @@ button:hover {
   .cart-dropdown2 {
     width: 70vw; /* Ширина 70% от ширины экрана */
   }
+}
+
+
+/* Стили для корзины на product.html */
+.floating-cart-product {
+    position: fixed; /* Фиксированное позиционирование */
+    top: 3vh; /* Отступ сверху */
+    right: 2vw; /* Отступ справа */
+    z-index: 1000; /* Чтобы корзина была поверх других элементов */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #42a5f5;
+    border-radius: 50%;
+    width: 3vw;
+    height: 3vw;
+    cursor: pointer;
+}
+
+.floating-cart-product img {
+    width: 1.8vw;
+    height: 1.8vw;
+}
+
+.cart-dropdown-product {
+    position: absolute;
+    right: 0;
+    top: 3.5vw;
+    width: 50vw;
+    max-width: 90vw;
+    max-height: 55vw;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-color: #2c2c2c;
+    border: 0.1vw solid #ccc;
+    border-radius: 2vw;
+    box-shadow: 0 0.5vw 0.8vw rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    padding: 1.5vw;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-2vw);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+    white-space: normal;
+    display: flex;
+    flex-direction: column;
+}
+
+.cart-dropdown-product.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Стили для списка товаров в корзине */
+#cart-items-product {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+#cart-items-product li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1vw;
+    border-bottom: 0.1vw solid #444;
+    text-align: center;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+/* Кнопка оформления заказа */
+#checkout-button-product {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 0;
+    padding: 1vw;
+    font-size: 1.1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 0.5vw;
+    background: linear-gradient(90deg, #42a5f5, #0d47a1);
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+#checkout-button-product:hover {
+    background: linear-gradient(90deg, #0d47a1, #42a5f5);
+    transform: scale(1.02);
 }

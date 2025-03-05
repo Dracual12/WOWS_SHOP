@@ -4,9 +4,9 @@ Telegram.WebApp.ready();
 Telegram.WebApp.disableClosingConfirmation();
 
 document.addEventListener('DOMContentLoaded', () => {
-    const cartItemsContainer = document.getElementById('cart-items');
-    const cartDropdown = document.querySelector('.cart-dropdown2'); // Исправлено на cart-dropdown2
-    const cartIcon = document.querySelector('.cart-icon2'); // Исправлено на cart-icon2
+    const cartItemsContainer = document.getElementById('cart-items-product');
+    const cartDropdown = document.querySelector('.cart-dropdown-product');
+    const cartIcon = document.querySelector('.cart-icon-product');
 
     // При клике по значку корзины переключаем класс "active" и загружаем товары
     cartIcon.addEventListener('click', () => {
