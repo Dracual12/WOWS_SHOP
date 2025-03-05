@@ -80,8 +80,7 @@ async def get_link(user):
     k  = response.text
     a = k.split("formUrl")[1][2:-1]
     b = a[1:-1]
-    print(b)
-    await botik.send_message(user, text=f"Нажимая <b>Оплатить</b> Вы принимаете пользовательское соглашение", reply_markup=pay(url))
+    await botik.send_message(user, text=f"Нажимая <b>Оплатить</b> Вы принимаете пользовательское соглашение", reply_markup=pay(b))
 
 
 
