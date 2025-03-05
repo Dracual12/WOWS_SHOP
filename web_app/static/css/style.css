@@ -223,55 +223,61 @@ button:hover {
   background: transparent;
 }
 
+/* === Значок корзины === */
 .floating-cart {
-  position: fixed; /* Фиксированное позиционирование */
-  top: 3vh; /* Отступ сверху */
-  right: 2vw; /* Отступ справа */
-  z-index: 1000; /* Чтобы корзина была поверх других элементов */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #42a5f5;
-  border-radius: 50%;
-  width: 3vw;
-  height: 3vw;
-  cursor: pointer;
+    position: fixed; /* Фиксированное позиционирование */
+    top: 3vh; /* Отступ сверху */
+    right: 2vw; /* Отступ справа */
+    z-index: 1000; /* Чтобы корзина была поверх других элементов */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #42a5f5;
+    border-radius: 50%;
+    width: 3vw;
+    height: 3vw;
+    cursor: pointer;
 }
 
 .floating-cart img {
-  width: 1.8vw;
-  height: 1.8vw;
-}}
+    width: 1.8vw;
+    height: 1.8vw;
+}
 
-/* === Выпадающая корзина === */
 .cart-dropdown {
-  position: absolute;
-  right: 0;
-  top: 3.5vw;
-  width: 50vw;
-  max-width: 90vw;
-  max-height: 55vw;
-  overflow-y: auto;
-  overflow-x: hidden;
-  background-color: #2c2c2c;
-  border: 0.1vw solid #ccc;
-  border-radius: 2vw;
-  box-shadow: 0 0.5vw 0.8vw rgba(0, 0, 0, 0.3);
-  z-index: 1000;
-  padding: 1.5vw;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-2vw);
-  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
-  white-space: normal;
-  display: flex;
-  flex-direction: column;
+    position: absolute;
+    right: 0;
+    top: 3.5vw;
+    width: 50vw;
+    max-width: 90vw;
+    max-height: 55vw;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-color: #2c2c2c;
+    border: 0.1vw solid #ccc;
+    border-radius: 2vw;
+    box-shadow: 0 0.5vw 0.8vw rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    padding: 1.5vw;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-2vw);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+    white-space: normal;
+    display: flex;
+    flex-direction: column;
 }
+
 .cart-dropdown.active {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 }
+
+
+
+
+
 
 /* === Стили для списка товаров в корзине === */
 #cart-items {
@@ -810,7 +816,7 @@ button:hover {
 /* Основной контейнер корзины */
 .floating-cart2 {
   position: fixed; /* Фиксированное позиционирование */
-  top: 3vh; /* Отступ сверху 2% от высоты экрана */
+  top: 2vh; /* Отступ сверху 2% от высоты экрана */
   right: 2vw; /* Отступ справа 2% от ширины экрана */
   z-index: 1000; /* Чтобы корзина была поверх других элементов */
   cursor: pointer; /* Курсор в виде указателя */
@@ -847,13 +853,6 @@ button:hover {
   display: block;
 }
 
-.cart-dropdown2 {
-    display: none; /* По умолчанию скрыто */
-}
-
-.cart-dropdown2.active {
-    display: block; /* Показываем при добавлении класса active */
-}
 /* Стили для списка товаров */
 #cart-items {
   list-style: none; /* Убираем маркеры списка */
