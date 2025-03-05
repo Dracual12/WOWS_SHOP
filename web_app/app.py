@@ -208,6 +208,30 @@ def add_to_cart():
     conn.close()
     return jsonify({"message": "Product added to cart"})
 
+@app.route('/api/cart2', methods=['POST'])
+def add_to_cart():
+    data = request.get_json()
+    telegram_id = data.get('telegram_id')
+    product_id = data.get("product_id")
+    quantity = data.get("quantity", 1)
+
+    # Проверяем, существует ли пользователь с этим Telegram ID
+    conn = get_db_connection()
+    user = conn.execute('SELECT id FROM users WHERE telegram_id = ?', (telegram_id,)).fetchone()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    user_id = telegram_id # Получаем внутренний ID пользователя
+
+    # Добавляем товар в корзину
+    conn.execute('''
+        INSERT INTO cart (user_id, product_id, quantity)
+        VALUES (?, ?, ?)
+        ON CONFLICT(user_id, product_id) DO UPDATE SET quantity = quantity + ?
+    ''', (user_id, product_id, quantity, quantity))
+    conn.commit()
+    conn.close()
+    return jsonify({"message": "Product added to cart"})
 
 
 
@@ -226,7 +250,18 @@ def get_cart():
     conn.close()
     return jsonify([dict(row) for row in cart])
 
-
+@app.route('/api/cart2', methods=['GET'])
+def get_cart():
+    conn = get_db_connection()
+    user_id = request.args.get("tg_id")
+    cart = conn.execute('''
+        SELECT p.id, p.name, c.quantity, (p.price * c.quantity) AS total
+        FROM cart c
+        JOIN products p ON c.product_id = p.id
+        WHERE c.user_id = ?
+    ''', (user_id,)).fetchall()
+    conn.close()
+    return jsonify([dict(row) for row in cart])
 
 
 @app.route('/api/cart/<int:product_id>', methods=['PUT'])
@@ -245,9 +280,33 @@ def update_cart_quantity(product_id):
 
     return jsonify({"message": "Количество товара обновлено"})
 
+@app.route('/api/cart2/<int:product_id>', methods=['PUT'])
+def update_cart_quantity(product_id):
+    data = request.get_json()
+    user = data.get('tg')
+    quantity = data.get('quantity')
 
+    if not quantity or quantity < 1:
+        return jsonify({"error": "Некорректное количество"}), 400
+
+    conn = get_db_connection()
+    conn.execute('UPDATE cart SET quantity = ? WHERE user_id = ?', (quantity, user))
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": "Количество товара обновлено"})
 
 @app.route('/api/cart/<int:tgId>/<int:product_id>', methods=['DELETE'])
+def delete_cart_item(tgId, product_id):
+    conn = get_db_connection()
+    conn.execute('DELETE FROM cart WHERE user_id = ?', (tgId,))
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": "Товар удалён из корзины"})
+
+
+@app.route('/api/cart2/<int:tgId>/<int:product_id>', methods=['DELETE'])
 def delete_cart_item(tgId, product_id):
     conn = get_db_connection()
     conn.execute('DELETE FROM cart WHERE user_id = ?', (tgId,))
