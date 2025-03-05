@@ -83,10 +83,13 @@ async def get_link(user):
     k  = response.json()
     if 'formUrl' in k:
         a = k['formUrl']
+        message_obj = await botik.send_message(user,
+                                               text=f"Нажимая «Оплатить» Вы принимаете пользовательское соглашение",
+                                               reply_markup=pay(a))
     else:
         print("Ключ 'formUrl' отсутствует в словаре k:", k)
         # Обработайте ситуацию, когда ключа нет
-    message_obj = await botik.send_message(user, text=f"Нажимая «Оплатить» Вы принимаете пользовательское соглашение", reply_markup=pay(a))
+
     conn = get_db_connection()
     order_message_id = conn.execute('UPDATE users SET message_id = ? WHERE telegram_id = ?', (message_obj.message_id, user))
     conn.close()
