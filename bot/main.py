@@ -91,7 +91,7 @@ async def get_link(user):
 
 
 async def check(orderId):
-   url = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&{orderId}'
+   url = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
    print(requests.get(url).text)
 async def main():
     await dp.start_polling(botik)
