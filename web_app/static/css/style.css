@@ -226,6 +226,7 @@ button:hover {
 /* === Значок корзины === */
 .floating-cart {
   position: relative;
+  left: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -845,6 +846,13 @@ button:hover {
   display: block;
 }
 
+.cart-dropdown2 {
+    display: none; /* По умолчанию скрыто */
+}
+
+.cart-dropdown2.active {
+    display: block; /* Показываем при добавлении класса active */
+}
 /* Стили для списка товаров */
 #cart-items {
   list-style: none; /* Убираем маркеры списка */
