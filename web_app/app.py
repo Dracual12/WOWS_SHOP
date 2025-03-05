@@ -209,7 +209,7 @@ def add_to_cart():
     return jsonify({"message": "Product added to cart"})
 
 @app.route('/api/cart2', methods=['POST'])
-def add_to_cart():
+def add_to_cart2():
     data = request.get_json()
     telegram_id = data.get('telegram_id')
     product_id = data.get("product_id")
@@ -251,7 +251,7 @@ def get_cart():
     return jsonify([dict(row) for row in cart])
 
 @app.route('/api/cart2', methods=['GET'])
-def get_cart():
+def get_cart2():
     conn = get_db_connection()
     user_id = request.args.get("tg_id")
     cart = conn.execute('''
@@ -281,7 +281,7 @@ def update_cart_quantity(product_id):
     return jsonify({"message": "Количество товара обновлено"})
 
 @app.route('/api/cart2/<int:product_id>', methods=['PUT'])
-def update_cart_quantity(product_id):
+def update_cart_quantity2(product_id):
     data = request.get_json()
     user = data.get('tg')
     quantity = data.get('quantity')
@@ -307,7 +307,7 @@ def delete_cart_item(tgId, product_id):
 
 
 @app.route('/api/cart2/<int:tgId>/<int:product_id>', methods=['DELETE'])
-def delete_cart_item(tgId, product_id):
+def delete_cart_item2(tgId, product_id):
     conn = get_db_connection()
     conn.execute('DELETE FROM cart WHERE user_id = ?', (tgId,))
     conn.commit()
