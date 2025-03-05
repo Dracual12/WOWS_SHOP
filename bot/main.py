@@ -78,7 +78,7 @@ async def get_link(user):
     url = f"https://payment.alfabank.ru/payment/rest/register.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderNumber={order_id}&amount={cart*100}&returnUrl=https://armada-wows-shop.ru/success"
     response = requests.get(url)
     k  = response.text
-    print(k.split("formUrl")[2:-1])
+    print(k, type(k))
     await botik.send_message(user, text=f"Нажимая <b>Оплатить</b> Вы принимаете пользовательское соглашение", reply_markup=pay(url))
 
 
