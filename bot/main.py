@@ -82,7 +82,7 @@ async def get_link(user):
     k  = response.json()
     a = k["formUrl"]
     print(a)
-    message_obj = await botik.send_message(user, text=f"Нажимая <b>Оплатить</b> Вы принимаете пользовательское соглашение", reply_markup=pay(b))
+    message_obj = await botik.send_message(user, text=f"Нажимая <b>Оплатить</b> Вы принимаете пользовательское соглашение", reply_markup=pay(a))
     conn = get_db_connection()
     order_message_id = conn.execute('UPDATE usere SET message_id = ? WHERE telegram_id = ?', (message_obj, user))
     conn.close()
