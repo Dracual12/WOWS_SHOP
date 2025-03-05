@@ -62,7 +62,7 @@ def format_order_summary(order_items):
     items_text = []
     for item in order_items:
         # Убираем Unicode-символы (например, \u0437) и декодируем строку
-        name = item['name'].encode('utf-16').decode('unicode_escape')
+        name = item['name'].encode('unicode_escape').decode('unicode_escape')
         items_text.append(f"{name} - {item['quantity']} шт. - {item['total']} руб.")
 
     # Объединяем все строки с товарами
