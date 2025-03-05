@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import sys
 import os
 import json
@@ -19,7 +20,19 @@ from bot.main import get_link
 
 
 app = Flask(__name__)
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
+def run_async_code(tg):
+    try:
+        # Ваш асинхронный код
+        logger.info(f"Запущен поток для telegram_id: {tg}")
+        # Пример долгой операции
+        import time
+        time.sleep(10)
+        logger.info(f"Завершен поток для telegram_id: {tg}")
+    except Exception as e:
+        logger.error(f"Ошибка в потоке для telegram_id {tg}: {e}")
 
 
 
@@ -132,10 +145,16 @@ def run_async_code(tg):
 def some_route():
     data = request.get_json()  # Получаем данные из запроса
     tg = data.get("telegram_id")
+
+    if not tg:
+        return jsonify({"error": "telegram_id is required"}), 400
+
+    # Запускаем поток без блокировки
     thread = Thread(target=run_async_code, args=(tg,))
     thread.start()
-    thread.join()
-    return "Запрос выполнен"
+
+    # Возвращаем ответ сразу после запуска потока
+    return jsonify({"message": "Запрос принят в обработку", "telegram_id": tg}), 202
 
 
 
