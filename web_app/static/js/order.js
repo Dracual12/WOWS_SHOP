@@ -188,13 +188,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         });
 
                         // Проверяем, что запрос выполнен успешно
-                        if (response.ok) {
-                            console.log('Запрос выполнен успешно');
-                            // Закрываем Telegram Web App
-                            window.Telegram.WebApp.close();
-                        } else {
-                            console.error('Ошибка при выполнении запроса:', response.statusText);
-                        }
+
+                        console.log('Запрос выполнен успешно');
+                        // Закрываем Telegram Web App
+                        window.Telegram.WebApp.close();
+
                     } catch (error) {
                         console.error('Ошибка при отправке запроса:', error);
                     }
