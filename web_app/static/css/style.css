@@ -803,3 +803,95 @@ button:hover {
 .notification.warning {
     background-color: #FF9800; /* Оранжевый для предупреждения */
 }
+
+
+/* Основной контейнер корзины */
+.floating-cart2 {
+  position: fixed; /* Фиксированное позиционирование */
+  top: 2vh; /* Отступ сверху 2% от высоты экрана */
+  right: 2vw; /* Отступ справа 2% от ширины экрана */
+  z-index: 1000; /* Чтобы корзина была поверх других элементов */
+  cursor: pointer; /* Курсор в виде указателя */
+}
+
+/* Иконка корзины */
+.cart-icon2 {
+  width: 5vw; /* Ширина иконки 5% от ширины экрана */
+  height: auto; /* Высота автоматически подстраивается */
+  transition: transform 0.3s ease; /* Плавное увеличение при наведении */
+}
+
+.cart-icon2:hover {
+  transform: scale(1.1); /* Увеличиваем иконку при наведении */
+}
+
+/* Выпадающая корзина */
+.cart-dropdown2 {
+  position: absolute;
+  top: 100%; /* Располагаем ниже иконки */
+  right: 0;
+  width: 30vw; /* Ширина 30% от ширины экрана */
+  max-width: 400px; /* Максимальная ширина */
+  background-color: #fff; /* Белый фон */
+  border: 1px solid #ccc; /* Граница */
+  border-radius: 10px; /* Закругленные углы */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Тень */
+  padding: 1rem; /* Внутренние отступы */
+  display: none; /* По умолчанию скрыта */
+}
+
+/* Показываем выпадающую корзину при наведении на иконку */
+.floating-cart2:hover .cart-dropdown2 {
+  display: block;
+}
+
+/* Стили для списка товаров */
+#cart-items {
+  list-style: none; /* Убираем маркеры списка */
+  padding: 0;
+  margin: 0;
+}
+
+#cart-items li {
+  padding: 0.5rem 0; /* Отступы для элементов списка */
+  border-bottom: 1px solid #eee; /* Разделительная линия */
+}
+
+/* Кнопка оформления заказа */
+#checkout-button {
+  width: 100%; /* Ширина кнопки 100% */
+  padding: 1vh 0; /* Отступы внутри кнопки */
+  background-color: #007bff; /* Синий цвет фона */
+  color: #fff; /* Белый текст */
+  border: none; /* Убираем границу */
+  border-radius: 5px; /* Закругленные углы */
+  cursor: pointer; /* Курсор в виде указателя */
+  font-size: 1rem; /* Размер текста */
+  margin-top: 1vh; /* Отступ сверху */
+  transition: background-color 0.3s ease; /* Плавное изменение цвета */
+}
+
+#checkout-button:hover {
+  background-color: #0056b3; /* Темно-синий цвет при наведении */
+}
+
+/* Адаптивные стили для маленьких экранов */
+@media (max-width: 768px) {
+  .cart-icon2 {
+    width: 8vw; /* Увеличиваем иконку на маленьких экранах */
+  }
+
+  .cart-dropdown2 {
+    width: 50vw; /* Ширина 50% от ширины экрана */
+  }
+}
+
+@media (max-width: 480px) {
+  .cart-icon2 {
+    width: 10vw; /* Еще больше иконка на очень маленьких экранах */
+  }
+
+  .cart-dropdown2 {
+    width: 70vw; /* Ширина 70% от ширины экрана */
+  }
+}
