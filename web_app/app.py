@@ -474,6 +474,8 @@ def view_sections():
     conn.close()
 
     return jsonify([{"id": row["id"], "name": row["name"]} for row in sections])
+
+
 @app.route('/admin/add_section', methods=['GET', 'POST'])
 def add_section():
     if request.method == 'POST':
