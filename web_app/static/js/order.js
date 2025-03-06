@@ -3,11 +3,11 @@ Telegram.WebApp.ready();
 // Отключаем возможность закрытия жестом "pull-to-close"
 Telegram.WebApp.disableClosingConfirmation();
 
-
 document.addEventListener("DOMContentLoaded", () => {
     const checkoutButton = document.getElementById("checkout-button");
     const cartItemsContainer = document.getElementById("cart-items-product");
-    checkoutButtonProduct.addEventListener("click", async () => {
+
+    checkoutButton.addEventListener("click", async () => {
         // Проверяем, есть ли товары в корзине
         const cartItems = cartItemsContainer.querySelectorAll("li");
         if (cartItems.length === 0) {
@@ -15,20 +15,17 @@ document.addEventListener("DOMContentLoaded", () => {
             return; // Прекращаем выполнение, если корзина пуста
         }
 
-    checkoutButton.addEventListener("click", async () => {
-    if (window.Telegram && window.Telegram.WebApp) {
-        const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
-        // Выводим Telegram ID в консоль сервера, отправив его через fetch
-         fetch("/save-tg-id", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ tg_id: userId }),
-        })}
-
-
-
+        if (window.Telegram && window.Telegram.WebApp) {
+            const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+            // Выводим Telegram ID в консоль сервера, отправив его через fetch
+            fetch("/save-tg-id", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ tg_id: userId }),
+            });
+        }
 
         // Закрываем окно корзины
         const cartDropdown = document.querySelector('.cart-dropdown');
@@ -37,6 +34,20 @@ document.addEventListener("DOMContentLoaded", () => {
         // Показываем всплывающее окно оформления заказа (первый шаг)
         showOrderPopup();
     });
+
+    // Функция для показа уведомления
+    function showNotification(message) {
+        const notification = document.createElement("div");
+        notification.classList.add("notification");
+        notification.textContent = message;
+
+        document.body.appendChild(notification);
+
+        // Убираем уведомление через 3 секунды
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
 
     function showOrderPopup() {
         const popup = document.createElement("div");
@@ -73,13 +84,14 @@ document.addEventListener("DOMContentLoaded", () => {
             if (window.Telegram && window.Telegram.WebApp) {
                 const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
                 // Выводим Telegram ID в консоль сервера, отправив его через fetch
-                 fetch("/save-otp", {
+                fetch("/save-otp", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ tg_id: userId, otp: otpData}),
-                })}
+                    body: JSON.stringify({ tg_id: userId, otp: otpData }),
+                });
+            }
             popup.remove();
             // Показываем второе окно для ввода ссылки Telegram
             showTelegramPopup();
@@ -120,13 +132,14 @@ document.addEventListener("DOMContentLoaded", () => {
             if (window.Telegram && window.Telegram.WebApp) {
                 const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
                 // Выводим Telegram ID в консоль сервера, отправив его через fetch
-                 fetch("/save_tg_link", {
+                fetch("/save_tg_link", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ tg_id: userId, link: telegramLink}),
-                })}
+                    body: JSON.stringify({ tg_id: userId, link: telegramLink }),
+                });
+            }
             popup.remove();
 
             // После ввода ссылки, запрашиваем с сервера последнюю запись заказа для текущего Telegram ID
@@ -140,20 +153,20 @@ document.addEventListener("DOMContentLoaded", () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ telegram_id: telegramId })
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Ошибка получения заказа");
-            }
-            return response.json();
-        })
-        .then(order => {
-            console.log("Полученный заказ:", order);
-            showOrderDetailsPopup(order);
-        })
-        .catch(error => {
-            console.error("Ошибка:", error);
-            alert("Не удалось получить данные заказа");
-        });
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Ошибка получения заказа");
+                }
+                return response.json();
+            })
+            .then(order => {
+                console.log("Полученный заказ:", order);
+                showOrderDetailsPopup(order);
+            })
+            .catch(error => {
+                console.error("Ошибка:", error);
+                alert("Не удалось получить данные заказа");
+            });
     }
 
     function showOrderDetailsPopup(order) {
@@ -180,7 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         popup.querySelector(".confirm-btn").addEventListener("click", async () => {
-    // Проверяем, что Telegram Web App инициализирован
+            // Проверяем, что Telegram Web App инициализирован
             if (window.Telegram && window.Telegram.WebApp) {
                 // Проверяем, что initDataUnsafe.user существует
                 const user = window.Telegram.WebApp.initDataUnsafe.user;
@@ -196,11 +209,13 @@ document.addEventListener("DOMContentLoaded", () => {
                         });
 
                         // Проверяем, что запрос выполнен успешно
-
-                        console.log('Запрос выполнен успешно');
-                        // Закрываем Telegram Web App
-                        window.Telegram.WebApp.close();
-
+                        if (response.ok) {
+                            console.log('Запрос выполнен успешно');
+                            // Закрываем Telegram Web App
+                            window.Telegram.WebApp.close();
+                        } else {
+                            console.error('Ошибка при выполнении запроса:', response.statusText);
+                        }
                     } catch (error) {
                         console.error('Ошибка при отправке запроса:', error);
                     }
