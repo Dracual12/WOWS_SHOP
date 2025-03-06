@@ -90,7 +90,7 @@ async def get_link(user):
         conn = get_db_connection()
         order_message_id = conn.execute('UPDATE users SET message_id = ? WHERE telegram_id = ?',
                                         (message_obj.message_id, user))
-
+        conn.commit()
         conn.close()
         await check(k['orderId'], user)
     else:
