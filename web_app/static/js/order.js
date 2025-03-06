@@ -5,7 +5,7 @@ Telegram.WebApp.disableClosingConfirmation();
 
 document.addEventListener("DOMContentLoaded", () => {
     const checkoutButton = document.getElementById("checkout-button");
-    const cartItemsContainer = document.getElementById("cart-items-product");
+    const cartItemsContainer = document.getElementById("cart-items");
 
     checkoutButton.addEventListener("click", async () => {
         // Проверяем, есть ли товары в корзине
