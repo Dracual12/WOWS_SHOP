@@ -115,7 +115,11 @@ async def check(orderId, user):
 
     conn = get_db_connection()
     if glag:
-        print(conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)).fetchall()[-1])
+        row = conn.execute('SELECT * FROM users WHERE telegram_id = ?', (user,)).fetchone()
+        if row:
+            # Преобразуем в словарь
+            row_dict = dict(row)
+            print(row_dict)
         await botik.edit_message_text(
             chat_id=user,  # ID чата (telegram_id пользователя)
             message_id=conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)).fetchone()[0],
