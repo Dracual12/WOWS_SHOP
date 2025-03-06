@@ -92,6 +92,7 @@ async def get_link(user):
         print(message_obj.message_id)
         order_message_id = conn.execute('UPDATE users SET message_id = ? WHERE telegram_id = ?',
                                         (message_obj.message_id, user))
+
         conn.close()
         await check(k['orderId'], user)
     else:
@@ -103,10 +104,9 @@ async def get_link(user):
 
 async def check(orderId, user):
     url = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
-
-    start_time = time.time()  # Запоминаем время начала
-    duration = 5 * 60  # 5 минут в секундах
-    interval = 5  # Интервал в секундах
+    start_time = time.time()
+    duration = 5 * 60
+    interval = 5
     glag = False
     while time.time() - start_time < duration:
         data = requests.get(url).json()
@@ -119,7 +119,7 @@ async def check(orderId, user):
     conn = get_db_connection()
     if glag:
         print('dcmlnsdcns')
-        print(conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)).fetchone()[0])
+        print(conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)))
         await botik.edit_message_text(
             chat_id=user,  # ID чата (telegram_id пользователя)
             message_id=conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)).fetchone()[0],
