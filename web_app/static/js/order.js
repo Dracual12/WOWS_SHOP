@@ -6,6 +6,14 @@ Telegram.WebApp.disableClosingConfirmation();
 
 document.addEventListener("DOMContentLoaded", () => {
     const checkoutButton = document.getElementById("checkout-button");
+    const cartItemsContainer = document.getElementById("cart-items-product");
+    checkoutButtonProduct.addEventListener("click", async () => {
+        // Проверяем, есть ли товары в корзине
+        const cartItems = cartItemsContainer.querySelectorAll("li");
+        if (cartItems.length === 0) {
+            showNotification("Корзина пуста!");
+            return; // Прекращаем выполнение, если корзина пуста
+        }
 
     checkoutButton.addEventListener("click", async () => {
     if (window.Telegram && window.Telegram.WebApp) {

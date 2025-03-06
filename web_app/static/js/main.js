@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div class="carousel-item">
                                 <img src="${product.image}" alt="${product.name}" class="carousel-image">
                                 <h3>${product.name}</h3>
-                                <p>${product.price} дублонов</p>
+                                <p>${product.price} рублей</p>
                             </div>
                         `).join("")}
                     </div>

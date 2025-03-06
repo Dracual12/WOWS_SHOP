@@ -5,8 +5,15 @@ Telegram.WebApp.disableClosingConfirmation();
 
 document.addEventListener("DOMContentLoaded", () => {
     const checkoutButtonProduct = document.getElementById("checkout-button-product");
-
+    const cartItemsContainer = document.getElementById("cart-items-product");
     checkoutButtonProduct.addEventListener("click", async () => {
+        // Проверяем, есть ли товары в корзине
+        const cartItems = cartItemsContainer.querySelectorAll("li");
+        if (cartItems.length === 0) {
+            showNotification("Корзина пуста!");
+            return; // Прекращаем выполнение, если корзина пуста
+        }
+
         if (window.Telegram && window.Telegram.WebApp) {
             const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
             // Выводим Telegram ID в консоль сервера, отправив его через fetch
@@ -26,6 +33,20 @@ document.addEventListener("DOMContentLoaded", () => {
         // Показываем всплывающее окно оформления заказа (первый шаг)
         showOrderPopup();
     });
+
+    // Функция для показа уведомления
+    function showNotification(message) {
+        const notification = document.createElement("div");
+        notification.classList.add("notification");
+        notification.textContent = message;
+
+        document.body.appendChild(notification);
+
+        // Убираем уведомление через 3 секунды
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
 
     function showOrderPopup() {
         const popup = document.createElement("div");
