@@ -391,18 +391,47 @@ def edit_product(product_id):
         name = request.form['name']
         price = request.form['price']
         description = request.form['description']
+        review_link = request.form.get('review_link', '')  # Новое поле для ссылки на обзор
+        section_id = request.form['section_id']
+
+        # Получение названия секции
+        section = conn.execute("SELECT name FROM sections WHERE id = ?", (section_id,)).fetchone()['name']
+
+        # Обработка загрузки изображения
+        image_file = request.files.get('image')
+        image_url = None
+        if image_file and image_file.filename:  # Если файл загружен
+            # Сохраняем файл в папку uploads
+            filename = os.path.join(app.config['UPLOAD_FOLDER'], image_file.filename)
+            image_file.save(filename)
+            image_url = f"/static/uploads/{image_file.filename}"
+
         # Обновление данных в базе
-        section = [dict(row) for row in conn.execute("SELECT name FROM sections WHERE id = ?", (request.form['section_id'],)).fetchall()][0]['name']
-        conn.execute('UPDATE products SET name = ?, price = ?, description = ?, section = ? WHERE id = ?',
-                     (name, price, description, section, product_id))
+        if image_url:
+            # Если загружено новое изображение, обновляем его URL
+            conn.execute('''
+                UPDATE products 
+                SET name = ?, price = ?, description = ?, section = ?, review_link = ?, image_url = ?
+                WHERE id = ?
+            ''', (name, price, description, section, review_link, image_url, product_id))
+        else:
+            # Если изображение не загружено, оставляем старое
+            conn.execute('''
+                UPDATE products 
+                SET name = ?, price = ?, description = ?, section = ?, review_link = ?
+                WHERE id = ?
+            ''', (name, price, description, section, review_link, product_id))
+
         conn.commit()
         conn.close()
-        return redirect(url_for('admin_panel'))
+        return redirect(url_for('admin_panel'))  # Перенаправляем в админ-панель
+
     else:
         # Получение текущих данных товара для отображения в форме
         product = conn.execute('SELECT * FROM products WHERE id = ?', (product_id,)).fetchone()
+        sections = conn.execute('SELECT * FROM sections').fetchall()  # Получаем все секции
         conn.close()
-        return render_template('edit_product.html', product=product)
+        return render_template('edit_product.html', product=product, sections=sections)
 
 # Маршрут для удаления товара
 @app.route('/admin/delete_product/<int:product_id>', methods=['POST'])
