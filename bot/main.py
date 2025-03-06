@@ -82,14 +82,12 @@ async def get_link(user):
     response = requests.get(url)
 
     k  = response.json()
-    print(order_id)
     if 'formUrl' in k:
         a = k['formUrl']
         message_obj = await botik.send_message(user,
                                                text=f"Нажимая «Оплатить»  Вы принимаете положения Политики Конфиденциальности и Пользовательского Соглашения",
                                                reply_markup=pay(a))
         conn = get_db_connection()
-        print(message_obj.message_id)
         order_message_id = conn.execute('UPDATE users SET message_id = ? WHERE telegram_id = ?',
                                         (message_obj.message_id, user))
 
@@ -110,7 +108,6 @@ async def check(orderId, user):
     glag = False
     while time.time() - start_time < duration:
         data = requests.get(url).json()
-        print(data)
         if data['OrderStatus'] == 2:
             glag = True
             break
@@ -118,8 +115,7 @@ async def check(orderId, user):
 
     conn = get_db_connection()
     if glag:
-        print('dcmlnsdcns')
-        print(conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)))
+        print(conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)).fetchall()[-1])
         await botik.edit_message_text(
             chat_id=user,  # ID чата (telegram_id пользователя)
             message_id=conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)).fetchone()[0],
