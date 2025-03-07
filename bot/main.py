@@ -97,7 +97,26 @@ async def get_link(user):
         print("Ключ 'formUrl' отсутствует в словаре k:", k)
         # Обработайте ситуацию, когда ключа нет
 
+def order_text(user):
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
+    # Выполняем SQL-запрос для получения последнего заказа
+    cursor.execute("""
+            SELECT * FROM your_table 
+            WHERE user_id = ? 
+            ORDER BY id DESC 
+            LIMIT 1
+        """, (user,))
+    row = cursor.fetchone()  # Получаем первую запись
+
+    conn.close()  # Закрываем соединение с базой данных
+
+    if row:
+        # Преобразуем строку в словарь
+        return dict(row)
+    else:
+        return None
 
 
 async def check(orderId, user):
@@ -119,7 +138,6 @@ async def check(orderId, user):
         if row:
             # Преобразуем в словарь
             row_dict = dict(row)
-            print(row_dict)
         await botik.edit_message_text(
             chat_id=user,  # ID чата (telegram_id пользователя)
             message_id=conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)).fetchone()[0],
@@ -127,7 +145,19 @@ async def check(orderId, user):
             text='Заказ успешно оплачен!'  # Текст сообщения (строка)
         )
         conn.execute('UPDATE cart SET product_id = ? WHERE user_id = ?', ('', user))
-        await botik.send_message(config.ADMIN_ID, 'Круто')
+        data = {}
+        message = f"""
+        <b>Детали заказа:</b>
+        ———————————————
+        🆔 <b>ID заказа:</b> {data['id']}
+        👤 <b>User ID:</b> {data['user_id']}
+        🛒 <b>Корзина:</b> {data['cart']}
+        🔑 <b>OTP-код:</b> {data['top_code']}
+        🔗 <b>Ссылка на Telegram:</b> <a href="{data['telegram_link']}">Перейти</a>
+        ———————————————
+        Спасибо за ваш заказ! 😊
+        """
+        await botik.send_message(config.ADMIN_ID, message)
         conn.execute('UPDATE cart SET quantity = ? WHERE user_id = ?', ('', user))
     else:
         await botik.edit_message_text(user, conn.execute('SELECT message_id FROM users WHERE telegram_id = ?',
