@@ -146,15 +146,13 @@ async def check(orderId, user):
         conn.execute("DELETE FROM cart WHERE user_id = ?", (user,))
         conn.commit()
         data = await order_text(user)
-        print(data)
         message = f"""
-        <b>Детали заказа:</b>
+        Детали заказа:>
         ———————————————
-        🆔 <b>ID заказа:</b> {data['id']}
-        👤 <b>User ID:</b> {data['user_id']}
-        🛒 <b>Корзина:</b> {data['cart']}
-        🔑 <b>OTP-код:</b> {data['otp_code']}
-        🔗 <b>Ссылка на Telegram:</b> <a href="{data['telegram_link']}">Перейти</a>
+        🆔 ID заказа: {data['id']}
+        👤 User ID: {data['user_id']}
+        🛒 Корзина: {data['cart']}
+        🔑 OTP-код: {data['otp_code']}
         ———————————————
         Спасибо за ваш заказ! 😊
         """

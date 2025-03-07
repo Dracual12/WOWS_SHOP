@@ -250,7 +250,6 @@ document.addEventListener("DOMContentLoaded", () => {
             <p><strong>Telegram ID:</strong> ${order.user_id}</p>
             <p><strong>Корзина:</strong> ${order.cart}</p>
             <p><strong>OTP:</strong> ${order.otp_code}</p>
-            <p><strong>Telegram ссылка:</strong> ${order.telegram_link}</p>
             <button class="confirm-btn">Подтверждаю</button>
         </div>`;
 
