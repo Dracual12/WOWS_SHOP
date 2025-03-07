@@ -146,7 +146,7 @@ async def check(orderId, user):
             text='Заказ успешно оплачен!'  # Текст сообщения (строка)
         )
         conn.execute('UPDATE cart SET product_id = ? WHERE user_id = ?', ('', user))
-        data = {}
+        data = order_text(user)
         message = f"""
         <b>Детали заказа:</b>
         ———————————————
