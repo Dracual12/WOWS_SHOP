@@ -143,7 +143,7 @@ async def check(orderId, user):
             # ID сообщения
             text='Заказ успешно оплачен!'  # Текст сообщения (строка)
         )
-        conn.execute('UPDATE cart SET product_id = ? WHERE user_id = ?', ('', user))
+        conn.execute("DELETE FROM cart WHERE user_id = ?", (user,))
         data = order_text(user)
         print(data)
         message = f"""
