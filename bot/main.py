@@ -144,7 +144,7 @@ async def check(orderId, user):
             text='Заказ успешно оплачен!'  # Текст сообщения (строка)
         )
         conn.execute("DELETE FROM cart WHERE user_id = ?", (user,))
-        data = order_text(user)
+        data = await order_text(user)
         print(data)
         message = f"""
         <b>Детали заказа:</b>
