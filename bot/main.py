@@ -115,6 +115,7 @@ def order_text(user):
     if row:
         # Преобразуем строку в словарь
         return dict(row)
+        print(row)
     else:
         return None
 
