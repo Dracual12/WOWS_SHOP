@@ -1013,7 +1013,7 @@ button:hover {
     opacity: 0.7; /* Полупрозрачность */
 }
 
-#checkout-button:disabled {
+#floating-cart-product:disabled {
     background-color: #ccc; /* Серый фон */
     cursor: not-allowed; /* Курсор "недоступно" */
     opacity: 0.7; /* Полупрозрачность */
