@@ -97,13 +97,12 @@ async def get_link(user):
         print("Ключ 'formUrl' отсутствует в словаре k:", k)
         # Обработайте ситуацию, когда ключа нет
 
-def order_text(user):
+async def order_text(user):
     conn = get_db_connection()
     cursor = conn.cursor()
-
     # Выполняем SQL-запрос для получения последнего заказа
     cursor.execute("""
-            SELECT * FROM your_table 
+            SELECT * FROM orders 
             WHERE user_id = ? 
             ORDER BY id DESC 
             LIMIT 1
@@ -115,7 +114,6 @@ def order_text(user):
     if row:
         # Преобразуем строку в словарь
         return dict(row)
-        print(row)
     else:
         return None
 
@@ -147,6 +145,7 @@ async def check(orderId, user):
         )
         conn.execute('UPDATE cart SET product_id = ? WHERE user_id = ?', ('', user))
         data = order_text(user)
+        print(data)
         message = f"""
         <b>Детали заказа:</b>
         ———————————————
