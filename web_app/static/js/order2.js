@@ -8,6 +8,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const cartItemsContainer = document.getElementById("cart-items-product");
     const addToCartButton = document.querySelector(".add_to_cart"); // Кнопка "Добавить в корзину"
 
+    // Добавляем обработчик для скрытия клавиатуры при нажатии вне поля ввода
+    document.addEventListener("click", (event) => {
+        const isInput = event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA';
+        if (!isInput) {
+            const activeElement = document.activeElement;
+            if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+                activeElement.blur(); // Скрываем клавиатуру
+            }
+        }
+    });
+
     checkoutButtonProduct.addEventListener("click", async () => {
         // Проверяем, есть ли товары в корзине
         const cartItems = cartItemsContainer.querySelectorAll("li");

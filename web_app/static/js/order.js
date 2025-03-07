@@ -58,6 +58,19 @@ document.addEventListener("DOMContentLoaded", () => {
         overlay.classList.add("overlay");
         document.body.appendChild(overlay);
         document.body.classList.add("no-scroll"); // Блокируем прокрутку
+
+        // Создаем скрытый input для скрытия клавиатуры
+        const hiddenInput = document.createElement("input");
+        hiddenInput.type = "text";
+        hiddenInput.style.position = "absolute";
+        hiddenInput.style.opacity = "0";
+        hiddenInput.style.pointerEvents = "none";
+        document.body.appendChild(hiddenInput);
+
+        // Обработчик клика на оверлей
+        overlay.addEventListener("click", () => {
+            hideKeyboard(); // Скрываем клавиатуру
+        });
     }
 
     // Функция для удаления оверлея
@@ -67,7 +80,34 @@ document.addEventListener("DOMContentLoaded", () => {
             overlay.remove();
         }
         document.body.classList.remove("no-scroll"); // Восстанавливаем прокрутку
+
+        // Удаляем скрытый input
+        const hiddenInput = document.querySelector("input[type='text'][style*='opacity: 0']");
+        if (hiddenInput) {
+            hiddenInput.remove();
+        }
     }
+
+    // Функция для скрытия клавиатуры
+    function hideKeyboard() {
+        const hiddenInput = document.querySelector("input[type='text'][style*='opacity: 0']");
+        if (hiddenInput) {
+            hiddenInput.focus(); // Переводим фокус на скрытый input
+            hiddenInput.blur();  // Сразу убираем фокус
+            console.log("Клавиатура скрыта");
+        } else {
+            console.log("Скрытый input не найден");
+        }
+    }
+
+    // Обработчик клика вне всплывающего окна
+    document.addEventListener("click", (event) => {
+        const popup = document.querySelector(".order-popup");
+        if (popup && !popup.contains(event.target)) {
+            // Клик был вне всплывающего окна
+            hideKeyboard(); // Скрываем клавиатуру
+        }
+    });
 
     function showOrderPopup() {
         createOverlay(); // Создаем оверлей

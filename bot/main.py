@@ -144,6 +144,7 @@ async def check(orderId, user):
             text='Заказ успешно оплачен!'  # Текст сообщения (строка)
         )
         conn.execute("DELETE FROM cart WHERE user_id = ?", (user,))
+        conn.commit()
         data = await order_text(user)
         print(data)
         message = f"""
@@ -152,13 +153,12 @@ async def check(orderId, user):
         🆔 <b>ID заказа:</b> {data['id']}
         👤 <b>User ID:</b> {data['user_id']}
         🛒 <b>Корзина:</b> {data['cart']}
-        🔑 <b>OTP-код:</b> {data['top_code']}
+        🔑 <b>OTP-код:</b> {data['otp_code']}
         🔗 <b>Ссылка на Telegram:</b> <a href="{data['telegram_link']}">Перейти</a>
         ———————————————
         Спасибо за ваш заказ! 😊
         """
         await botik.send_message(config.ADMIN_ID, message)
-        conn.execute('UPDATE cart SET quantity = ? WHERE user_id = ?', ('', user))
     else:
         await botik.edit_message_text(user, conn.execute('SELECT message_id FROM users WHERE telegram_id = ?',
                                                          (user,)).fetchone()[0], 'Время на оплату истекло')
