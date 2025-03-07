@@ -1006,3 +1006,15 @@ button:hover {
 .no-scroll {
     overflow: hidden;
 }
+
+#checkout-button-product:disabled {
+    background-color: #ccc; /* Серый фон */
+    cursor: not-allowed; /* Курсор "недоступно" */
+    opacity: 0.7; /* Полупрозрачность */
+}
+
+#checkout-button:disabled {
+    background-color: #ccc; /* Серый фон */
+    cursor: not-allowed; /* Курсор "недоступно" */
+    opacity: 0.7; /* Полупрозрачность */
+}

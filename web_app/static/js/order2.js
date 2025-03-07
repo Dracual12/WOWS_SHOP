@@ -31,6 +31,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const cartDropdownProduct = document.querySelector('.cart-dropdown-product');
         cartDropdownProduct.classList.remove('active');
 
+        // Блокируем кнопку корзины
+        checkoutButtonProduct.disabled = true;
+
         // Показываем всплывающее окно оформления заказа (первый шаг)
         showOrderPopup();
     });
@@ -91,6 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
         popup.querySelector(".order-popup-close").addEventListener("click", () => {
             popup.remove();
             removeOverlay(); // Удаляем оверлей
+            checkoutButtonProduct.disabled = false; // Разблокируем кнопку корзины
         });
 
         // Обработчик для кнопки "Далее" в первом окне
@@ -112,6 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             popup.remove();
             removeOverlay(); // Удаляем оверлей
+            checkoutButtonProduct.disabled = false; // Разблокируем кнопку корзины
             showTelegramPopup(); // Показываем второе окно
         });
     }
@@ -141,6 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
         popup.querySelector(".order-popup-close").addEventListener("click", () => {
             popup.remove();
             removeOverlay(); // Удаляем оверлей
+            checkoutButtonProduct.disabled = false; // Разблокируем кнопку корзины
         });
 
         // Обработчик для кнопки "Далее" во втором окне
@@ -162,6 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             popup.remove();
             removeOverlay(); // Удаляем оверлей
+            checkoutButtonProduct.disabled = false; // Разблокируем кнопку корзины
             fetchLatestOrder(window.Telegram.WebApp.initDataUnsafe.user.id);
         });
     }
@@ -212,6 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
         popup.querySelector(".order-popup-close").addEventListener("click", () => {
             popup.remove();
             removeOverlay(); // Удаляем оверлей
+            checkoutButtonProduct.disabled = false; // Разблокируем кнопку корзины
         });
 
         popup.querySelector(".confirm-btn").addEventListener("click", async () => {
