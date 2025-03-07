@@ -6,6 +6,7 @@ Telegram.WebApp.disableClosingConfirmation();
 document.addEventListener("DOMContentLoaded", () => {
     const checkoutButtonProduct = document.getElementById("checkout-button-product");
     const cartItemsContainer = document.getElementById("cart-items-product");
+    const addToCartButton = document.querySelector(".add_to_cart"); // Кнопка "Добавить в корзину"
 
     checkoutButtonProduct.addEventListener("click", async () => {
         // Проверяем, есть ли товары в корзине
@@ -31,8 +32,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const cartDropdownProduct = document.querySelector('.cart-dropdown-product');
         cartDropdownProduct.classList.remove('active');
 
-        // Блокируем кнопку корзины
-        checkoutButtonProduct.disabled = true;
+        // Блокируем кнопку "Добавить в корзину"
+        addToCartButton.disabled = true;
 
         // Показываем всплывающее окно оформления заказа (первый шаг)
         showOrderPopup();
@@ -94,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
         popup.querySelector(".order-popup-close").addEventListener("click", () => {
             popup.remove();
             removeOverlay(); // Удаляем оверлей
-            checkoutButtonProduct.disabled = false; // Разблокируем кнопку корзины
+            addToCartButton.disabled = false; // Разблокируем кнопку "Добавить в корзину"
         });
 
         // Обработчик для кнопки "Далее" в первом окне
@@ -116,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             popup.remove();
             removeOverlay(); // Удаляем оверлей
-            checkoutButtonProduct.disabled = false; // Разблокируем кнопку корзины
+            addToCartButton.disabled = false; // Разблокируем кнопку "Добавить в корзину"
             showTelegramPopup(); // Показываем второе окно
         });
     }
@@ -146,7 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
         popup.querySelector(".order-popup-close").addEventListener("click", () => {
             popup.remove();
             removeOverlay(); // Удаляем оверлей
-            checkoutButtonProduct.disabled = false; // Разблокируем кнопку корзины
+            addToCartButton.disabled = false; // Разблокируем кнопку "Добавить в корзину"
         });
 
         // Обработчик для кнопки "Далее" во втором окне
@@ -168,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             popup.remove();
             removeOverlay(); // Удаляем оверлей
-            checkoutButtonProduct.disabled = false; // Разблокируем кнопку корзины
+            addToCartButton.disabled = false; // Разблокируем кнопку "Добавить в корзину"
             fetchLatestOrder(window.Telegram.WebApp.initDataUnsafe.user.id);
         });
     }
@@ -219,7 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
         popup.querySelector(".order-popup-close").addEventListener("click", () => {
             popup.remove();
             removeOverlay(); // Удаляем оверлей
-            checkoutButtonProduct.disabled = false; // Разблокируем кнопку корзины
+            addToCartButton.disabled = false; // Разблокируем кнопку "Добавить в корзину"
         });
 
         popup.querySelector(".confirm-btn").addEventListener("click", async () => {
