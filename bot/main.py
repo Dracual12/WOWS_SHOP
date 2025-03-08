@@ -147,7 +147,7 @@ async def check(orderId, user):
         conn.commit()
         data = await order_text(user)
         message = f"""
-        Детали заказа:>
+        Детали заказа:
         ———————————————
         🆔 ID заказа: {data['id']}
         👤 User ID: id <a href="tg://user?id={data['user_id']}">{data['user_id']}
