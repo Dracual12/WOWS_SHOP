@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <button class="quantity-btn increase">+</button>
                             </div>
                             <div class='item-price'>
-                            <span class="item-total">${(unitPrice * item.quantity).toFixed(2)} дублонов</span>
+                            <span class="item-total">${(unitPrice * item.quantity).toFixed(2)} рублей</span>
                             </div>
                         `;
 
@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(() => {
                 const unitPrice = parseFloat(li.getAttribute('data-unit-price'));
                 li.querySelector('.quantity-value').textContent = newQuantity;
-                li.querySelector('.item-total').textContent = (unitPrice * newQuantity).toFixed(2) + ' дублонов';
+                li.querySelector('.item-total').textContent = (unitPrice * newQuantity).toFixed(2) + ' рублей';
             })
             .catch(error => console.error('Ошибка:', error));
     }

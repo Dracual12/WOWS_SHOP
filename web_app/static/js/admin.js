@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         newRow.innerHTML = `
                             <td>${newProduct.id}</td>
                             <td>${newProduct.name}</td>
-                            <td>${newProduct.price} дублонов</td>
+                            <td>${newProduct.price} рублей</td>
                             <td>
                                 <button class="edit-product" data-id="${newProduct.id}">Редактировать</button>
                                 <button class="delete-product" data-id="${newProduct.id}">Удалить</button>
@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function editProduct(productId, button) {
         const productRow = button.closest("tr");
         const productName = productRow.querySelector("td:nth-child(2)").textContent;
-        const productPrice = productRow.querySelector("td:nth-child(3)").textContent.replace(" дублонов", "");
+        const productPrice = productRow.querySelector("td:nth-child(3)").textContent.replace(" рублей", "");
 
         const newName = prompt("Введите новое название товара:", productName);
         const newPrice = prompt("Введите новую цену товара:", productPrice);
@@ -121,7 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then(data => {
                     if (data.success) {
                         productRow.querySelector("td:nth-child(2)").textContent = newName;
-                        productRow.querySelector("td:nth-child(3)").textContent = `${newPrice} дублонов`;
+                        productRow.querySelector("td:nth-child(3)").textContent = `${newPrice} рублей`;
                         alert("Товар успешно обновлен.");
                     } else {
                         alert("Ошибка обновления товара: " + data.error);
