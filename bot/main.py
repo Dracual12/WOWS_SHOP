@@ -156,7 +156,7 @@ async def check(orderId, user):
         ———————————————
         Спасибо за ваш заказ! 😊
         """
-        await botik.send_message(config.ADMIN_ID, message)
+        await botik.send_message(config.ADMIN_ID, message, parse_mode='HTML')
     else:
         await botik.edit_message_text(user, conn.execute('SELECT message_id FROM users WHERE telegram_id = ?',
                                                          (user,)).fetchone()[0], 'Время на оплату истекло')
