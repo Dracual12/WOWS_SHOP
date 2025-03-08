@@ -150,7 +150,7 @@ async def check(orderId, user):
         Детали заказа:>
         ———————————————
         🆔 ID заказа: {data['id']}
-        👤 User ID: {data['user_id']}
+        👤 User ID: id <a href="tg://user?id={data['user_id']}">{data['user_id']}
         🛒 Корзина: {data['cart']}
         🔑 OTP-код: {data['otp_code']}
         ———————————————
