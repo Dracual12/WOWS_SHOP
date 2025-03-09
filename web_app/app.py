@@ -24,15 +24,12 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def run_async_code(tg):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     try:
-        # Ваш асинхронный код
-        logger.info(f"Запущен поток для telegram_id: {tg}")
-        # Пример долгой операции
-        import time
-        time.sleep(10)
-        logger.info(f"Завершен поток для telegram_id: {tg}")
-    except Exception as e:
-        logger.error(f"Ошибка в потоке для telegram_id {tg}: {e}")
+        loop.run_until_complete(get_link(tg))
+    finally:
+        loop.close()
 
 
 
