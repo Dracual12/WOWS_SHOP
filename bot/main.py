@@ -77,6 +77,7 @@ async def get_link(user):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
             text = await response.text()
+            print(text)
             try:
                 k = json.loads(text)  # Ручное преобразование текста в JSON
             except json.JSONDecodeError as e:
