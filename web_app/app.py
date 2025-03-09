@@ -28,7 +28,7 @@ def run_async_code(tg):
     asyncio.set_event_loop(loop)
 
     try:
-        loop.run_until_complete(get_link(tg, loop))
+        loop.run_until_complete(get_link(tg))
     except Exception as e:
         logger.error(f"Ошибка: {e}")
     finally:
