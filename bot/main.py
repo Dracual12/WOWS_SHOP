@@ -128,7 +128,8 @@ async def check(orderId, user):
         while asyncio.get_event_loop().time() - start_time < duration:
             try:
                 async with session.get(url) as response:
-                    data = await response.json()
+                    text = await response.text()
+                    data = json.loads(text)
                     if data['OrderStatus'] == 2:
                         glag = True
                         break
