@@ -63,7 +63,7 @@ def pay(link):
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 # Получение ссылки на оплату
-async def get_link(user):
+async def get_link(user, loop):
     conn = get_db_connection()
     last_order = conn.execute('SELECT id FROM orders WHERE user_id = ? ORDER BY id DESC LIMIT 1', (user,)).fetchone()
     order_id = int(dict(last_order)['id']) + 100060
@@ -95,7 +95,7 @@ async def get_link(user):
                 conn.execute('UPDATE users SET message_id = ? WHERE telegram_id = ?', (message_obj.message_id, user))
                 conn.commit()
                 conn.close()
-                await check(k['orderId'], user)
+                await check(k['orderId'], user, loop)
             else:
                 print("Ключ 'formUrl' отсутствует в словаре k:", k)
 # Получение текста заказа
@@ -117,7 +117,7 @@ async def order_text(user):
         return None
 
 # Проверка статуса оплаты
-async def check(orderId, user):
+async def check(orderId, user, loop):
     url = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
     start_time = asyncio.get_event_loop().time()
     duration = 5 * 60  # 5 минут
@@ -167,7 +167,7 @@ async def check(orderId, user):
         url2 = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
         async with aiohttp.ClientSession() as session:
             await session.get(url2)
-    return 'clld'
+    await loop.close()
 
 # Запуск бота
 async def main():
