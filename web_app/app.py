@@ -26,10 +26,14 @@ logger = logging.getLogger(__name__)
 def run_async_code(tg):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
+
     try:
         loop.run_until_complete(get_link(tg))
+    except Exception as e:
+        print(f"Ошибка: {e}")
     finally:
-        loop.close()
+        if not loop.is_closed():
+            loop.close()
 
 
 
