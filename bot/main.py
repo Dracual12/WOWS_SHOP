@@ -75,7 +75,13 @@ async def get_link(user):
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
-            k = await response.json()
+            text = await response.text()
+            try:
+                k = json.loads(text)  # Ручное преобразование текста в JSON
+            except json.JSONDecodeError as e:
+                print("Ошибка при декодировании JSON:", e)
+                return  # Прекращаем выполнение, если текст не является JSON
+
             if 'formUrl' in k:
                 a = k['formUrl']
                 message_obj = await botik.send_message(
@@ -90,7 +96,6 @@ async def get_link(user):
                 await check(k['orderId'], user)
             else:
                 print("Ключ 'formUrl' отсутствует в словаре k:", k)
-
 # Получение текста заказа
 async def order_text(user):
     conn = get_db_connection()
