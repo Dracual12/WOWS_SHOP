@@ -135,12 +135,6 @@ def save_link():
     return jsonify({'message': "cool"})
 
 
-def run_async_code(tg):
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    result = loop.run_until_complete(get_link(tg))
-    loop.close()
-    return result
 
 @app.route('/api/order/end', methods=['POST'])
 def some_route():
