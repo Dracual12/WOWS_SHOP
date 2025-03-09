@@ -167,6 +167,7 @@ async def check(orderId, user):
         url2 = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
         async with aiohttp.ClientSession() as session:
             await session.get(url2)
+    return 'clld'
 
 # Запуск бота
 async def main():
