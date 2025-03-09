@@ -32,6 +32,9 @@ def run_async_code(tg):
     except Exception as e:
         logger.error(f"Ошибка: {e}")
     finally:
+        if loop.is_running():
+            print("Цикл событий все еще выполняется. Остановка...")
+            loop.stop()
         if not loop.is_closed():
             logger.info("Закрытие цикла событий...")
             loop.close()
