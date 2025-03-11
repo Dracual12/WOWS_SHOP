@@ -174,7 +174,7 @@ asyncio.set_event_loop(loop)
 
 # Функция для получения loop
 def get_bot_loop():
-    loop = asyncio.get_event_loop()
+    global loop
     return loop
 
 # Запуск бота
