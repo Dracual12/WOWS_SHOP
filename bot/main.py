@@ -14,7 +14,7 @@ import bot.config as config
 from bot.db import add_user, get_db_connection
 
 # Настройка пути к проекту
-
+bot_loop = None
 
 # Инициализация бота и диспетчера
 botik = Bot(token=config.BOT_TOKEN)
@@ -177,5 +177,8 @@ if __name__ == "__main__":
     loop = asyncio.new_event_loop()
     # Устанавливаем его как текущий event loop
     asyncio.set_event_loop(loop)
+    # Делаем loop доступным для других модулей
+    global bot_loop
+    bot_loop = loop
     # Запускаем main() в этом event loop
     loop.run_until_complete(main())

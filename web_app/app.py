@@ -17,6 +17,7 @@ if project_root not in sys.path:
 from bot.db import get_db_connection
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from bot.main import get_link
+from bot.main import bot_loop
 
 
 app = Flask(__name__)
@@ -24,9 +25,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def run_async_code(tg):
-    loop = asyncio.get_event_loop()
-    asyncio.run_coroutine_threadsafe(get_link(tg), loop)
-
+    asyncio.run_coroutine_threadsafe(get_link(tg), bot_loop)
 # Главная страница
 @app.route('/')
 def index():
