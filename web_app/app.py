@@ -22,9 +22,13 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+from bot.main import get_bot_loop
+
 def run_async_code(tg):
-    bot_loop = asyncio.get_event_loop()
+    bot_loop = get_bot_loop()  # Получаем loop из main.py
     asyncio.run_coroutine_threadsafe(get_link(tg), bot_loop)
+
+
 # Главная страница
 @app.route('/')
 def index():
@@ -554,5 +558,22 @@ def checkout():
 
     return jsonify({"success": True})
 
+import threading
+from bot.main import main as bot_main
+from app import app as flask_app
+
+# Запуск Flask-приложения в отдельном потоке
+def run_flask():
+    flask_app.run(host="0.0.0.0", port=5050, debug=False)
+
+# Запуск бота в основном потоке
+def run_bot():
+    bot_main()
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5050, debug=True)
+    # Запуск Flask в отдельном потоке
+    flask_thread = threading.Thread(target=run_flask)
+    flask_thread.start()
+
+    # Запуск бота в основном потоке
+    run_bot()

@@ -1,4 +1,3 @@
-bot_loop = None
 import json
 import sys
 import os
@@ -170,15 +169,16 @@ async def check(orderId, user):
         async with aiohttp.ClientSession() as session:
             await session.get(url2)
 
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
+
+# Функция для получения loop
+def get_bot_loop():
+    return loop
+
 # Запуск бота
 async def main():
     await dp.start_polling(botik)
 
 if __name__ == "__main__":
-    # Создаём новый event loop
-    loop = asyncio.new_event_loop()
-    # Устанавливаем его как текущий event loop
-    asyncio.set_event_loop(loop)
-    # Делаем loop доступным для других модуле
-    # Запускаем main() в этом event loop
     loop.run_until_complete(main())
