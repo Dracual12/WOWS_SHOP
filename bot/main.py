@@ -14,7 +14,8 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from aiogram.filters import Command
 import bot.config as config
 from bot.db import add_user, get_db_connection
-from start import get_shared_loop
+from start import get_shared_loop, run_loop
+
 # Настройка пути к проекту
 
 # Инициализация бота и диспетчера
@@ -170,11 +171,12 @@ async def check(orderId, user):
             await session.get(url2)
 
 
-loop = get_shared_loop()
 
 # Запуск бота
 async def main():
     await dp.start_polling(botik)
 
 if __name__ == "__main__":
+    run_loop()
+    loop = get_shared_loop()
     loop.run_until_complete(main())
