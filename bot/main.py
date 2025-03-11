@@ -14,7 +14,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from aiogram.filters import Command
 import bot.config as config
 from bot.db import add_user, get_db_connection
-
+from start import main_loop
 # Настройка пути к проекту
 
 # Инициализация бота и диспетчера
@@ -120,13 +120,13 @@ async def order_text(user):
 # Проверка статуса оплаты
 async def check(orderId, user):
     url = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
-    start_time = asyncio.get_event_loop().time()
+    start_time = main_loop.time()
     duration = 5 * 60  # 5 минут
     interval = 5  # Интервал проверки (5 секунд)
     glag = False
 
     async with aiohttp.ClientSession() as session:
-        while asyncio.get_event_loop().time() - start_time < duration:
+        while main_loop.time() - start_time < duration:
             try:
                 async with session.get(url) as response:
                     text = await response.text()
@@ -170,18 +170,9 @@ async def check(orderId, user):
             await session.get(url2)
 
 
-loop
-# Функция для получения loop
-def get_bot_loop():
-    global loop
-    return loop
-
-# Запуск бота
 async def main():
     await dp.start_polling(botik)
 
+
 if __name__ == "__main__":
-    global loop
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.run_until_complete(main())
+    main_loop.run_until_complete(main())
