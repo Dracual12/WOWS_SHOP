@@ -24,20 +24,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def run_async_code(tg):
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-
-    try:
-        loop.run_until_complete(get_link(tg))
-    except Exception as e:
-        logger.error(f"Ошибка: {e}")
-    finally:
-        if loop.is_running():
-            print("Цикл событий все еще выполняется. Остановка...")
-            loop.stop()
-        if not loop.is_closed():
-            logger.info("Закрытие цикла событий...")
-            loop.close()
+    asyncio.run(get_link(tg))
 
 
 # Главная страница
