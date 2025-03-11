@@ -1,6 +1,9 @@
 import json
 import sys
 import os
+import time
+
+bot_loop = None
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if project_root not in sys.path:
     sys.path.append(project_root)
@@ -14,7 +17,6 @@ import bot.config as config
 from bot.db import add_user, get_db_connection
 
 # Настройка пути к проекту
-bot_loop = None
 
 # Инициализация бота и диспетчера
 botik = Bot(token=config.BOT_TOKEN)
@@ -177,8 +179,8 @@ if __name__ == "__main__":
     loop = asyncio.new_event_loop()
     # Устанавливаем его как текущий event loop
     asyncio.set_event_loop(loop)
-    # Делаем loop доступным для других модулей
-    global bot_loop
-    bot_loop = loop
+    # Делаем loop доступным для других модуле
     # Запускаем main() в этом event loop
     loop.run_until_complete(main())
+    global bot_loop
+    bot_loop = loop
