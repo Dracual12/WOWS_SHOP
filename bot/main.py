@@ -177,6 +177,5 @@ async def main():
     await dp.start_polling(botik)
 
 if __name__ == "__main__":
-    run_loop()
     loop = get_shared_loop()
     loop.run_until_complete(main())
