@@ -26,6 +26,7 @@ from bot.main import get_bot_loop
 
 def run_async_code(tg):
     bot_loop = get_bot_loop()  # Получаем loop из main.py
+    print(bot_loop)
     asyncio.run_coroutine_threadsafe(get_link(tg), bot_loop)
 
 
