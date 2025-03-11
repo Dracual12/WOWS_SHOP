@@ -14,7 +14,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from aiogram.filters import Command
 import bot.config as config
 from bot.db import add_user, get_db_connection
-from start import get_shared_loop, run_loop
+from start import get_shared_loop
 
 # Настройка пути к проекту
 
@@ -178,4 +178,4 @@ async def main():
 
 if __name__ == "__main__":
     loop = get_shared_loop()
-    loop.run_until_complete(main())
+    asyncio.run_coroutine_threadsafe(main(), loop)

@@ -27,11 +27,11 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def run_async_code(tg):
-    loop = get_shared_loop()
-    bot_loop = loop  # Получаем loop из main.py
-    asyncio.run_coroutine_threadsafe(get_link(tg), bot_loop)
+loop = get_shared_loop()
 
+# Функция для запуска асинхронных задач
+def run_async_code(tg):
+    asyncio.run_coroutine_threadsafe(get_link(tg), loop)
 
 # Главная страница
 @app.route('/')
