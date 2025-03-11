@@ -169,8 +169,7 @@ async def check(orderId, user):
         async with aiohttp.ClientSession() as session:
             await session.get(url2)
 
-loop = asyncio.new_event_loop()
-asyncio.set_event_loop(loop)
+
 
 # Функция для получения loop
 def get_bot_loop():
@@ -182,4 +181,6 @@ async def main():
     await dp.start_polling(botik)
 
 if __name__ == "__main__":
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     loop.run_until_complete(main())
