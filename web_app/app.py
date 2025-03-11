@@ -24,7 +24,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def run_async_code(tg):
-    asyncio.create_task(get_link(tg))
+    loop = asyncio.get_event_loop()
+    asyncio.run_coroutine_threadsafe(get_link(tg), loop)
 
 # Главная страница
 @app.route('/')
