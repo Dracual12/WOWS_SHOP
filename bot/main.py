@@ -182,5 +182,6 @@ if __name__ == "__main__":
     # Делаем loop доступным для других модуле
     # Запускаем main() в этом event loop
     loop.run_until_complete(main())
+    time.sleep(2)
     global bot_loop
     bot_loop = loop
