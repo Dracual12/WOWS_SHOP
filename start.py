@@ -1,4 +1,20 @@
 import asyncio
-from asyncio import set_event_loop
 
-main_loop = asyncio.new_event_loop()
+# Создаем общий цикл событий
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
+
+# Функция для получения общего цикла
+def get_shared_loop():
+    print("Shared loop is running:", loop.is_running())
+    return loop
+
+# Функция для запуска цикла
+def run_loop():
+    print("Starting shared loop...")
+    loop.run_forever()
+
+# Функция для остановки цикла
+def stop_loop():
+    print("Stopping shared loop...")
+    loop.stop()

@@ -17,7 +17,10 @@ if project_root not in sys.path:
 from bot.db import get_db_connection
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from bot.main import get_link
-from start import main_loop
+from start import get_shared_loop
+
+# Получаем общий цикл событий
+loop = get_shared_loop()
 
 
 app = Flask(__name__)
@@ -26,7 +29,8 @@ logger = logging.getLogger(__name__)
 
 
 def run_async_code(tg):
-    bot_loop = main_loop  # Получаем loop из main.py
+    global loop
+    bot_loop = loop  # Получаем loop из main.py
     asyncio.run_coroutine_threadsafe(get_link(tg), bot_loop)
 
 
