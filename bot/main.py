@@ -173,5 +173,9 @@ async def main():
     await dp.start_polling(botik)
 
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
+    # Создаём новый event loop
+    loop = asyncio.new_event_loop()
+    # Устанавливаем его как текущий event loop
+    asyncio.set_event_loop(loop)
+    # Запускаем main() в этом event loop
     loop.run_until_complete(main())
