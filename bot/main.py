@@ -172,7 +172,7 @@ async def check(orderId, user):
             await session.get(url2)
 
 
-
+loop = get_shared_loop()
 # Запуск бота
 async def main():
     print("Bot is running...")
