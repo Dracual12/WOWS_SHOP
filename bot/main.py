@@ -181,5 +181,3 @@ async def main():
 if __name__ == "__main__":
     print("Running main coroutine...")
     asyncio.run_coroutine_threadsafe(main(), loop)
-    while True:
-        pass
