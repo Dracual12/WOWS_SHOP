@@ -121,6 +121,7 @@ async def order_text(user):
 # Проверка статуса оплаты
 async def check(orderId, user):
     url = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
+    main_loop = get_shared_loop()
     start_time = main_loop.time()
     duration = 5 * 60  # 5 минут
     interval = 5  # Интервал проверки (5 секунд)
@@ -174,8 +175,9 @@ async def check(orderId, user):
 
 # Запуск бота
 async def main():
+    print("Bot is running...")
     await dp.start_polling(botik)
 
 if __name__ == "__main__":
-    loop = get_shared_loop()
+    print("Running main coroutine...")
     asyncio.run_coroutine_threadsafe(main(), loop)
