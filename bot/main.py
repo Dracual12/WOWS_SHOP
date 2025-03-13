@@ -122,14 +122,13 @@ async def order_text(user):
 # Проверка статуса оплаты
 async def check(orderId, user):
     url = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
-    main_loop = get_shared_loop()
-    start_time = main_loop.time()
+    start_time = asyncio.get_event_loop().time()
     duration = 5 * 60  # 5 минут
     interval = 5  # Интервал проверки (5 секунд)
     glag = False
 
     async with aiohttp.ClientSession() as session:
-        while main_loop.time() - start_time < duration:
+        while asyncio.get_event_loop().time() - start_time < duration:
             try:
                 async with session.get(url) as response:
                     text = await response.text()
