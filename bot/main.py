@@ -2,6 +2,9 @@ import json
 import sys
 import os
 import time
+from http.client import responses
+
+import requests
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if project_root not in sys.path:
@@ -10,11 +13,10 @@ if project_root not in sys.path:
 import asyncio
 import aiohttp
 from aiogram import Bot, Dispatcher, types
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo, FSInputFile
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo, FSInputFile, Update
 from aiogram.filters import Command
 import bot.config as config
 from bot.db import add_user, get_db_connection
-from start import get_shared_loop
 
 # Настройка пути к проекту
 
@@ -75,31 +77,30 @@ async def get_link(user):
     conn.close()
 
     url = f"https://payment.alfabank.ru/payment/rest/register.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderNumber={order_id}&amount={cart}&returnUrl=https://t.me/armada_gold_bot"
+    response = requests.get(url)
+    text = response.text
+    print(type(text))
+    print(text)
+    try:
+        k = json.loads(text)  # Ручное преобразование текста в JSON
+    except json.JSONDecodeError as e:
+        print("Ошибка при декодировании JSON:", e)
+        return  # Прекращаем выполнение, если текст не является JSON
 
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            text = await response.text()
-            print(type(text))
-            try:
-                k = json.loads(text)  # Ручное преобразование текста в JSON
-            except json.JSONDecodeError as e:
-                print("Ошибка при декодировании JSON:", e)
-                return  # Прекращаем выполнение, если текст не является JSON
-
-            if 'formUrl' in k:
-                a = k['formUrl']
-                message_obj = await botik.send_message(
-                    user,
-                    text="Нажимая «Оплатить» Вы принимаете положения Политики Конфиденциальности и Пользовательского Соглашения",
-                    reply_markup=pay(a)
-                )
-                conn = get_db_connection()
-                conn.execute('UPDATE users SET message_id = ? WHERE telegram_id = ?', (message_obj.message_id, user))
-                conn.commit()
-                conn.close()
-                await check(k['orderId'], user)
-            else:
-                print("Ключ 'formUrl' отсутствует в словаре k:", k)
+    if 'formUrl' in k:
+        a = k['formUrl']
+        message_obj = await botik.send_message(
+            user,
+            text="Нажимая «Оплатить» Вы принимаете положения Политики Конфиденциальности и Пользовательского Соглашения",
+            reply_markup=pay(a)
+        )
+        conn = get_db_connection()
+        conn.execute('UPDATE users SET message_id = ? WHERE telegram_id = ?', (message_obj.message_id, user))
+        conn.commit()
+        conn.close()
+        await check(k['orderId'], user)
+    else:
+        print("Ключ 'formUrl' отсутствует в словаре k:", k)
 # Получение текста заказа
 async def order_text(user):
     conn = get_db_connection()
@@ -172,17 +173,22 @@ async def check(orderId, user):
             await session.get(url2)
 
 
-loop = get_shared_loop()
+@dp.message_handler(content_types=types.ContentType.WEB_APP_DATA)
+async def handle_web_app_data(message: types.Message):
+    # Получаем данные из Web App
+    data = message.web_app_data.data  # Это строка, отправленная из Web App
+    print(f"Получены данные из Web App: {data}")
+
+    # Отправляем ответ пользователю
+    await message.answer(f"Данные из Web App: {data}")
 # Запуск бота
+
+
+
 async def main():
     print("Bot is running...")
     await dp.start_polling(botik)
 
 if __name__ == "__main__":
     print("Running main coroutine...")
-    print(loop)
-    asyncio.run_coroutine_threadsafe(main(), loop)
-    try:
-        loop.run_forever()
-    except KeyboardInterrupt:
-        print("Stopping bot...")
+    asyncio.run(main())

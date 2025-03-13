@@ -17,7 +17,6 @@ if project_root not in sys.path:
 from bot.db import get_db_connection
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from bot.main import get_link
-from start import get_shared_loop
 
 # Получаем общий цикл событи
 
@@ -27,11 +26,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-loop = get_shared_loop()
-
 # Функция для запуска асинхронных задач
-def run_async_code(tg):
-    asyncio.run_coroutine_threadsafe(get_link(tg), loop)
 
 # Главная страница
 @app.route('/')
@@ -132,20 +127,6 @@ def save_link():
 
 
 
-@app.route('/api/order/end', methods=['POST'])
-def some_route():
-    data = request.get_json()  # Получаем данные из запроса
-    tg = data.get("telegram_id")
-
-    if not tg:
-        return jsonify({"error": "telegram_id is required"}), 400
-
-    # Запускаем поток без блокировки
-    thread = Thread(target=run_async_code, args=(tg,))
-    thread.start()
-
-    # Возвращаем ответ сразу после запуска потока
-    return jsonify({"message": "Запрос принят в обработку", "telegram_id": tg}), 202
 
 
 

@@ -267,17 +267,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (user && user.id) {
                     const userId = user.id;
                     try {
-                        const response = await fetch('/api/order/end', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ telegram_id: userId })
-                        });
-                        if (response.ok) {
-                            console.log('Запрос выполнен успешно');
-                            window.Telegram.WebApp.close();
-                        } else {
-                            console.error('Ошибка при выполнении запроса:', response.statusText);
-                        }
+                        Telegram.WebApp.sendData(userId);
+                        alert('kfvmf');
                     } catch (error) {
                         console.error('Ошибка при отправке запроса:', error);
                     }
