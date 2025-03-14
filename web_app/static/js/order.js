@@ -267,10 +267,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (user && user.id) {
                     const userId = user.id;
                     try {
-                        alert('kfvmf');
                         window.Telegram.WebApp.sendData(userId);
-                        window.Telegram.WebApp.close();
                         alert('kfvmf');
+                        window.Telegram.WebApp.close();
+
                     } catch (error) {
                         console.error('Ошибка при отправке запроса:', error);
                     }
