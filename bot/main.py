@@ -1,6 +1,11 @@
 import json
-import sys
 import os
+import sys
+
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if project_root not in sys.path:
+    sys.path.append(project_root)
+
 import time
 import asyncio
 import aiohttp
@@ -13,9 +18,7 @@ import bot.config as config
 from bot.db import add_user, get_db_connection
 
 # Настройка пути к проекту
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-if project_root not in sys.path:
-    sys.path.append(project_root)
+
 
 # Инициализация бота и диспетчера
 botik = Bot(token=config.BOT_TOKEN)
