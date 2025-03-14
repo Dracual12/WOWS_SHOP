@@ -267,6 +267,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (user && user.id) {
                     const userId = user.id;
                     try {
+                        alert('kfvmf');
                         Telegram.WebApp.sendData(userId);
                         alert('kfvmf');
                     } catch (error) {
