@@ -268,7 +268,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     const userId = user.id;
                     try {
                         alert('kfvmf');
-                        Telegram.WebApp.sendData(userId);
+                        window.Telegram.WebApp.sendData(userId);
+                        window.Telegram.WebApp.close();
                         alert('kfvmf');
                     } catch (error) {
                         console.error('Ошибка при отправке запроса:', error);
