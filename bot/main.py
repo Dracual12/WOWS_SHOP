@@ -2,23 +2,20 @@ import json
 import sys
 import os
 import time
-from http.client import responses
-
-import requests
-
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-if project_root not in sys.path:
-    sys.path.append(project_root)
-
 import asyncio
 import aiohttp
+import requests
 from aiogram import Bot, Dispatcher, types
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo, FSInputFile, Update
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo, FSInputFile
 from aiogram.filters import Command
+from aiogram.enums import ContentType
 import bot.config as config
 from bot.db import add_user, get_db_connection
 
 # Настройка пути к проекту
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if project_root not in sys.path:
+    sys.path.append(project_root)
 
 # Инициализация бота и диспетчера
 botik = Bot(token=config.BOT_TOKEN)
@@ -101,6 +98,7 @@ async def get_link(user):
         await check(k['orderId'], user)
     else:
         print("Ключ 'formUrl' отсутствует в словаре k:", k)
+
 # Получение текста заказа
 async def order_text(user):
     conn = get_db_connection()
@@ -171,8 +169,8 @@ async def check(orderId, user):
         async with aiohttp.ClientSession() as session:
             await session.get(url2)
 
-
-@dp.message_handler(content_types=types.ContentType.WEB_APP_DATA)
+# Обработчик данных из Web App
+@dp.message(lambda message: message.content_type == ContentType.WEB_APP_DATA)
 async def handle_web_app_data(message: types.Message):
     # Получаем данные из Web App
     data = message.web_app_data.data  # Это строка, отправленная из Web App
@@ -180,10 +178,8 @@ async def handle_web_app_data(message: types.Message):
 
     # Отправляем ответ пользователю
     await message.answer(f"Данные из Web App: {data}")
+
 # Запуск бота
-
-
-
 async def main():
     print("Bot is running...")
     await dp.start_polling(botik)
