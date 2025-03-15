@@ -28,6 +28,7 @@ dp = Dispatcher()
 # Команда /start
 @dp.message(Command("start"))
 async def send_welcome(message: types.Message):
+    print('wddsdw')
     telegram_id = message.from_user.id
     add_user(telegram_id)
     photo = FSInputFile(f"{os.getcwd()}/bot/assets/welcome.jpeg")
@@ -176,9 +177,7 @@ async def check(orderId, user):
 # Обработчик данных из Web App
 @dp.message(lambda message: message.content_type == ContentType.WEB_APP_DATA)
 async def handle_web_app_data(message: types.Message):
-    logging.info("Получены данные из Web App")
-    logging.info(f"Тип контента: {message.content_type}")
-    logging.info(f"Данные: {message.web_app_data.data}")
+    print('dcdcd')
     await message.answer(f"Данные из Web App: {message.web_app_data.data}")
 
 # Запуск бота
