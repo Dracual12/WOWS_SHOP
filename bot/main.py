@@ -11,7 +11,8 @@ import time
 import asyncio
 import aiohttp
 import requests
-from aiogram import Bot, Dispatcher, types
+
+from aiogram import Bot, Dispatcher, types, F
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo, FSInputFile
 from aiogram.filters import Command
 from aiogram.enums import ContentType
@@ -52,7 +53,7 @@ async def send_welcome(message: types.Message):
         ),
         reply_markup=main_menu()
     )
-@dp.message(lambda message: message.content_type == ContentType.WEB_APP_DATA)
+@dp.message(F.content_type == ContentType.WEB_APP_DATA)
 async def handle_web_app_data(message: types.Message):
     logging.info("Получены данные из Web App")
     await message.answer(f"Данные из Web App: {message.web_app_data.data}")
