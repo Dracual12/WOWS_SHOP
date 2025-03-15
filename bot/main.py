@@ -129,27 +129,25 @@ async def order_text(user):
 # Проверка статуса оплаты
 async def check(orderId, user):
     url = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
-    start_time = asyncio.get_event_loop().time()
+    start_time = time.time()
     duration = 5 * 60  # 5 минут
     interval = 5  # Интервал проверки (5 секунд)
     glag = False
 
-    # Мы будем использовать session в каждом запросе, чтобы закрыть её правильно.
+    # Синхронный запрос с использованием requests
     try:
-        async with aiohttp.ClientSession() as session:
-            print("Создана сессия", session)
-            while asyncio.get_event_loop().time() - start_time < duration:
-                try:
-                    async with session.get(url) as response:
-                        text = await response.text()
-                        data = json.loads(text)
-                        print(f"Ответ от сервера: {data}")
-                        if data['OrderStatus'] == 2:
-                            glag = True
-                            break
-                except Exception as e:
-                    print(f"Ошибка при запросе статуса заказа: {e}")
-                await asyncio.sleep(interval)
+        while time.time() - start_time < duration:
+            try:
+                response = requests.get(url)
+                text = response.text
+                data = json.loads(text)
+                print(f"Ответ от сервера: {data}")
+                if data['OrderStatus'] == 2:
+                    glag = True
+                    break
+            except Exception as e:
+                print(f"Ошибка при запросе статуса заказа: {e}")
+            time.sleep(interval)
 
         conn = get_db_connection()
         if glag:
@@ -179,14 +177,11 @@ async def check(orderId, user):
                 text='Время на оплату истекло'
             )
             url2 = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
-            async with aiohttp.ClientSession() as session2:
-                print("Создана сессия для второго запроса", session2)
-                await session2.get(url2)
+            response2 = requests.get(url2)
+            print(f"Ответ от второго запроса: {response2.text}")
+
     except Exception as e:
         print(f"Ошибка: {e}")
-    finally:
-        print("Завершаем работу с сессией")
-
 
 # Запуск бота
 # Обработчик сообщений из WebApp
