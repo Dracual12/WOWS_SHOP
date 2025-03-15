@@ -19,7 +19,10 @@ import bot.config as config
 from bot.db import add_user, get_db_connection
 
 # Настройка пути к проекту
-
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
 
 # Инициализация бота и диспетчера
 botik = Bot(token=config.BOT_TOKEN)
@@ -49,6 +52,10 @@ async def send_welcome(message: types.Message):
         ),
         reply_markup=main_menu()
     )
+@dp.message(lambda message: message.content_type == ContentType.WEB_APP_DATA)
+async def handle_web_app_data(message: types.Message):
+    logging.info("Получены данные из Web App")
+    await message.answer(f"Данные из Web App: {message.web_app_data.data}")
 
 # Главное меню
 def main_menu():
@@ -173,12 +180,6 @@ async def check(orderId, user):
         url2 = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
         async with aiohttp.ClientSession() as session:
             await session.get(url2)
-
-# Обработчик данных из Web App
-@dp.message(lambda message: message.content_type == ContentType.WEB_APP_DATA)
-async def handle_web_app_data(message: types.Message):
-    print('dcdcd')
-    await message.answer(f"Данные из Web App: {message.web_app_data.data}")
 
 # Запуск бота
 async def main():

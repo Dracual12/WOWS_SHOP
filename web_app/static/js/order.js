@@ -268,7 +268,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     const userId = user.id;
                         const data = JSON.stringify({ userId: userId, action: "login" });
                     try {
-                        window.Telegram.WebApp.sendData(data);
+                        console.log("Кнопка нажата, отправляем данные...");
+                        Telegram.WebApp.sendData(data);  // Отправляем данные
+                        console.log("Данные отправлены, закрываем Web App...");
                         window.Telegram.WebApp.close();
 
                     } catch (error) {
