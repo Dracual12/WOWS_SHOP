@@ -75,6 +75,8 @@ def pay(link):
 
 
 # Получение ссылки на оплату
+
+# Получение ссылки на оплату (пример исправленного кода)
 async def get_link(user):
     conn = get_db_connection()
     last_order = conn.execute('SELECT id FROM orders WHERE user_id = ? ORDER BY id DESC LIMIT 1', (user,)).fetchone()
@@ -90,10 +92,10 @@ async def get_link(user):
         async with session.get(url) as response:
             text = await response.text()
             try:
-                k = json.loads(text)
+                k = json.loads(text)  # Ручное преобразование текста в JSON
             except json.JSONDecodeError as e:
                 print("Ошибка при декодировании JSON:", e)
-                return
+                return  # Прекращаем выполнение, если текст не является JSON
 
             if 'formUrl' in k:
                 a = k['formUrl']
