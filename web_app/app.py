@@ -10,13 +10,12 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Добавляем корневую директорию в sys.path
 if project_root not in sys.path:
     sys.path.append(project_root)
-
+import importlib
 
 
 
 from bot.db import get_db_connection
 from flask import Flask, render_template, request, jsonify, redirect, url_for
-from bot.main import get_link
 
 # Получаем общий цикл событи
 
