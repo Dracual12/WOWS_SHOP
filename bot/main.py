@@ -133,14 +133,17 @@ async def check(orderId, user):
     duration = 5 * 60  # 5 минут
     interval = 5  # Интервал проверки (5 секунд)
     glag = False
-    session = None
+
+    # Мы будем использовать session в каждом запросе, чтобы закрыть её правильно.
     try:
         async with aiohttp.ClientSession() as session:
+            print("Создана сессия", session)
             while asyncio.get_event_loop().time() - start_time < duration:
                 try:
                     async with session.get(url) as response:
                         text = await response.text()
                         data = json.loads(text)
+                        print(f"Ответ от сервера: {data}")
                         if data['OrderStatus'] == 2:
                             glag = True
                             break
@@ -148,7 +151,6 @@ async def check(orderId, user):
                     print(f"Ошибка при запросе статуса заказа: {e}")
                 await asyncio.sleep(interval)
 
-        # После выполнения сессия будет автоматически закрыта
         conn = get_db_connection()
         if glag:
             await botik.edit_message_text(
@@ -178,12 +180,12 @@ async def check(orderId, user):
             )
             url2 = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
             async with aiohttp.ClientSession() as session2:
+                print("Создана сессия для второго запроса", session2)
                 await session2.get(url2)
     except Exception as e:
         print(f"Ошибка: {e}")
     finally:
-        if session:
-            await session.close() 
+        print("Завершаем работу с сессией")
 
 
 # Запуск бота
