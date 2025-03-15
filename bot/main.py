@@ -202,9 +202,13 @@ async def web_app_handler(message: types.Message):
 # Основной обработчик вебхука
 @app.route(config.WEBHOOK_PATH, methods=["POST"])
 async def telegram_webhook():
-    update = await request.get_json()
-    await dp.feed_update(botik, update)
-    return {"ok": True}
+    try:
+        update = await request.get_json()  # Получаем данные асинхронно
+        await dp.feed_update(botik, update)  # Обрабатываем обновления
+        return {"ok": True}  # Возвращаем успех
+    except Exception as e:
+        logging.error(f"Ошибка при обработке вебхука: {e}")
+        return {"ok": False, "error": str(e)}
 
 
 # Функция для запуска бота
