@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import sys
 
@@ -175,12 +176,10 @@ async def check(orderId, user):
 # Обработчик данных из Web App
 @dp.message(lambda message: message.content_type == ContentType.WEB_APP_DATA)
 async def handle_web_app_data(message: types.Message):
-    # Получаем данные из Web App
-    data = message.web_app_data.data  # Это строка, отправленная из Web App
-    print(f"Получены данные из Web App: {data}")
-
-    # Отправляем ответ пользователю
-    await message.answer(f"Данные из Web App: {data}")
+    logging.info("Получены данные из Web App")
+    logging.info(f"Тип контента: {message.content_type}")
+    logging.info(f"Данные: {message.web_app_data.data}")
+    await message.answer(f"Данные из Web App: {message.web_app_data.data}")
 
 # Запуск бота
 async def main():
@@ -188,5 +187,4 @@ async def main():
     await dp.start_polling(botik)
 
 if __name__ == "__main__":
-    print("Running main coroutine...")
     asyncio.run(main())
