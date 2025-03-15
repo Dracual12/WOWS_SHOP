@@ -147,7 +147,6 @@ async def check(orderId, user):
                     print(f"Ошибка при запросе статуса заказа: {e}")
                 await asyncio.sleep(interval)
 
-
         conn = get_db_connection()
         if glag:
             await botik.edit_message_text(
@@ -178,8 +177,11 @@ async def check(orderId, user):
             url2 = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
             async with aiohttp.ClientSession() as session:
                 await session.get(url2)
+    except Exception as e:
+        print(f"Ошибка: {e}")
     finally:
-        await session.close()
+        await session.close()  # Закрытие сессии явно в finally
+
 
 # Запуск бота
 # Обработчик сообщений из WebApp
