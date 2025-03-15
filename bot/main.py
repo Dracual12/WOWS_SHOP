@@ -6,14 +6,11 @@ import sys
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if project_root not in sys.path:
     sys.path.append(project_root)
-
 import json
 import logging
-
-import time
+import os
 import asyncio
 import aiohttp
-from flask import request
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo, FSInputFile
 from aiogram.filters import Command
@@ -21,7 +18,6 @@ import bot.config as config
 from bot.db import add_user, get_db_connection
 from web_app.app import app
 
-# Настройка пути к проекту
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -88,48 +84,33 @@ async def get_link(user):
 
     url = f"https://payment.alfabank.ru/payment/rest/register.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderNumber={order_id}&amount={cart}&returnUrl=https://t.me/armada_gold_bot"
 
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            text = await response.text()
-            try:
-                k = json.loads(text)
-            except json.JSONDecodeError as e:
-                print("Ошибка при декодировании JSON:", e)
-                return
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                text = await response.text()
+                try:
+                    k = json.loads(text)
+                except json.JSONDecodeError as e:
+                    print("Ошибка при декодировании JSON:", e)
+                    return
 
-            if 'formUrl' in k:
-                a = k['formUrl']
-                message_obj = await botik.send_message(
-                    user,
-                    text="Нажимая «Оплатить» Вы принимаете положения Политики Конфиденциальности и Пользовательского Соглашения",
-                    reply_markup=pay(a)
-                )
-                conn = get_db_connection()
-                conn.execute('UPDATE users SET message_id = ? WHERE telegram_id = ?', (message_obj.message_id, user))
-                conn.commit()
-                conn.close()
-                await check(k['orderId'], user)
-            else:
-                print("Ключ 'formUrl' отсутствует в словаре k:", k)
-
-
-# Получение текста заказа
-async def order_text(user):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT * FROM orders 
-        WHERE user_id = ? 
-        ORDER BY id DESC 
-        LIMIT 1
-    """, (user,))
-    row = cursor.fetchone()
-    conn.close()
-
-    if row:
-        return dict(row)
-    else:
-        return None
+                if 'formUrl' in k:
+                    a = k['formUrl']
+                    message_obj = await botik.send_message(
+                        user,
+                        text="Нажимая «Оплатить» Вы принимаете положения Политики Конфиденциальности и Пользовательского Соглашения",
+                        reply_markup=pay(a)
+                    )
+                    conn = get_db_connection()
+                    conn.execute('UPDATE users SET message_id = ? WHERE telegram_id = ?',
+                                 (message_obj.message_id, user))
+                    conn.commit()
+                    conn.close()
+                    await check(k['orderId'], user)
+                else:
+                    print("Ключ 'formUrl' отсутствует в словаре k:", k)
+    except Exception as e:
+        print(f"Ошибка при запросе: {e}")
 
 
 # Проверка статуса оплаты
@@ -140,7 +121,6 @@ async def check(orderId, user):
     interval = 5  # Интервал проверки (5 секунд)
     glag = False
 
-    # Используем асинхронный запрос с aiohttp
     try:
         while time.time() - start_time < duration:
             try:
@@ -183,13 +163,8 @@ async def check(orderId, user):
                 message_id=conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)).fetchone()[0],
                 text='Время на оплату истекло'
             )
-            url2 = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
-            async with aiohttp.ClientSession() as session:
-                response2 = await session.get(url2)
-                print(f"Ответ от второго запроса: {response2.text}")
-
     except Exception as e:
-        print(f"Ошибка: {e}")
+        print(f"Ошибка при проверке статуса: {e}")
 
 
 # Запуск бота
