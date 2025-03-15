@@ -2,6 +2,14 @@ import json
 import logging
 import os
 import sys
+
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if project_root not in sys.path:
+    sys.path.append(project_root)
+
+import json
+import logging
+
 import time
 import asyncio
 import aiohttp
