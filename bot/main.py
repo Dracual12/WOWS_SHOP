@@ -11,21 +11,20 @@ import time
 import asyncio
 import aiohttp
 import requests
-
+from flask import request
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo, FSInputFile
 from aiogram.filters import Command
 from aiogram.enums import ContentType
 import bot.config as config
 from bot.db import add_user, get_db_connection
-
+from web_app.app import app
 # Настройка пути к проекту
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 
-# Инициализация бота и диспетчера
 botik = Bot(token=config.BOT_TOKEN)
 dp = Dispatcher()
 
@@ -53,9 +52,6 @@ async def send_welcome(message: types.Message):
         ),
         reply_markup=main_menu()
     )
-@dp.message()
-async def catch_all(message: types.Message):
-    print(message)
 
 
 # Главное меню
@@ -183,9 +179,30 @@ async def check(orderId, user):
             await session.get(url2)
 
 # Запуск бота
-async def main():
-    logging.info("Запуск бота...")
-    await dp.start_polling(botik)
+# Обработчик сообщений из WebApp
+@dp.message(lambda message: message.web_app_data)
+async def web_app_handler(message: types.Message):
+    data = message.web_app_data.data  # Получаем JSON-строку
+    logging.info(f"Получены данные от WebApp: {data}")
+    await message.answer(f"Данные получены: {data}")
 
+# Основной обработчик вебхука
+@app.route(config.WEBHOOK_PATH, methods=["POST"])
+def telegram_webhook():
+    update = request.get_json()
+    asyncio.run(dp.feed_update(botik, update))
+    return {"ok": True}
+
+# Функция для запуска бота
+async def main():
+    logging.info("Удаляем старый вебхук...")
+    await botik.delete_webhook()
+
+    logging.info(f"Устанавливаем новый вебхук: {config.WEBHOOK_URL}")
+    await botik.set_webhook(url=config.WEBHOOK_URL)
+
+    logging.info("Бот запущен через вебхук.")
+
+# Запускаем бота
 if __name__ == "__main__":
     asyncio.run(main())
