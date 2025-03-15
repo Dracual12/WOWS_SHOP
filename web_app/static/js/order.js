@@ -266,8 +266,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 const user = window.Telegram.WebApp.initDataUnsafe.user;
                 if (user && user.id) {
                     const userId = user.id;
+                        const data = JSON.stringify({ userId: userId, action: "login" });
                     try {
-                        window.Telegram.WebApp.sendData(userId.toString());
+                        window.Telegram.WebApp.sendData(data);
                         window.Telegram.WebApp.close();
 
                     } catch (error) {
