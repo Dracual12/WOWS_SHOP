@@ -183,7 +183,7 @@ async def handle_web_app_data(message: types.Message):
 
 # Запуск бота
 async def main():
-    print("Bot is running...")
+    logging.info("Запуск бота...")
     await dp.start_polling(botik)
 
 if __name__ == "__main__":
