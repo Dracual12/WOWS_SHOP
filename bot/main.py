@@ -53,7 +53,7 @@ async def send_welcome(message: types.Message):
         ),
         reply_markup=main_menu()
     )
-@dp.message(F.content_type == ContentType.WEB_APP_DATA)
+@dp.message(lambda message: message.web_app_data)
 async def handle_web_app_data(message: types.Message):
     logging.info("Получены данные из Web App")
     await message.answer(f"Данные из Web App: {message.web_app_data.data}")
