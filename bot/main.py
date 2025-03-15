@@ -133,50 +133,53 @@ async def check(orderId, user):
     duration = 5 * 60  # 5 минут
     interval = 5  # Интервал проверки (5 секунд)
     glag = False
-
-    async with aiohttp.ClientSession() as session:
-        while asyncio.get_event_loop().time() - start_time < duration:
-            try:
-                async with session.get(url) as response:
-                    text = await response.text()
-                    data = json.loads(text)
-                    if data['OrderStatus'] == 2:
-                        glag = True
-                        break
-            except Exception as e:
-                print(f"Ошибка при запросе статуса заказа: {e}")
-            await asyncio.sleep(interval)
-
-    conn = get_db_connection()
-    if glag:
-        await botik.edit_message_text(
-            chat_id=user,
-            message_id=conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)).fetchone()[0],
-            text='Заказ успешно оплачен!'
-        )
-        conn.execute("DELETE FROM cart WHERE user_id = ?", (user,))
-        conn.commit()
-        data = await order_text(user)
-        message = f"""
-        Детали заказа:
-        ———————————————
-        🆔 ID заказа: {data['id']}
-        👤 User ID: id <a href="tg://user?id={data['user_id']}">{data['user_id']}</a>
-        🛒 Корзина: {data['cart']}
-        🔑 OTP-код: {data['otp_code']}
-        ———————————————
-        Спасибо за ваш заказ! 😊
-        """
-        await botik.send_message(config.ADMIN_ID, message, parse_mode='HTML')
-    else:
-        await botik.edit_message_text(
-            chat_id=user,
-            message_id=conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)).fetchone()[0],
-            text='Время на оплату истекло'
-        )
-        url2 = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
+    try:
         async with aiohttp.ClientSession() as session:
-            await session.get(url2)
+            while asyncio.get_event_loop().time() - start_time < duration:
+                try:
+                    async with session.get(url) as response:
+                        text = await response.text()
+                        data = json.loads(text)
+                        if data['OrderStatus'] == 2:
+                            glag = True
+                            break
+                except Exception as e:
+                    print(f"Ошибка при запросе статуса заказа: {e}")
+                await asyncio.sleep(interval)
+
+
+        conn = get_db_connection()
+        if glag:
+            await botik.edit_message_text(
+                chat_id=user,
+                message_id=conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)).fetchone()[0],
+                text='Заказ успешно оплачен!'
+            )
+            conn.execute("DELETE FROM cart WHERE user_id = ?", (user,))
+            conn.commit()
+            data = await order_text(user)
+            message = f"""
+            Детали заказа:
+            ———————————————
+            🆔 ID заказа: {data['id']}
+            👤 User ID: id <a href="tg://user?id={data['user_id']}">{data['user_id']}</a>
+            🛒 Корзина: {data['cart']}
+            🔑 OTP-код: {data['otp_code']}
+            ———————————————
+            Спасибо за ваш заказ! 😊
+            """
+            await botik.send_message(config.ADMIN_ID, message, parse_mode='HTML')
+        else:
+            await botik.edit_message_text(
+                chat_id=user,
+                message_id=conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)).fetchone()[0],
+                text='Время на оплату истекло'
+            )
+            url2 = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
+            async with aiohttp.ClientSession() as session:
+                await session.get(url2)
+    finally:
+        await session.close()
 
 # Запуск бота
 # Обработчик сообщений из WebApp
