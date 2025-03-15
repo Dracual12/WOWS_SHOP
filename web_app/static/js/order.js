@@ -267,8 +267,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (user && user.id) {
                     const userId = user.id;
                     try {
-                        window.Telegram.WebApp.sendData(userId);
-                        alert('kfvmf');
+                        window.Telegram.WebApp.sendData(userId.toString());
                         window.Telegram.WebApp.close();
 
                     } catch (error) {
