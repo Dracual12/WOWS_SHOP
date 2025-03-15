@@ -2,23 +2,17 @@ import json
 import logging
 import os
 import sys
-
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-if project_root not in sys.path:
-    sys.path.append(project_root)
-
 import time
 import asyncio
 import aiohttp
-import requests
 from flask import request
-from aiogram import Bot, Dispatcher, types, F
+from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo, FSInputFile
 from aiogram.filters import Command
-from aiogram.enums import ContentType
 import bot.config as config
 from bot.db import add_user, get_db_connection
 from web_app.app import app
+
 # Настройка пути к проекту
 logging.basicConfig(
     level=logging.INFO,
@@ -28,10 +22,10 @@ logging.basicConfig(
 botik = Bot(token=config.BOT_TOKEN)
 dp = Dispatcher()
 
+
 # Команда /start
 @dp.message(Command("start"))
 async def send_welcome(message: types.Message):
-    print('wddsdw')
     telegram_id = message.from_user.id
     add_user(telegram_id)
     photo = FSInputFile(f"{os.getcwd()}/bot/assets/welcome.jpeg")
@@ -63,6 +57,7 @@ def main_menu():
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
+
 # Клавиатура для оплаты
 def pay(link):
     buttons = [
@@ -71,6 +66,7 @@ def pay(link):
          InlineKeyboardButton(text="Политика конфиденциальности", url="https://clck.ru/3GHACe")]
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
+
 
 # Получение ссылки на оплату
 async def get_link(user):
@@ -83,30 +79,31 @@ async def get_link(user):
     conn.close()
 
     url = f"https://payment.alfabank.ru/payment/rest/register.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderNumber={order_id}&amount={cart}&returnUrl=https://t.me/armada_gold_bot"
-    response = requests.get(url)
-    text = response.text
-    print(type(text))
-    print(text)
-    try:
-        k = json.loads(text)  # Ручное преобразование текста в JSON
-    except json.JSONDecodeError as e:
-        print("Ошибка при декодировании JSON:", e)
-        return  # Прекращаем выполнение, если текст не является JSON
 
-    if 'formUrl' in k:
-        a = k['formUrl']
-        message_obj = await botik.send_message(
-            user,
-            text="Нажимая «Оплатить» Вы принимаете положения Политики Конфиденциальности и Пользовательского Соглашения",
-            reply_markup=pay(a)
-        )
-        conn = get_db_connection()
-        conn.execute('UPDATE users SET message_id = ? WHERE telegram_id = ?', (message_obj.message_id, user))
-        conn.commit()
-        conn.close()
-        await check(k['orderId'], user)
-    else:
-        print("Ключ 'formUrl' отсутствует в словаре k:", k)
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            text = await response.text()
+            try:
+                k = json.loads(text)
+            except json.JSONDecodeError as e:
+                print("Ошибка при декодировании JSON:", e)
+                return
+
+            if 'formUrl' in k:
+                a = k['formUrl']
+                message_obj = await botik.send_message(
+                    user,
+                    text="Нажимая «Оплатить» Вы принимаете положения Политики Конфиденциальности и Пользовательского Соглашения",
+                    reply_markup=pay(a)
+                )
+                conn = get_db_connection()
+                conn.execute('UPDATE users SET message_id = ? WHERE telegram_id = ?', (message_obj.message_id, user))
+                conn.commit()
+                conn.close()
+                await check(k['orderId'], user)
+            else:
+                print("Ключ 'formUrl' отсутствует в словаре k:", k)
+
 
 # Получение текста заказа
 async def order_text(user):
@@ -126,6 +123,7 @@ async def order_text(user):
     else:
         return None
 
+
 # Проверка статуса оплаты
 async def check(orderId, user):
     url = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
@@ -134,20 +132,21 @@ async def check(orderId, user):
     interval = 5  # Интервал проверки (5 секунд)
     glag = False
 
-    # Синхронный запрос с использованием requests
+    # Используем асинхронный запрос с aiohttp
     try:
         while time.time() - start_time < duration:
             try:
-                response = requests.get(url)
-                text = response.text
-                data = json.loads(text)
-                print(f"Ответ от сервера: {data}")
-                if data['OrderStatus'] == 2:
-                    glag = True
-                    break
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(url) as response:
+                        text = await response.text()
+                        data = json.loads(text)
+                        print(f"Ответ от сервера: {data}")
+                        if data['OrderStatus'] == 2:
+                            glag = True
+                            break
             except Exception as e:
                 print(f"Ошибка при запросе статуса заказа: {e}")
-            time.sleep(interval)
+            await asyncio.sleep(interval)
 
         conn = get_db_connection()
         if glag:
@@ -177,11 +176,13 @@ async def check(orderId, user):
                 text='Время на оплату истекло'
             )
             url2 = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
-            response2 = requests.get(url2)
-            print(f"Ответ от второго запроса: {response2.text}")
+            async with aiohttp.ClientSession() as session:
+                response2 = await session.get(url2)
+                print(f"Ответ от второго запроса: {response2.text}")
 
     except Exception as e:
         print(f"Ошибка: {e}")
+
 
 # Запуск бота
 # Обработчик сообщений из WebApp
@@ -191,12 +192,14 @@ async def web_app_handler(message: types.Message):
     logging.info(f"Получены данные от WebApp: {data}")
     await message.answer(f"Данные получены: {data}")
 
+
 # Основной обработчик вебхука
 @app.route(config.WEBHOOK_PATH, methods=["POST"])
-def telegram_webhook():
-    update = request.get_json()
-    asyncio.run(dp.feed_update(botik, update))
+async def telegram_webhook():
+    update = await request.get_json()
+    await dp.feed_update(botik, update)
     return {"ok": True}
+
 
 # Функция для запуска бота
 async def main():
@@ -207,6 +210,7 @@ async def main():
     await botik.set_webhook(url=config.WEBHOOK_URL)
 
     logging.info("Бот запущен через вебхук.")
+
 
 # Запускаем бота
 if __name__ == "__main__":
