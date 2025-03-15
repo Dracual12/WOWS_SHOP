@@ -29,7 +29,6 @@ botik = Bot(token=config.BOT_TOKEN)
 dp = Dispatcher()
 
 
-# Команда /start
 @dp.message(Command("start"))
 async def send_welcome(message: types.Message):
     telegram_id = message.from_user.id
@@ -64,7 +63,6 @@ def main_menu():
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
-# Клавиатура для оплаты
 def pay(link):
     buttons = [
         [InlineKeyboardButton(text="Оплатить", url=link)],
@@ -76,7 +74,6 @@ def pay(link):
 
 # Получение ссылки на оплату
 
-# Получение ссылки на оплату (пример исправленного кода)
 async def get_link(user):
     conn = get_db_connection()
     last_order = conn.execute('SELECT id FROM orders WHERE user_id = ? ORDER BY id DESC LIMIT 1', (user,)).fetchone()
@@ -92,10 +89,10 @@ async def get_link(user):
         async with session.get(url) as response:
             text = await response.text()
             try:
-                k = json.loads(text)  # Ручное преобразование текста в JSON
+                k = json.loads(text)
             except json.JSONDecodeError as e:
                 print("Ошибка при декодировании JSON:", e)
-                return  # Прекращаем выполнение, если текст не является JSON
+                return
 
             if 'formUrl' in k:
                 a = k['formUrl']
@@ -113,7 +110,6 @@ async def get_link(user):
                 print("Ключ 'formUrl' отсутствует в словаре k:", k)
 
 
-# Получение текста заказа
 async def order_text(user):
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -136,11 +132,10 @@ async def order_text(user):
 async def check(orderId, user):
     url = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
     start_time = time.time()
-    duration = 5 * 60  # 5 минут
-    interval = 5  # Интервал проверки (5 секунд)
+    duration = 5 * 60
+    interval = 5
     glag = False
 
-    # Используем асинхронный запрос с aiohttp
     try:
         while time.time() - start_time < duration:
             try:
@@ -192,28 +187,26 @@ async def check(orderId, user):
         print(f"Ошибка: {e}")
 
 
-# Запуск бота
-# Обработчик сообщений из WebApp
 @dp.message(lambda message: message.web_app_data)
 async def web_app_handler(message: types.Message):
-    data = message.web_app_data.data  # Получаем JSON-строку
+    data = message.web_app_data.data
     logging.info(f"Получены данные от WebApp: {data}")
     await message.answer(f"Данные получены: {data}")
 
 
-# Основной обработчик вебхука
+
 @app.route(config.WEBHOOK_PATH, methods=["POST"])
 async def telegram_webhook():
     try:
-        update = await request.get_json()  # Получаем данные асинхронно
-        await dp.feed_update(botik, update)  # Обрабатываем обновления
-        return {"ok": True}  # Возвращаем успех
+        update = await request.get_json()
+        await dp.feed_update(botik, update)
+        return {"ok": True}
     except Exception as e:
         logging.error(f"Ошибка при обработке вебхука: {e}")
         return {"ok": False, "error": str(e)}
 
 
-# Функция для запуска бота
+
 async def main():
     logging.info("Удаляем старый вебхук...")
     await botik.delete_webhook()
