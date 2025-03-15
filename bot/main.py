@@ -133,6 +133,7 @@ async def check(orderId, user):
     duration = 5 * 60  # 5 минут
     interval = 5  # Интервал проверки (5 секунд)
     glag = False
+    session = None
     try:
         async with aiohttp.ClientSession() as session:
             while asyncio.get_event_loop().time() - start_time < duration:
@@ -147,6 +148,7 @@ async def check(orderId, user):
                     print(f"Ошибка при запросе статуса заказа: {e}")
                 await asyncio.sleep(interval)
 
+        # После выполнения сессия будет автоматически закрыта
         conn = get_db_connection()
         if glag:
             await botik.edit_message_text(
@@ -175,12 +177,13 @@ async def check(orderId, user):
                 text='Время на оплату истекло'
             )
             url2 = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
-            async with aiohttp.ClientSession() as session:
-                await session.get(url2)
+            async with aiohttp.ClientSession() as session2:
+                await session2.get(url2)
     except Exception as e:
         print(f"Ошибка: {e}")
     finally:
-        await session.close()  # Закрытие сессии явно в finally
+        if session:
+            await session.close() 
 
 
 # Запуск бота
