@@ -239,13 +239,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (user && user.id) {
                     const userId = user.id;
                     try {
-                        const response = await fetch('/api/order/end', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ telegram_id: userId })
-                        });
-                        console.log('Запрос выполнен успешно');
-                        window.Telegram.WebApp.close();
+
+                    console.log('Запрос выполнен успешно');
+                    window.Telegram.WebApp.close();
+                    const response = await fetch('/api/order/end', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ telegram_id: userId })
+                    });
                     } catch (error) {
                         console.error('Ошибка при отправке запроса:', error);
                     }
