@@ -149,7 +149,6 @@ def check(orderId, user):
 
     conn = get_db_connection()
     if glag:
-        send_telegram('Заказ успешно оплачен!', BOT_TOKEN, user)
         edit_telegram_message(BOT_TOKEN, user, conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)).fetchone()[0], 'Заказ успешно оплачен!')
         conn.execute("DELETE FROM cart WHERE user_id = ?", (user,))
         conn.commit()
