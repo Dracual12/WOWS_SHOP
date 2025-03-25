@@ -149,7 +149,7 @@ def check(orderId, user):
 
     conn = get_db_connection()
     if glag:
-        send_telegram('Заказ успешно оплачен!', BOT_TOKEN, user, )
+        send_telegram('Заказ успешно оплачен!', BOT_TOKEN, user)
         edit_telegram_message(BOT_TOKEN, user, conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)).fetchone()[0], 'Заказ успешно оплачен!')
         conn.execute("DELETE FROM cart WHERE user_id = ?", (user,))
         conn.commit()
@@ -164,7 +164,7 @@ def check(orderId, user):
         ———————————————
         Спасибо за ваш заказ! 😊
         """
-        send_telegram(config.ADMIN_ID, message, parse_mode='HTML')
+        send_telegram(message, BOT_TOKEN, config.ADMIN_ID)
     else:
         edit_telegram_message(BOT_TOKEN, user, conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)).fetchone()[0], 'Время на оплату истекло')
         url2 = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
