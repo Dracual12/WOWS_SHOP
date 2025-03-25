@@ -145,7 +145,6 @@ def check(orderId, user):
                 break
         except Exception as e:
             print(f"Ошибка при запросе статуса заказа: {e}")
-        time.sleep(interval)
 
     conn = get_db_connection()
     if glag:
