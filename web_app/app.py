@@ -81,6 +81,7 @@ def pay(link):
 
 # Получение ссылки на оплату
 def get_link(user):
+    print(user)
     conn = get_db_connection()
     last_order = conn.execute('SELECT id FROM orders WHERE user_id = ? ORDER BY id DESC LIMIT 1', (user,)).fetchone()
     order_id = int(dict(last_order)['id']) + 100060
@@ -92,7 +93,6 @@ def get_link(user):
     url = f"https://payment.alfabank.ru/payment/rest/register.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderNumber={order_id}&amount={cart}&returnUrl=https://t.me/armada_gold_bot"
     response = requests.get(url)
     text = response.text
-    print(text)
     try:
         k = json.loads(text)  # Ручное преобразование текста в JSON
     except json.JSONDecodeError as e:
@@ -106,7 +106,6 @@ def get_link(user):
         conn.execute('UPDATE users SET message_id = ? WHERE telegram_id = ?', (k2, user))
         conn.commit()
         conn.close()
-        print(k)
         check(k['orderId'], user)
     else:
         print("Ключ 'formUrl' отсутствует в словаре k:", k)
