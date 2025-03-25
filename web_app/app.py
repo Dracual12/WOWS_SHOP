@@ -101,9 +101,9 @@ def get_link(user):
 
     if 'formUrl' in k:
         a = k['formUrl']
-        k = send_telegram(user, BOT_TOKEN,"Нажимая «Оплатить» Вы принимаете положения Политики Конфиденциальности и Пользовательского Соглашения", pay(a))
+        k2 = send_telegram(user, BOT_TOKEN,"Нажимая «Оплатить» Вы принимаете положения Политики Конфиденциальности и Пользовательского Соглашения", pay(a))
         conn = get_db_connection()
-        conn.execute('UPDATE users SET message_id = ? WHERE telegram_id = ?', (k, user))
+        conn.execute('UPDATE users SET message_id = ? WHERE telegram_id = ?', (k2, user))
         conn.commit()
         conn.close()
         print(k)
