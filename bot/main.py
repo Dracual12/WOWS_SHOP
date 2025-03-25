@@ -24,6 +24,7 @@ dp = Dispatcher()
 @dp.message(Command("start"))
 async def send_welcome(message: types.Message):
     telegram_id = message.from_user.id
+    print(message.from_user.username)
     add_user(telegram_id)
     photo = FSInputFile(f"{os.getcwd()}/bot/assets/welcome.jpeg")
     await botik.send_photo(
