@@ -5,6 +5,10 @@ import os
 import json
 from threading import Thread
 
+import requests
+
+from bot import config
+
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 # Добавляем корневую директорию в sys.path
@@ -17,11 +21,22 @@ if project_root not in sys.path:
 from bot.db import get_db_connection
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from bot.main import get_link
-
+BOT_TOKEN = "7574071837:AAFE0A2rW27YmxOi40AG68577fK3zluinu4"
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+def send_telegram(text: str, BOT_TOKEN, CHAT_ID):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    params = {
+        "chat_id": CHAT_ID,
+        "text": text,
+        "parse_mode": "HTML"  # Опционально для форматирования
+    }
+    requests.post(url, params=params)
+
 
 def run_async_code(tg):
     try:
@@ -148,11 +163,7 @@ def some_route():
 
     if not tg:
         return jsonify({"error": "telegram_id is required"}), 400
-
-    # Запускаем поток без блокировки
-    thread = Thread(target=run_async_code, args=(tg,))
-    thread.start()
-
+    send_telegram('ldm,cldc', BOT_TOKEN, tg)
     # Возвращаем ответ сразу после запуска потока
     return jsonify({"message": "Запрос принят в обработку", "telegram_id": tg}), 202
 
