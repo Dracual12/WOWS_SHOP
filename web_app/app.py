@@ -106,6 +106,7 @@ def get_link(user):
         conn.execute('UPDATE users SET message_id = ? WHERE telegram_id = ?', (k, user))
         conn.commit()
         conn.close()
+        print(k)
         check(k['orderId'], user)
     else:
         print("Ключ 'formUrl' отсутствует в словаре k:", k)
