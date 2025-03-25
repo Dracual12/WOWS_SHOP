@@ -3,7 +3,7 @@ import logging
 import sys
 import os
 import json
-from threading import Thread
+import time
 
 import requests
 
@@ -16,11 +16,163 @@ if project_root not in sys.path:
     sys.path.append(project_root)
 
 
+def edit_telegram_message(
+        BOT_TOKEN: str,
+        chat_id: str,
+        message_id: int,
+        new_text: str,
+        reply_markup=None,
+        parse_mode="HTML"
+):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageText"
+    params = {
+        "chat_id": chat_id,
+        "message_id": message_id,
+        "text": new_text,
+        "parse_mode": parse_mode
+    }
+
+    if reply_markup:
+        params["reply_markup"] = json.dumps(reply_markup)
+
+    response = requests.post(url, params=params).json()
+
+    if response.get("ok"):
+        return True
+    else:
+        print("Ошибка редактирования:", response)
+        return False
+
+def send_telegram(text: str, BOT_TOKEN: str, CHAT_ID: str, reply_markup=None):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    params = {
+        "chat_id": CHAT_ID,
+        "text": text,
+        "parse_mode": "HTML",  # или "MarkdownV2"
+    }
+
+    if reply_markup:
+        params["reply_markup"] = json.dumps(reply_markup)
+
+    response = requests.post(url, params=params).json()
+
+    if response.get("ok"):
+        return response["result"]["message_id"]  # Возвращаем message_id
+    else:
+        print("Ошибка отправки:", response)
+        return None
+
+
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo, FSInputFile
+# Клавиатура для оплаты
+def pay(link):
+    keyboard = {
+        "inline_keyboard": [
+            [
+                {"text": "Оплатить", "url": f"{link}"},
+                {"text": "Пользовательское соглашение", "url": "https://clck.ru/3GgzNq"}
+            ],
+            [
+                {"text": "Политика конфиденциальности", "url": "https://clck.ru/3GHACe"}
+            ]
+        ]
+    }
+    return keyboard
+
+# Получение ссылки на оплату
+def get_link(user):
+    conn = get_db_connection()
+    last_order = conn.execute('SELECT id FROM orders WHERE user_id = ? ORDER BY id DESC LIMIT 1', (user,)).fetchone()
+    order_id = int(dict(last_order)['id']) + 100060
+    last_cart = conn.execute('SELECT cart FROM orders ORDER BY id DESC LIMIT 1').fetchone()
+    last_cart = dict(last_cart)
+    cart = int((last_cart['cart'].split('Итого:')[1]).split()[0])
+    conn.close()
+
+    url = f"https://payment.alfabank.ru/payment/rest/register.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderNumber={order_id}&amount={cart}&returnUrl=https://t.me/armada_gold_bot"
+    response = requests.get(url)
+    text = response.text
+    print(text)
+    try:
+        k = json.loads(text)  # Ручное преобразование текста в JSON
+    except json.JSONDecodeError as e:
+        print("Ошибка при декодировании JSON:", e)
+        return  # Прекращаем выполнение, если текст не является JSON
+
+    if 'formUrl' in k:
+        a = k['formUrl']
+        k = send_telegram(user, BOT_TOKEN,"Нажимая «Оплатить» Вы принимаете положения Политики Конфиденциальности и Пользовательского Соглашения", pay(a))
+        conn = get_db_connection()
+        conn.execute('UPDATE users SET message_id = ? WHERE telegram_id = ?', (k, user))
+        conn.commit()
+        conn.close()
+        check(k['orderId'], user)
+    else:
+        print("Ключ 'formUrl' отсутствует в словаре k:", k)
+# Получение текста заказа
+def order_text(user):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT * FROM orders 
+        WHERE user_id = ? 
+        ORDER BY id DESC 
+        LIMIT 1
+    """, (user,))
+    row = cursor.fetchone()
+    conn.close()
+
+    if row:
+        return dict(row)
+    else:
+        return None
+
+# Проверка статуса оплаты
+def check(orderId, user):
+    url = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
+    start_time = time.time()
+    duration = 5 * 60  # 5 минут
+    interval = 5  # Интервал проверки (5 секунд)
+    glag = False
+
+    while time.time() - start_time < duration:
+        try:
+            response = requests.get(url)
+
+            data = response.json()
+            if data['OrderStatus'] == 2:
+                glag = True
+                break
+        except Exception as e:
+            print(f"Ошибка при запросе статуса заказа: {e}")
+        asyncio.sleep(interval)
+
+    conn = get_db_connection()
+    if glag:
+        send_telegram('Заказ успешно оплачен!', BOT_TOKEN, user, )
+        edit_telegram_message(BOT_TOKEN, user, conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)).fetchone()[0], 'Заказ успешно оплачен!')
+        conn.execute("DELETE FROM cart WHERE user_id = ?", (user,))
+        conn.commit()
+        data = order_text(user)
+        message = f"""
+        Детали заказа:
+        ———————————————
+        🆔 ID заказа: {data['id']}
+        👤 User ID: id <a href="tg://user?id={data['user_id']}">{data['user_id']}</a>
+        🛒 Корзина: {data['cart']}
+        🔑 OTP-код: {data['otp_code']}
+        ———————————————
+        Спасибо за ваш заказ! 😊
+        """
+        send_telegram(config.ADMIN_ID, message, parse_mode='HTML')
+    else:
+        edit_telegram_message(BOT_TOKEN, user, conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)).fetchone()[0], 'Время на оплату истекло')
+        url2 = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
+        requests.get(url2)
 
 
 from bot.db import get_db_connection
 from flask import Flask, render_template, request, jsonify, redirect, url_for
-from bot.main import get_link
 BOT_TOKEN = "7574071837:AAFE0A2rW27YmxOi40AG68577fK3zluinu4"
 
 app = Flask(__name__)
@@ -28,26 +180,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def send_telegram(text: str, BOT_TOKEN, CHAT_ID):
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    params = {
-        "chat_id": CHAT_ID,
-        "text": text,
-        "parse_mode": "HTML"  # Опционально для форматирования
-    }
-    requests.post(url, params=params)
 
 
-def run_async_code(tg):
-    try:
-        # Ваш асинхронный код
-        logger.info(f"Запущен поток для telegram_id: {tg}")
-        # Пример долгой операции
-        import time
-        time.sleep(10)
-        logger.info(f"Завершен поток для telegram_id: {tg}")
-    except Exception as e:
-        logger.error(f"Ошибка в потоке для telegram_id {tg}: {e}")
 
 
 
@@ -149,12 +283,6 @@ def save_link():
     return jsonify({'message': "cool"})
 
 
-def run_async_code(tg):
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    result = loop.run_until_complete(get_link(tg))
-    loop.close()
-    return result
 
 @app.route('/api/order/end', methods=['POST'])
 def some_route():
@@ -163,7 +291,7 @@ def some_route():
 
     if not tg:
         return jsonify({"error": "telegram_id is required"}), 400
-    send_telegram('ldm,cldc', BOT_TOKEN, tg)
+    get_link(tg)
     # Возвращаем ответ сразу после запуска потока
     return jsonify({"message": "Запрос принят в обработку", "telegram_id": tg}), 202
 
