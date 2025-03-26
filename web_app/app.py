@@ -157,7 +157,7 @@ def check(orderId, user):
         ———————————————
         🆔 ID заказа: {data['id']}
         👤 User ID: id <a href="tg://user?id={data['user_id']}">{data['user_id']}</a>
-           Username: @{conn.execute("SELECT username FROM users WHERE telegram_id = ?",(user,))}
+           Username: @{conn.execute("SELECT username FROM users WHERE telegram_id = ?",(user,)).fetchone()[0]}
         🛒 Корзина: {data['cart']}
         🔑 OTP-код: {data['otp_code']}
         ———————————————
