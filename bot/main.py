@@ -38,7 +38,8 @@ async def send_welcome(message: types.Message):
 
             f'<b>Чтобы начать, нажмите «Открыть магазин»</b> 👇'
         ),
-        reply_markup=main_menu()
+        reply_markup=main_menu(),
+        parse_mode='HTML'
     )
 
 # Главное меню
