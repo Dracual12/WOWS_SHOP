@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 body: JSON.stringify({ tg_id: userId }),
             });
         }
-
+        checkoutButtonProduct.disabled = false;
         // Закрываем окно корзины
         const cartDropdownProduct = document.querySelector('.cart-dropdown-product');
         cartDropdownProduct.classList.remove('active');
