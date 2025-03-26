@@ -22,11 +22,12 @@ document.addEventListener("DOMContentLoaded", () => {
     checkoutButtonProduct.addEventListener("click", async () => {
         // Проверяем, есть ли товары в корзине
         const cartItems = cartItemsContainer.querySelectorAll("li");
+        alert(cartItems.length)
         if (cartItems.length === 0) {
             showNotification("Корзина пуста!");
             return; // Прекращаем выполнение, если корзина пуста
         }
-        else {
+
         if (window.Telegram && window.Telegram.WebApp) {
             const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
             // Выводим Telegram ID в консоль сервера, отправив его через fetch
@@ -47,11 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
         addToCartButton.disabled = true;
 
         // Показываем всплывающее окно оформления заказа (первый шаг)
-        if (cartItems.length === 0) {
-            showNotification("Корзина пуста!");
-            return; // Прекращаем выполнение, если корзина пуста
-        }
-        }
+        showOrderPopup();
     });
 
     // Функция для показа уведомления
@@ -251,6 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ telegram_id: userId })
                     });
+
                     } catch (error) {
                         console.error('Ошибка при отправке запроса:', error);
                     }
