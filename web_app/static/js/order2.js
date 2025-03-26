@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
         cartDropdownProduct.classList.remove('active');
 
         // Блокируем кнопку корзины
-        checkoutButton.disabled = true;
+        checkoutButtonProduct.disabled = true;
 
         // Показываем всплывающее окно оформления заказа (первый шаг)
         showOrderPopup();
