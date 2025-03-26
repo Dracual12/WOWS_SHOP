@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     checkoutButton.addEventListener("click", async () => {
         // Проверяем, есть ли товары в корзине
-        getCart(window.Telegram.WebApp.initDataUnsafe.user.id;).then(({items, count}) => {
+        getCart(window.Telegram.WebApp.initDataUnsafe.user.id).then(({items, count}) => {
         if (count > 0) {
             if (window.Telegram && window.Telegram.WebApp) {
             const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
