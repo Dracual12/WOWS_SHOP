@@ -9,13 +9,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     checkoutButton.addEventListener("click", async () => {
         // Проверяем, есть ли товары в корзине
-        const cartItems = cartItemsContainer.querySelectorAll("li");
-        if (cartItems.length === 0) {
-            showNotification("Корзина пуста!");
-            return; // Прекращаем выполнение, если корзина пуста
-        }
-        else {
-        if (window.Telegram && window.Telegram.WebApp) {
+        getCart(window.Telegram.WebApp.initDataUnsafe.user.id;).then(({items, count}) => {
+        if (count > 0) {
+            if (window.Telegram && window.Telegram.WebApp) {
             const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
             // Выводим Telegram ID в консоль сервера, отправив его через fetch
             fetch("/save-tg-id", {
@@ -36,9 +32,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Показываем всплывающее окно оформления заказа (первый шаг)
         showOrderPopup();
+
+        } else {
+            showNotification("Корзина пуста!");
+            return;
         }
     });
+        const cartItems = cartItemsContainer.querySelectorAll("li");
+    });
+    async function getCart(tgId) {
+        try {
+            const response = await fetch(`/api/cart?tg_id=${encodeURIComponent(tgId)}`);
 
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const cartItems = await response.json();
+            const itemCount = cartItems.length;
+
+            console.log(`Получено ${itemCount} товаров в корзине`);
+
+            return {
+                items: cartItems,
+                count: itemCount
+            };
+        } catch (error) {
+            console.error('Ошибка при получении корзины:', error);
+            return {
+                items: [],
+                count: 0
+            };
+        }
+    }
     // Функция для показа уведомления
     function showNotification(message) {
         const notification = document.createElement("div");
