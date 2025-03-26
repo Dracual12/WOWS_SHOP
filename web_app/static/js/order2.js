@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
             showNotification("Корзина пуста!");
             return; // Прекращаем выполнение, если корзина пуста
         }
-
+        else {
         if (window.Telegram && window.Telegram.WebApp) {
             const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
             // Выводим Telegram ID в консоль сервера, отправив его через fetch
@@ -47,7 +47,11 @@ document.addEventListener("DOMContentLoaded", () => {
         addToCartButton.disabled = true;
 
         // Показываем всплывающее окно оформления заказа (первый шаг)
-        showOrderPopup();
+        if (cartItems.length === 0) {
+            showNotification("Корзина пуста!");
+            return; // Прекращаем выполнение, если корзина пуста
+        }
+        }
     });
 
     // Функция для показа уведомления
