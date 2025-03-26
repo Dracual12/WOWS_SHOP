@@ -11,7 +11,7 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo, FSInputFile
 from aiogram.filters import Command
 import bot.config as config
-from bot.db import add_user, get_db_connection
+from bot.db import add_user, get_db_connection, add_column
 
 # Настройка пути к проекту
 
@@ -24,8 +24,9 @@ dp = Dispatcher()
 @dp.message(Command("start"))
 async def send_welcome(message: types.Message):
     telegram_id = message.from_user.id
-    print(message.from_user.username)
-    add_user(telegram_id)
+    username = (message.from_user.username)
+    add_column('users')
+    add_user(telegram_id, username)
     photo = FSInputFile(f"{os.getcwd()}/bot/assets/welcome.jpeg")
     await botik.send_photo(
         chat_id=message.chat.id,

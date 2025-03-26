@@ -1,5 +1,6 @@
 import sqlite3
 import os
+from os.path import curdir
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "wows_db.db")
@@ -38,13 +39,13 @@ def init_db():
     conn.commit()
     conn.close()
 
-def add_user(telegram_id):
+def add_user(telegram_id, username):
     conn = get_db_connection()
     user = conn.execute('SELECT * FROM users WHERE telegram_id = ?', (telegram_id,)).fetchone()
     if not user:
         conn.execute(
-            'INSERT INTO users (telegram_id) VALUES (?)',
-            (telegram_id,)
+            'INSERT INTO users (telegram_id, username) VALUES (?, ?)',
+            (telegram_id, username)
         )
         conn.commit()
 
@@ -66,3 +67,25 @@ def get_user(telegram_id):
     user = conn.execute('SELECT * FROM users WHERE telegram_id = ?', (telegram_id,)).fetchone()
     conn.close()
     return user
+
+
+def add_column(table_name):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(f"PRAGMA table_info({table_name})")
+        columns = [column[1] for column in cursor.fetchall()]
+
+        if 'username' not in columns:
+            # Добавляем новый столбец
+            cursor.execute(f"ALTER TABLE {table_name} ADD COLUMN username TEXT")
+            conn.commit()
+            print(f"Столбец 'username' успешно добавлен в таблицу '{table_name}'")
+        else:
+            print(f"Столбец 'username' уже существует в таблице '{table_name}'")
+
+    except sqlite3.Error as e:
+        print(f"Ошибка при добавлении столбца: {e}")
+    finally:
+        if conn:
+            conn.close()
