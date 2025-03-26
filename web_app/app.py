@@ -90,7 +90,7 @@ def get_link(user):
     cart = int((last_cart['cart'].split('Итого:')[1]).split()[0])
     conn.close()
 
-    url = f"https://payment.alfabank.ru/payment/rest/register.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderNumber={order_id}&amount={cart}&returnUrl=https://t.me/armada_gold_bot"
+    url = f"https://payment.alfabank.ru/payment/rest/register.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderNumber={order_id}&amount={cart*100}&returnUrl=https://t.me/armada_gold_bot"
     response = requests.get(url)
     text = response.text
     try:
@@ -152,6 +152,7 @@ def check(orderId, user):
         conn.execute("DELETE FROM cart WHERE user_id = ?", (user,))
         conn.commit()
         data = order_text(user)
+        print(conn.execute("SELECT username FROM users WHERE telegram_id = ?",(user,)).fetchone())
         message = f"""
         Детали заказа:
         ———————————————
