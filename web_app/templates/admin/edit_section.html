@@ -1,0 +1,79 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Редактирование раздела</h2>
+    
+    {% if error %}
+    <div class="alert alert-danger" role="alert">
+        {{ error }}
+    </div>
+    {% endif %}
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Название раздела</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ section.name }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="order_index" class="form-label">Порядок отображения</label>
+                    <input type="number" class="form-control" id="order_index" name="order_index" value="{{ section.order_index }}">
+                    <div class="form-text">Чем меньше число, тем выше будет отображаться раздел в списке</div>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="is_active" name="is_active" {% if section.is_active %}checked{% endif %}>
+                    <label class="form-check-label" for="is_active">Активный</label>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('admin.admin_panel') }}" class="btn btn-secondary">Отмена</a>
+                    <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0069d9;
+    border-color: #0062cc;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+.alert {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 0.25rem;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+</style>
+{% endblock %} 

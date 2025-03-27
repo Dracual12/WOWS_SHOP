@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for, current_app
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, current_app, session
 from web_app import db
 from ..utils.helpers import format_order_summary, order_text
 from ..utils.telegram import send_telegram
@@ -6,7 +6,7 @@ from ..config import Config
 from werkzeug.utils import secure_filename
 import os
 from ..models.database import Database
-from ..utils.auth import admin_required
+from ..utils.auth import admin_required, login_admin, logout_admin, is_admin_logged_in
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 db = Database()
@@ -85,33 +85,61 @@ def delete_product(product_id):
     return redirect(url_for('admin.admin_panel'))
 
 @bp.route('/add_section', methods=['GET', 'POST'])
+@admin_required
 def add_section():
     if request.method == 'POST':
-        data = request.form
-        current_app.logger.info('Попытка добавления нового раздела')
-        # Здесь можно добавить логику добавления раздела
-        current_app.logger.info('Раздел успешно добавлен')
-        return redirect(url_for('admin.admin_panel'))
-    current_app.logger.info('Открыта страница добавления раздела')
+        name = request.form.get('name')
+        order_index = int(request.form.get('order_index', 0))
+        is_active = request.form.get('is_active') == 'on'
+        
+        success = db.add_section(name, order_index, is_active)
+        
+        if success:
+            current_app.logger.info('Раздел успешно добавлен')
+            return redirect(url_for('admin.admin_panel'))
+        else:
+            current_app.logger.error('Ошибка при добавлении раздела')
+            return render_template('admin/add_section.html', error='Ошибка при добавлении раздела')
+    
     return render_template('admin/add_section.html')
 
 @bp.route('/delete_section/<int:section_id>', methods=['POST'])
+@admin_required
 def delete_section(section_id):
-    current_app.logger.info(f'Попытка удаления раздела {section_id}')
-    # Здесь можно добавить логику удаления раздела
-    current_app.logger.info('Раздел успешно удален')
+    success = db.delete_section(section_id)
+    
+    if success:
+        current_app.logger.info(f'Раздел {section_id} успешно удален')
+    else:
+        current_app.logger.error(f'Ошибка при удалении раздела {section_id}')
+    
     return redirect(url_for('admin.admin_panel'))
 
 @bp.route('/edit_section/<int:section_id>', methods=['GET', 'POST'])
+@admin_required
 def edit_section(section_id):
-    if request.method == 'POST':
-        data = request.form
-        current_app.logger.info(f'Попытка редактирования раздела {section_id}')
-        # Здесь можно добавить логику редактирования раздела
-        current_app.logger.info('Раздел успешно отредактирован')
+    section = db.get_section(section_id)
+    if not section:
+        current_app.logger.error(f'Раздел {section_id} не найден')
         return redirect(url_for('admin.admin_panel'))
-    current_app.logger.info(f'Открыта страница редактирования раздела {section_id}')
-    return render_template('admin/edit_section.html', section_id=section_id)
+    
+    if request.method == 'POST':
+        name = request.form.get('name')
+        order_index = int(request.form.get('order_index', 0))
+        is_active = request.form.get('is_active') == 'on'
+        
+        success = db.update_section(section_id, name, order_index, is_active)
+        
+        if success:
+            current_app.logger.info(f'Раздел {section_id} успешно обновлен')
+            return redirect(url_for('admin.admin_panel'))
+        else:
+            current_app.logger.error(f'Ошибка при обновлении раздела {section_id}')
+            return render_template('admin/edit_section.html', 
+                                 section=section,
+                                 error='Ошибка при обновлении раздела')
+    
+    return render_template('admin/edit_section.html', section=section)
 
 # API эндпоинты для управления порядком
 @bp.route('/api/sections/reorder', methods=['POST'])
@@ -176,4 +204,27 @@ def update_product_order(product_id):
         return jsonify({"status": "success"})
     else:
         current_app.logger.error(f'Ошибка при обновлении порядка товара {product_id}')
-        return jsonify({"status": "error", "message": "Ошибка при обновлении порядка"}) 
+        return jsonify({"status": "error", "message": "Ошибка при обновлении порядка"})
+
+@bp.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        if username == Config.ADMIN_USERNAME and password == Config.ADMIN_PASSWORD:
+            login_admin()
+            return redirect(url_for('admin.admin_panel'))
+        else:
+            current_app.logger.warning('Неудачная попытка входа в админ-панель')
+            return render_template('admin/login.html', error='Неверное имя пользователя или пароль')
+    
+    if is_admin_logged_in():
+        return redirect(url_for('admin.admin_panel'))
+    
+    return render_template('admin/login.html')
+
+@bp.route('/logout')
+def logout():
+    logout_admin()
+    return redirect(url_for('admin.login')) 
