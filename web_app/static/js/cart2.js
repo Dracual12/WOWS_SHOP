@@ -18,7 +18,7 @@ window.updateCartQuantity = function(productId, newQuantity, li) {
         body: JSON.stringify({ quantity: newQuantity, tg_id: tgId }),
     })
         .then(response => {
-            console.log('Ответ сервера:', response);
+            console.log('Получен ответ:', response.status);
             if (!response.ok) {
                 throw new Error('Ошибка обновления корзины');
             }
@@ -26,14 +26,18 @@ window.updateCartQuantity = function(productId, newQuantity, li) {
         })
         .then(data => {
             console.log('Данные ответа:', data);
-            const unitPrice = parseFloat(li.getAttribute('data-unit-price'));
-            li.querySelector('.quantity-value').textContent = newQuantity;
-            li.querySelector('.item-total').textContent = (unitPrice * newQuantity).toFixed(2) + ' рублей';
-            // Перезагружаем корзину для обновления общей суммы
-            window.loadCartItems();
+            if (data.status === 'success') {
+                const unitPrice = parseFloat(li.getAttribute('data-unit-price'));
+                li.querySelector('.quantity-value').textContent = newQuantity;
+                li.querySelector('.item-total').textContent = (unitPrice * newQuantity).toFixed(2) + ' рублей';
+                // Перезагружаем корзину для обновления общей суммы
+                window.loadCartItems();
+            } else {
+                console.error('Ошибка обновления:', data);
+            }
         })
         .catch(error => {
-            console.error('Ошибка при обновлении количества:', error);
+            console.error('Ошибка:', error);
         });
 };
 

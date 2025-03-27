@@ -61,13 +61,29 @@ class Database:
         with self.get_connection() as conn:
             cursor = conn.cursor()
             try:
+                print(f"Попытка обновить количество: tg_id={tg_id}, product_id={product_id}, quantity={quantity}")
+                
+                # Проверяем, существует ли запись
                 cursor.execute("""
-                    UPDATE cart 
-                    SET quantity = ? 
+                    SELECT quantity FROM cart 
                     WHERE tg_id = ? AND product_id = ?
-                """, (quantity, tg_id, product_id))
-                conn.commit()
-                return True
+                """, (tg_id, product_id))
+                existing = cursor.fetchone()
+                print(f"Существующая запись: {existing}")
+                
+                if existing:
+                    print("Запись найдена, обновляем количество")
+                    cursor.execute("""
+                        UPDATE cart 
+                        SET quantity = ? 
+                        WHERE tg_id = ? AND product_id = ?
+                    """, (quantity, tg_id, product_id))
+                    conn.commit()
+                    print("Количество успешно обновлено")
+                    return True
+                else:
+                    print("Запись не найдена")
+                    return False
             except Exception as e:
                 print(f"Ошибка обновления корзины: {e}")
                 return False

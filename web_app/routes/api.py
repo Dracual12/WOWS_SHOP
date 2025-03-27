@@ -37,18 +37,25 @@ def get_cart():
 @bp.route('/cart/<int:product_id>', methods=['PUT'])
 def update_cart_quantity(product_id):
     data = request.get_json()
+    current_app.logger.info(f'Получены данные для обновления корзины: {data}')
+    
     tg_id = data.get('tg') or data.get('tg_id')  # Поддерживаем оба варианта
     quantity = data.get('quantity')
     
+    current_app.logger.info(f'Извлеченные данные: tg_id={tg_id}, quantity={quantity}')
+    
     if tg_id and quantity:
         current_app.logger.info(f'Обновление количества товара {product_id} в корзине пользователя {tg_id}')
-        if db.update_cart_quantity(tg_id, product_id, quantity):
-            current_app.logger.info('Количество товара успешно обновлено')
-            return jsonify({"status": "success"})
-        else:
-            current_app.logger.error('Ошибка обновления количества товара')
+        try:
+            if db.update_cart_quantity(tg_id, product_id, quantity):
+                current_app.logger.info('Количество товара успешно обновлено')
+                return jsonify({"status": "success"})
+            else:
+                current_app.logger.error('Ошибка обновления количества товара')
+        except Exception as e:
+            current_app.logger.error(f'Исключение при обновлении количества: {str(e)}')
     else:
-        current_app.logger.warning('Попытка обновить количество товара с неполными данными')
+        current_app.logger.warning(f'Попытка обновить количество товара с неполными данными: tg_id={tg_id}, quantity={quantity}')
     return jsonify({"status": "error"})
 
 @bp.route('/cart/<int:tg_id>/<int:product_id>', methods=['DELETE'])
