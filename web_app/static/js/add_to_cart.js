@@ -3,7 +3,7 @@ let isHandlerAdded = false; // Флаг для проверки
 function setupAddToCartButtons() {
     if (isHandlerAdded) return; // Если обработчик уже добавлен, выходим
 
-    const addToCartButtons = document.querySelectorAll('.add_to_cart');
+    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
     addToCartButtons.forEach(button => {
         button.addEventListener('click', handleAddToCart);
     });
@@ -17,19 +17,20 @@ setupAddToCartButtons();
 async function handleAddToCart() {
     console.log('Кнопка нажата'); // Лог для отладки
 
-    const productId = this.getAttribute('data-id');
-    const tg_id = window.Telegram.WebApp.initDataUnsafe.user.id;
+    const productId = this.getAttribute('data-product-id');
+    const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
 
     try {
         console.log('Отправка запроса на сервер'); // Лог для отладки
         const response = await fetch('/api/cart', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                product_id: productId, 
-                quantity: 1, 
-                tg_id: tg_id 
-            }),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                product_id: productId,
+                tg_id: tgId
+            })
         });
 
         const data = await response.json();
@@ -45,7 +46,7 @@ async function handleAddToCart() {
             }
         } else {
             console.log('Ошибка:', data); // Лог для отладки
-            showNotification('Ошибка при добавлении товара в корзину', 'error');
+            showNotification(data.message || 'Ошибка при добавлении товара', 'error');
         }
     } catch (err) {
         console.error('Ошибка при добавлении в корзину:', err);
