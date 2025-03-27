@@ -44,20 +44,33 @@ window.updateCartQuantity = function(productId, newQuantity, li) {
 // Функция удаления товара из корзины
 window.removeCartItem = function(productId, li) {
     const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
+    console.log('Отправка запроса на удаление:', {
+        productId,
+        tgId
+    });
+    
     fetch(`/api/cart/${tgId}/${productId}`, {
         method: 'DELETE',
     })
         .then(response => {
+            console.log('Получен ответ:', response.status);
             if (!response.ok) {
                 throw new Error('Ошибка удаления товара из корзины');
             }
             return response.json();
         })
-        .then(() => {
-            // Перезагружаем корзину для обновления общей суммы
-            window.loadCartItems();
+        .then(data => {
+            console.log('Данные ответа:', data);
+            if (data.status === 'success') {
+                // Перезагружаем корзину для обновления общей суммы
+                window.loadCartItems();
+            } else {
+                console.error('Ошибка удаления:', data);
+            }
         })
-        .catch(error => console.error('Ошибка:', error));
+        .catch(error => {
+            console.error('Ошибка:', error);
+        });
 };
 
 // Делаем функцию доступной глобально
@@ -105,14 +118,22 @@ window.loadCartItems = function() {
                     // Привязываем обработчики для этого элемента
                     const increaseBtn = li.querySelector('.quantity-btn.increase');
                     const decreaseBtn = li.querySelector('.quantity-btn.decrease');
-                    const removeBtn = li.querySelector('.remove-btn img');
+                    const removeBtn = li.querySelector('.remove-btn');
+
+                    console.log('Найдены кнопки:', {
+                        increase: increaseBtn,
+                        decrease: decreaseBtn,
+                        remove: removeBtn
+                    });
 
                     increaseBtn.addEventListener('click', () => {
+                        console.log('Нажата кнопка увеличения количества');
                         const currentQuantity = parseInt(li.querySelector('.quantity-value').textContent);
                         window.updateCartQuantity(item.id, currentQuantity + 1, li);
                     });
 
                     decreaseBtn.addEventListener('click', () => {
+                        console.log('Нажата кнопка уменьшения количества');
                         const currentQuantity = parseInt(li.querySelector('.quantity-value').textContent);
                         if (currentQuantity > 1) {
                             window.updateCartQuantity(item.id, currentQuantity - 1, li);
@@ -120,6 +141,7 @@ window.loadCartItems = function() {
                     });
 
                     removeBtn.addEventListener('click', () => {
+                        console.log('Нажата кнопка удаления');
                         window.removeCartItem(item.id, li);
                     });
 
