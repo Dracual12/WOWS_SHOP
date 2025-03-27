@@ -60,17 +60,40 @@ def delete_cart_item(tg_id, product_id):
     current_app.logger.error('Ошибка удаления товара из корзины')
     return jsonify({"status": "error"})
 
-@bp.route('/products', methods=['GET'])
-def get_products():
-    current_app.logger.info('Запрос списка всех товаров')
-    products = db.get_products()
-    return jsonify({"status": "success", "products": products})
-
 @bp.route('/sections', methods=['GET'])
 def get_sections():
     current_app.logger.info('Запрос списка всех разделов')
-    sections = db.get_sections()
-    return jsonify({"status": "success", "sections": sections})
+    try:
+        sections = db.get_sections()
+        products = db.get_products()
+        
+        # Группируем товары по разделам
+        sections_with_products = {}
+        for section in sections:
+            section_products = [p for p in products if p.get('section') == section['name']]
+            sections_with_products[section['id']] = {
+                'section_name': section['name'],
+                'products': section_products
+            }
+        
+        current_app.logger.info(f'Получено разделов: {len(sections_with_products)}')
+        current_app.logger.info(f'Данные разделов: {sections_with_products}')
+        return jsonify(sections_with_products)
+    except Exception as e:
+        current_app.logger.error(f'Ошибка при получении разделов: {str(e)}')
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@bp.route('/products', methods=['GET'])
+def get_products():
+    current_app.logger.info('Запрос списка всех товаров')
+    try:
+        products = db.get_products()
+        current_app.logger.info(f'Получено товаров: {len(products)}')
+        current_app.logger.info(f'Данные товаров: {products}')
+        return jsonify({"status": "success", "products": products})
+    except Exception as e:
+        current_app.logger.error(f'Ошибка при получении товаров: {str(e)}')
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 @bp.route('/checkout', methods=['POST'])
 def checkout():
