@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(response => response.json())
         .then(sections => {
             console.log('Получены секции:', sections);
-            Object.values(sections).forEach(section => {
+            sections.forEach(section => {
                 // Создаём секцию
                 const sectionElement = document.createElement("div");
                 sectionElement.classList.add("section");
