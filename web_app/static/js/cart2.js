@@ -15,6 +15,8 @@ window.updateCartQuantity = function(productId, newQuantity, li) {
     
     if (!productId) {
         console.error('Не удалось получить ID товара');
+        console.log('Элемент li:', li);
+        console.log('data-product-id:', li ? li.getAttribute('data-product-id') : 'нет элемента');
         return;
     }
 
@@ -22,7 +24,11 @@ window.updateCartQuantity = function(productId, newQuantity, li) {
     console.log('Отправка запроса на обновление количества:', {
         productId,
         newQuantity,
-        tgId
+        tgId,
+        li: li ? {
+            'data-product-id': li.getAttribute('data-product-id'),
+            'data-unit-price': li.getAttribute('data-unit-price')
+        } : 'нет элемента'
     });
     
     fetch(`/api/cart/${productId}`, {
@@ -106,15 +112,34 @@ window.loadCartItems = function() {
                 cartItemsContainer.innerHTML = '<li>Корзина пуста</li>';
             } else {
                 cartItems.forEach(item => {
+                    console.log('Создание элемента корзины для товара:', item);
                     const li = document.createElement('li');
+                    
+                    // Проверяем наличие id в item
+                    if (!item.id) {
+                        console.error('У товара отсутствует id:', item);
+                        return;
+                    }
+                    
                     li.setAttribute('data-product-id', item.id);
                     
                     // Используем цену из базы данных напрямую
                     const unitPrice = parseFloat(item.price);
+                    if (isNaN(unitPrice)) {
+                        console.error('Некорректная цена для товара:', item);
+                        return;
+                    }
+                    
                     li.setAttribute('data-unit-price', unitPrice);
                     const itemTotal = unitPrice * parseInt(item.quantity);
                     totalSum += itemTotal; // Добавляем к общей сумме
                     
+                    console.log('Созданный элемент li:', {
+                        'data-product-id': li.getAttribute('data-product-id'),
+                        'data-unit-price': li.getAttribute('data-unit-price'),
+                        itemTotal
+                    });
+
                     li.innerHTML = `
                         <div class="cart-item-top">
                             <span class="item-name">${item.name}</span>
