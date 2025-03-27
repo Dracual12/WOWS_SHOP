@@ -11,6 +11,28 @@ def index():
     current_app.logger.info('Открыта главная страница')
     return render_template('index.html')
 
+@bp.route('/api/sections')
+def get_sections():
+    current_app.logger.info('Запрос списка секций и товаров')
+    try:
+        sections = db.get_sections()
+        products = db.get_products()
+        
+        # Группируем товары по разделам
+        sections_with_products = {}
+        for section in sections:
+            section_products = [p for p in products if p.get('section') == section['name']]
+            sections_with_products[section['id']] = {
+                'section_name': section['name'],
+                'products': section_products
+            }
+        
+        current_app.logger.info(f'Получено разделов: {len(sections_with_products)}')
+        return jsonify(sections_with_products)
+    except Exception as e:
+        current_app.logger.error(f'Ошибка при получении разделов: {str(e)}')
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 @bp.route("/save-tg-id", methods=["POST"])
 def save_tg_id():
     data = request.get_json()
