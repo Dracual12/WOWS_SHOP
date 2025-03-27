@@ -64,4 +64,69 @@ def edit_section(section_id):
         current_app.logger.info('Раздел успешно отредактирован')
         return redirect(url_for('admin.admin_panel'))
     current_app.logger.info(f'Открыта страница редактирования раздела {section_id}')
-    return render_template('admin/edit_section.html', section_id=section_id) 
+    return render_template('admin/edit_section.html', section_id=section_id)
+
+# API эндпоинты для управления порядком
+@bp.route('/api/sections/reorder', methods=['POST'])
+def reorder_sections():
+    data = request.get_json()
+    section_ids = data.get('section_ids', [])
+    
+    if not section_ids:
+        current_app.logger.warning('Попытка обновить порядок секций без указания ID')
+        return jsonify({"status": "error", "message": "Не указаны ID секций"})
+    
+    if db.reorder_sections(section_ids):
+        current_app.logger.info('Порядок секций успешно обновлен')
+        return jsonify({"status": "success"})
+    else:
+        current_app.logger.error('Ошибка при обновлении порядка секций')
+        return jsonify({"status": "error", "message": "Ошибка при обновлении порядка"})
+
+@bp.route('/api/products/reorder', methods=['POST'])
+def reorder_products():
+    data = request.get_json()
+    product_ids = data.get('product_ids', [])
+    
+    if not product_ids:
+        current_app.logger.warning('Попытка обновить порядок товаров без указания ID')
+        return jsonify({"status": "error", "message": "Не указаны ID товаров"})
+    
+    if db.reorder_products(product_ids):
+        current_app.logger.info('Порядок товаров успешно обновлен')
+        return jsonify({"status": "success"})
+    else:
+        current_app.logger.error('Ошибка при обновлении порядка товаров')
+        return jsonify({"status": "error", "message": "Ошибка при обновлении порядка"})
+
+@bp.route('/api/sections/<int:section_id>/order', methods=['PUT'])
+def update_section_order(section_id):
+    data = request.get_json()
+    new_order = data.get('order')
+    
+    if new_order is None:
+        current_app.logger.warning(f'Попытка обновить порядок секции {section_id} без указания нового порядка')
+        return jsonify({"status": "error", "message": "Не указан новый порядок"})
+    
+    if db.update_section_order(section_id, new_order):
+        current_app.logger.info(f'Порядок секции {section_id} успешно обновлен')
+        return jsonify({"status": "success"})
+    else:
+        current_app.logger.error(f'Ошибка при обновлении порядка секции {section_id}')
+        return jsonify({"status": "error", "message": "Ошибка при обновлении порядка"})
+
+@bp.route('/api/products/<int:product_id>/order', methods=['PUT'])
+def update_product_order(product_id):
+    data = request.get_json()
+    new_order = data.get('order')
+    
+    if new_order is None:
+        current_app.logger.warning(f'Попытка обновить порядок товара {product_id} без указания нового порядка')
+        return jsonify({"status": "error", "message": "Не указан новый порядок"})
+    
+    if db.update_product_order(product_id, new_order):
+        current_app.logger.info(f'Порядок товара {product_id} успешно обновлен')
+        return jsonify({"status": "success"})
+    else:
+        current_app.logger.error(f'Ошибка при обновлении порядка товара {product_id}')
+        return jsonify({"status": "error", "message": "Ошибка при обновлении порядка"}) 

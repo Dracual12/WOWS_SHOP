@@ -20,6 +20,16 @@ def init_db():
         )
     ''')
     cursor = conn.cursor()
+    
+    # Создаем таблицу sections с полем order
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS sections (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        order_index INTEGER NOT NULL DEFAULT 0
+    );
+    ''')
+    
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS cart (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,12 +40,19 @@ def init_db():
         FOREIGN KEY (product_id) REFERENCES products (id)
     );
     ''')
-    cursor.execute('''CREATE TABLE IF NOT EXISTS products (
-                                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                name TEXT NOT NULL,
-                                price REAL NOT NULL,
-                                image TEXT
-                            );''')
+    
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS products (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        price REAL NOT NULL,
+        image TEXT,
+        section_id INTEGER,
+        order_index INTEGER NOT NULL DEFAULT 0,
+        FOREIGN KEY (section_id) REFERENCES sections (id)
+    );
+    ''')
+    
     conn.commit()
     conn.close()
 
@@ -89,3 +106,78 @@ def add_column(table_name):
     finally:
         if conn:
             conn.close()
+
+def update_section_order(section_id, new_order):
+    """Обновляет порядок секции"""
+    conn = get_db_connection()
+    try:
+        conn.execute('UPDATE sections SET order_index = ? WHERE id = ?', (new_order, section_id))
+        conn.commit()
+        return True
+    except sqlite3.Error as e:
+        print(f"Ошибка при обновлении порядка секции: {e}")
+        return False
+    finally:
+        conn.close()
+
+def update_product_order(product_id, new_order):
+    """Обновляет порядок товара"""
+    conn = get_db_connection()
+    try:
+        conn.execute('UPDATE products SET order_index = ? WHERE id = ?', (new_order, product_id))
+        conn.commit()
+        return True
+    except sqlite3.Error as e:
+        print(f"Ошибка при обновлении порядка товара: {e}")
+        return False
+    finally:
+        conn.close()
+
+def get_sections_ordered():
+    """Получает все секции, отсортированные по order_index"""
+    conn = get_db_connection()
+    try:
+        sections = conn.execute('SELECT * FROM sections ORDER BY order_index').fetchall()
+        return sections
+    finally:
+        conn.close()
+
+def get_products_ordered(section_id=None):
+    """Получает все товары, отсортированные по order_index"""
+    conn = get_db_connection()
+    try:
+        if section_id:
+            products = conn.execute('SELECT * FROM products WHERE section_id = ? ORDER BY order_index', (section_id,)).fetchall()
+        else:
+            products = conn.execute('SELECT * FROM products ORDER BY order_index').fetchall()
+        return products
+    finally:
+        conn.close()
+
+def reorder_sections(section_ids):
+    """Обновляет порядок всех секций"""
+    conn = get_db_connection()
+    try:
+        for order, section_id in enumerate(section_ids):
+            conn.execute('UPDATE sections SET order_index = ? WHERE id = ?', (order, section_id))
+        conn.commit()
+        return True
+    except sqlite3.Error as e:
+        print(f"Ошибка при обновлении порядка секций: {e}")
+        return False
+    finally:
+        conn.close()
+
+def reorder_products(product_ids):
+    """Обновляет порядок всех товаров"""
+    conn = get_db_connection()
+    try:
+        for order, product_id in enumerate(product_ids):
+            conn.execute('UPDATE products SET order_index = ? WHERE id = ?', (order, product_id))
+        conn.commit()
+        return True
+    except sqlite3.Error as e:
+        print(f"Ошибка при обновлении порядка товаров: {e}")
+        return False
+    finally:
+        conn.close()

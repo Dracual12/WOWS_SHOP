@@ -14,7 +14,7 @@ class Database:
         """Получает список всех товаров."""
         with self.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM products")
+            cursor.execute("SELECT * FROM products ORDER BY order_index")
             columns = [description[0] for description in cursor.description]
             return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
@@ -22,7 +22,7 @@ class Database:
         """Получает список всех разделов."""
         with self.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM sections")
+            cursor.execute("SELECT * FROM sections ORDER BY order_index")
             columns = [description[0] for description in cursor.description]
             return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
@@ -85,4 +85,70 @@ class Database:
                 return True
             except Exception as e:
                 print(f"Ошибка удаления из корзины: {e}")
+                return False
+
+    def update_section_order(self, section_id: int, new_order: int) -> bool:
+        """Обновляет порядок секции."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            try:
+                cursor.execute("""
+                    UPDATE sections 
+                    SET order_index = ? 
+                    WHERE id = ?
+                """, (new_order, section_id))
+                conn.commit()
+                return True
+            except Exception as e:
+                print(f"Ошибка обновления порядка секции: {e}")
+                return False
+
+    def update_product_order(self, product_id: int, new_order: int) -> bool:
+        """Обновляет порядок товара."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            try:
+                cursor.execute("""
+                    UPDATE products 
+                    SET order_index = ? 
+                    WHERE id = ?
+                """, (new_order, product_id))
+                conn.commit()
+                return True
+            except Exception as e:
+                print(f"Ошибка обновления порядка товара: {e}")
+                return False
+
+    def reorder_sections(self, section_ids: List[int]) -> bool:
+        """Обновляет порядок всех секций."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            try:
+                for order, section_id in enumerate(section_ids):
+                    cursor.execute("""
+                        UPDATE sections 
+                        SET order_index = ? 
+                        WHERE id = ?
+                    """, (order, section_id))
+                conn.commit()
+                return True
+            except Exception as e:
+                print(f"Ошибка обновления порядка секций: {e}")
+                return False
+
+    def reorder_products(self, product_ids: List[int]) -> bool:
+        """Обновляет порядок всех товаров."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            try:
+                for order, product_id in enumerate(product_ids):
+                    cursor.execute("""
+                        UPDATE products 
+                        SET order_index = ? 
+                        WHERE id = ?
+                    """, (order, product_id))
+                conn.commit()
+                return True
+            except Exception as e:
+                print(f"Ошибка обновления порядка товаров: {e}")
                 return False 
