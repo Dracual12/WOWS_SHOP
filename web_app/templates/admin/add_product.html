@@ -1,0 +1,135 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Добавление нового товара</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Название товара</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">Описание</label>
+                    <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="price" class="form-label">Цена</label>
+                    <input type="number" class="form-control" id="price" name="price" step="0.01" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="section" class="form-label">Раздел</label>
+                    <select class="form-select" id="section" name="section" required>
+                        <option value="">Выберите раздел</option>
+                        {% for section in sections %}
+                        <option value="{{ section.id }}">{{ section.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="image" class="form-label">Изображение</label>
+                    <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                    <div class="form-text">Рекомендуемый размер: 800x800 пикселей</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="order_index" class="form-label">Порядок отображения</label>
+                    <input type="number" class="form-control" id="order_index" name="order_index" value="0">
+                    <div class="form-text">Чем меньше число, тем выше будет отображаться товар в списке</div>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="is_active" name="is_active" checked>
+                    <label class="form-check-label" for="is_active">Активный</label>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('admin.products') }}" class="btn btn-secondary">Отмена</a>
+                    <button type="submit" class="btn btn-primary">Добавить товар</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Предварительный просмотр изображения
+    const imageInput = document.getElementById('image');
+    const previewContainer = document.createElement('div');
+    previewContainer.className = 'mt-2';
+    imageInput.parentNode.appendChild(previewContainer);
+
+    imageInput.addEventListener('change', function() {
+        previewContainer.innerHTML = '';
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'img-thumbnail';
+                img.style.maxHeight = '200px';
+                previewContainer.appendChild(img);
+            }
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+
+    // Валидация формы
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const price = document.getElementById('price').value;
+        if (price <= 0) {
+            e.preventDefault();
+            alert('Цена должна быть больше 0');
+            return;
+        }
+
+        const section = document.getElementById('section').value;
+        if (!section) {
+            e.preventDefault();
+            alert('Пожалуйста, выберите раздел');
+            return;
+        }
+    });
+});
+</script>
+
+<style>
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+.form-select:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0069d9;
+    border-color: #0062cc;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+</style>
+{% endblock %} 
