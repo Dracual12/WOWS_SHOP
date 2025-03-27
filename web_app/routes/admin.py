@@ -3,10 +3,16 @@ from web_app import db
 from ..utils.helpers import format_order_summary, order_text
 from ..utils.telegram import send_telegram
 from ..config import Config
+from werkzeug.utils import secure_filename
+import os
+from ..models.database import Database
+from ..utils.auth import admin_required
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
+db = Database()
 
 @bp.route('/', methods=['GET'])
+@admin_required
 def admin_panel():
     current_app.logger.info('Открыта панель администратора')
     return render_template('admin/index.html')
@@ -18,16 +24,47 @@ def order_management():
     products = db.get_products()
     return render_template('admin/order.html', sections=sections, products=products)
 
+@bp.route('/products', methods=['GET'])
+@admin_required
+def products():
+    products = db.get_products()
+    sections = db.get_sections()
+    return render_template('admin/products.html', products=products, sections=sections)
+
 @bp.route('/add_product', methods=['GET', 'POST'])
+@admin_required
 def add_product():
     if request.method == 'POST':
-        data = request.form
-        current_app.logger.info('Попытка добавления нового товара')
-        # Здесь можно добавить логику добавления товара
-        current_app.logger.info('Товар успешно добавлен')
-        return redirect(url_for('admin.admin_panel'))
-    current_app.logger.info('Открыта страница добавления товара')
-    return render_template('admin/add_product.html')
+        name = request.form.get('name')
+        description = request.form.get('description')
+        price = float(request.form.get('price'))
+        section_id = int(request.form.get('section'))
+        order_index = int(request.form.get('order_index', 0))
+        is_active = request.form.get('is_active') == 'on'
+        
+        image = request.files.get('image')
+        image_path = None
+        
+        if image:
+            filename = secure_filename(image.filename)
+            image_path = os.path.join('static', 'images', 'products', filename)
+            full_path = os.path.join(current_app.root_path, image_path)
+            os.makedirs(os.path.dirname(full_path), exist_ok=True)
+            image.save(full_path)
+        
+        success = db.add_product(name, description, price, section_id, image_path, order_index, is_active)
+        
+        if success:
+            current_app.logger.info('Товар успешно добавлен')
+            return redirect(url_for('admin.products'))
+        else:
+            current_app.logger.error('Ошибка при добавлении товара')
+            return render_template('admin/add_product.html', 
+                                 sections=db.get_sections(),
+                                 error='Ошибка при добавлении товара')
+    
+    sections = db.get_sections()
+    return render_template('admin/add_product.html', sections=sections)
 
 @bp.route('/edit_product/<int:product_id>', methods=['GET', 'POST'])
 def edit_product(product_id):
