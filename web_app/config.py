@@ -23,4 +23,8 @@ class Config:
     
     # Настройки для загрузки файлов
     UPLOAD_FOLDER = os.path.join(BASE_DIR, 'bot', 'assets')
-    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max-limit 
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max-limit
+
+    # Учетные данные администратора
+    ADMIN_USERNAME = 'admin'
+    ADMIN_PASSWORD = 'admin123' 
