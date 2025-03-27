@@ -44,12 +44,28 @@ class Database:
         with self.get_connection() as conn:
             cursor = conn.cursor()
             try:
+                # Сначала проверяем, существует ли запись
                 cursor.execute("""
-                    INSERT INTO cart (tg_id, product_id, quantity)
-                    VALUES (?, ?, ?)
-                    ON CONFLICT(tg_id, product_id) 
-                    DO UPDATE SET quantity = quantity + ?
-                """, (tg_id, product_id, quantity, quantity))
+                    SELECT quantity FROM cart 
+                    WHERE tg_id = ? AND product_id = ?
+                """, (tg_id, product_id))
+                existing = cursor.fetchone()
+                
+                if existing:
+                    # Если запись существует, обновляем количество
+                    new_quantity = existing[0] + quantity
+                    cursor.execute("""
+                        UPDATE cart 
+                        SET quantity = ? 
+                        WHERE tg_id = ? AND product_id = ?
+                    """, (new_quantity, tg_id, product_id))
+                else:
+                    # Если записи нет, создаем новую
+                    cursor.execute("""
+                        INSERT INTO cart (tg_id, product_id, quantity)
+                        VALUES (?, ?, ?)
+                    """, (tg_id, product_id, quantity))
+                
                 conn.commit()
                 return True
             except Exception as e:
