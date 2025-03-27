@@ -3,8 +3,6 @@ Telegram.WebApp.ready();
 // Отключаем возможность закрытия жестом "pull-to-close"
 Telegram.WebApp.disableClosingConfirmation();
 
-
-
 document.addEventListener("DOMContentLoaded", () => {
     const sectionsContainer = document.getElementById("sections-container");
 
@@ -12,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch('/api/sections')
         .then(response => response.json())
         .then(sections => {
-            console.log(sections)
+            console.log('Получены секции:', sections);
             Object.values(sections).forEach(section => {
                 // Создаём секцию
                 const sectionElement = document.createElement("div");
@@ -21,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <h2>${section.section_name}</h2>
                     <div class="product-carousel">
                         ${section.products.map(product => `
-                            <div class="carousel-item">
+                            <div class="carousel-item" data-product-id="${product.id}">
                                 <img src="${product.image}" alt="${product.name}" class="carousel-image">
                                 <h3>${product.name}</h3>
                                 <p>${product.price} рублей</p>
@@ -35,17 +33,17 @@ document.addEventListener("DOMContentLoaded", () => {
             // Добавляем обработчики для открытия страницы товара
             document.querySelectorAll('.carousel-item').forEach(item => {
                 item.addEventListener('click', () => {
-                    const productName = item.querySelector('h3').textContent;
-                    fetch('/api/products')
-                        .then(response => response.json())
-                        .then(products => {
-                            const product = products.find(p => p.name === productName);
-                            if (product) {
-                                window.location.href = `/product/${product.id}`;
-                            }
-                        });
+                    const productId = item.dataset.productId;
+                    if (productId) {
+                        window.location.href = `/product/${productId}`;
+                    } else {
+                        console.error('ID товара не найден');
+                    }
                 });
             });
         })
-        .catch(error => console.error('Ошибка загрузки секций:', error));
+        .catch(error => {
+            console.error('Ошибка загрузки секций:', error);
+            sectionsContainer.innerHTML = '<p class="error">Ошибка загрузки данных. Пожалуйста, обновите страницу.</p>';
+        });
 });
