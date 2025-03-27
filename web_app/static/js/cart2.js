@@ -6,25 +6,35 @@ Telegram.WebApp.disableClosingConfirmation();
 // Функция обновления количества товара
 window.updateCartQuantity = function(productId, newQuantity, li) {
     const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
+    console.log('Отправка запроса на обновление количества:', {
+        productId,
+        newQuantity,
+        tgId
+    });
+    
     fetch(`/api/cart/${productId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quantity: newQuantity, tg: tgId }),
+        body: JSON.stringify({ quantity: newQuantity, tg_id: tgId }),
     })
         .then(response => {
+            console.log('Ответ сервера:', response);
             if (!response.ok) {
                 throw new Error('Ошибка обновления корзины');
             }
             return response.json();
         })
-        .then(() => {
+        .then(data => {
+            console.log('Данные ответа:', data);
             const unitPrice = parseFloat(li.getAttribute('data-unit-price'));
             li.querySelector('.quantity-value').textContent = newQuantity;
             li.querySelector('.item-total').textContent = (unitPrice * newQuantity).toFixed(2) + ' рублей';
             // Перезагружаем корзину для обновления общей суммы
             window.loadCartItems();
         })
-        .catch(error => console.error('Ошибка:', error));
+        .catch(error => {
+            console.error('Ошибка при обновлении количества:', error);
+        });
 };
 
 // Функция удаления товара из корзины
