@@ -78,7 +78,7 @@ def add_product():
     return render_template('admin/add_product.html', sections=sections)
 
 @bp.route('/products/edit/<int:product_id>', methods=['GET', 'POST'])
-@login_required
+@admin_required
 def edit_product(product_id):
     current_app.logger.info(f'Редактирование товара: {product_id}')
     
@@ -133,6 +133,7 @@ def edit_product(product_id):
                          sections=db.get_sections())
 
 @bp.route('/delete_product/<int:product_id>', methods=['POST'])
+@admin_required
 def delete_product(product_id):
     current_app.logger.info(f'Попытка удаления товара {product_id}')
     # Здесь можно добавить логику удаления товара
