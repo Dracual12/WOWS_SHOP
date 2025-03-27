@@ -34,7 +34,7 @@ class Database:
                 SELECT c.*, p.name, p.price 
                 FROM cart c 
                 JOIN products p ON c.product_id = p.id 
-                WHERE c.tg_id = ?
+                WHERE c.user_id = ?
             """, (tg_id,))
             columns = [description[0] for description in cursor.description]
             return [dict(zip(columns, row)) for row in cursor.fetchall()]
@@ -45,9 +45,9 @@ class Database:
             cursor = conn.cursor()
             try:
                 cursor.execute("""
-                    INSERT INTO cart (tg_id, product_id, quantity)
+                    INSERT INTO cart (user_id, product_id, quantity)
                     VALUES (?, ?, ?)
-                    ON CONFLICT(tg_id, product_id) 
+                    ON CONFLICT(user_id, product_id) 
                     DO UPDATE SET quantity = quantity + ?
                 """, (tg_id, product_id, quantity, quantity))
                 conn.commit()
@@ -66,7 +66,7 @@ class Database:
                 # Проверяем, существует ли запись
                 cursor.execute("""
                     SELECT quantity FROM cart 
-                    WHERE tg_id = ? AND product_id = ?
+                    WHERE user_id = ? AND product_id = ?
                 """, (tg_id, product_id))
                 existing = cursor.fetchone()
                 print(f"Существующая запись: {existing}")
@@ -76,7 +76,7 @@ class Database:
                     cursor.execute("""
                         UPDATE cart 
                         SET quantity = ? 
-                        WHERE tg_id = ? AND product_id = ?
+                        WHERE user_id = ? AND product_id = ?
                     """, (quantity, tg_id, product_id))
                     conn.commit()
                     print("Количество успешно обновлено")
@@ -95,7 +95,7 @@ class Database:
             try:
                 cursor.execute("""
                     DELETE FROM cart 
-                    WHERE tg_id = ? AND product_id = ?
+                    WHERE user_id = ? AND product_id = ?
                 """, (tg_id, product_id))
                 conn.commit()
                 return True
