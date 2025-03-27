@@ -9,7 +9,7 @@ bp = Blueprint('api', __name__, url_prefix='/api')
 @bp.route('/cart', methods=['POST'])
 def add_to_cart():
     data = request.get_json()
-    tg_id = data.get('tg_id')
+    tg_id = data.get('telegram_id') or data.get('tg_id')  # Поддерживаем оба варианта
     product_id = data.get('product_id')
     quantity = data.get('quantity', 1)
     
@@ -30,14 +30,14 @@ def get_cart():
     if tg_id:
         current_app.logger.info(f'Запрос корзины пользователя {tg_id}')
         cart_items = db.get_cart(int(tg_id))
-        return jsonify({"status": "success", "items": cart_items})
+        return jsonify(cart_items)  # Возвращаем массив напрямую
     current_app.logger.warning('Попытка получить корзину без указания tg_id')
-    return jsonify({"status": "error"})
+    return jsonify([])  # Возвращаем пустой массив
 
 @bp.route('/cart/<int:product_id>', methods=['PUT'])
 def update_cart_quantity(product_id):
     data = request.get_json()
-    tg_id = data.get('tg_id')
+    tg_id = data.get('tg') or data.get('tg_id')  # Поддерживаем оба варианта
     quantity = data.get('quantity')
     
     if tg_id and quantity:

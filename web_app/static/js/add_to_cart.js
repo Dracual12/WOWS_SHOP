@@ -18,23 +18,34 @@ async function handleAddToCart() {
     console.log('Кнопка нажата'); // Лог для отладки
 
     const productId = this.getAttribute('data-id');
-    const telegram_id = window.Telegram.WebApp.initDataUnsafe.user.id;
+    const tg_id = window.Telegram.WebApp.initDataUnsafe.user.id;
 
     try {
         console.log('Отправка запроса на сервер'); // Лог для отладки
         const response = await fetch('/api/cart', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ product_id: productId, quantity: 1, telegram_id: telegram_id }),
+            body: JSON.stringify({ 
+                product_id: productId, 
+                quantity: 1, 
+                tg_id: tg_id 
+            }),
         });
 
-        if (!response.ok) {
-            const error = await response.json();
-            console.log('Ошибка:', error); // Лог для отладки
-            showNotification(`Ошибка: ${error.error}`, 'error');
-        } else {
+        const data = await response.json();
+        
+        if (data.status === 'success') {
             console.log('Товар успешно добавлен'); // Лог для отладки
             showNotification('Товар успешно добавлен в корзину!', 'success');
+            
+            // Обновляем корзину, если она открыта
+            const cartDropdown = document.querySelector('.cart-dropdown-product');
+            if (cartDropdown && cartDropdown.classList.contains('active')) {
+                loadCartItems();
+            }
+        } else {
+            console.log('Ошибка:', data); // Лог для отладки
+            showNotification('Ошибка при добавлении товара в корзину', 'error');
         }
     } catch (err) {
         console.error('Ошибка при добавлении в корзину:', err);
