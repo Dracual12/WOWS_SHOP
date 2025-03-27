@@ -72,13 +72,14 @@ class Database:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute('''
-                    SELECT id, name, description, price, section as section_id, image, order_index, is_active, review_links
+                    SELECT id, name, description, price, section, image, order_index, is_active, review_links
                     FROM products
                     WHERE is_active = 1
                     ORDER BY order_index
                 ''')
                 columns = [description[0] for description in cursor.description]
                 products = [dict(zip(columns, row)) for row in cursor.fetchall()]
+                print("Полученные товары:", products)  # Добавляем отладочный вывод
                 return products
         except Exception as e:
             print(f"Ошибка при получении списка товаров: {e}")
@@ -264,6 +265,7 @@ class Database:
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
+                print(f"Добавление товара: name={name}, section_id={section_id}, image_path={image_path}")  # Отладочный вывод
                 cursor.execute('''
                     INSERT INTO products (name, description, price, section, image, order_index, is_active, review_links)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)

@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             console.log('Обработка товара:', product);
                             return `
                                 <div class="carousel-item" data-product-id="${product.id}">
-                                    <img src="/${product.image_path}" alt="${product.name}" class="carousel-image">
+                                    <img src="/${product.image}" alt="${product.name}" class="carousel-image">
                                     <h3>${product.name}</h3>
                                     <p>${product.price.toLocaleString()} ₽</p>
                                 </div>
