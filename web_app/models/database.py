@@ -255,7 +255,7 @@ class Database:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute('''
-                    INSERT INTO products (name, description, price, section, image, order_index, is_active, review_links)
+                    INSERT INTO products (name, description, price, section, image, order_index, is_active, review_link)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (name, description, price, section_id, image_path, order_index, is_active, review_links))
                 conn.commit()
