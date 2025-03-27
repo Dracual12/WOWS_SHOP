@@ -12,19 +12,23 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(sections => {
             console.log('Получены секции:', sections);
             sections.forEach(section => {
+                console.log(`Обработка раздела ${section.section_name}:`, section.products);
                 // Создаём секцию
                 const sectionElement = document.createElement("div");
                 sectionElement.classList.add("section");
                 sectionElement.innerHTML = `
                     <h2>${section.section_name}</h2>
                     <div class="product-carousel">
-                        ${section.products.map(product => `
-                            <div class="carousel-item" data-product-id="${product.id}">
-                                <img src="/${product.image_path}" alt="${product.name}" class="carousel-image">
-                                <h3>${product.name}</h3>
-                                <p>${product.price.toLocaleString()} ₽</p>
-                            </div>
-                        `).join("")}
+                        ${section.products.map(product => {
+                            console.log('Обработка товара:', product);
+                            return `
+                                <div class="carousel-item" data-product-id="${product.id}">
+                                    <img src="/${product.image_path}" alt="${product.name}" class="carousel-image">
+                                    <h3>${product.name}</h3>
+                                    <p>${product.price.toLocaleString()} ₽</p>
+                                </div>
+                            `;
+                        }).join("")}
                     </div>
                 `;
                 sectionsContainer.appendChild(sectionElement);

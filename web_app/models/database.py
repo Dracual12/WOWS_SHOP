@@ -66,13 +66,23 @@ class Database:
         """Создает и возвращает соединение с базой данных."""
         return sqlite3.connect(self.db_path)
 
-    def get_products(self) -> List[Dict[str, Any]]:
-        """Получает список всех товаров."""
-        with self.get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM products ORDER BY order_index")
-            columns = [description[0] for description in cursor.description]
-            return [dict(zip(columns, row)) for row in cursor.fetchall()]
+    def get_products(self) -> List[Dict]:
+        """Получает список всех товаров"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    SELECT id, name, description, price, section as section_id, image, order_index, is_active, review_links
+                    FROM products
+                    WHERE is_active = 1
+                    ORDER BY order_index
+                ''')
+                columns = [description[0] for description in cursor.description]
+                products = [dict(zip(columns, row)) for row in cursor.fetchall()]
+                return products
+        except Exception as e:
+            print(f"Ошибка при получении списка товаров: {e}")
+            return []
 
     def get_sections(self) -> List[Dict[str, Any]]:
         """Получает список всех разделов."""
@@ -255,7 +265,7 @@ class Database:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute('''
-                    INSERT INTO products (name, description, price, section, image, order_index, is_active, review_link)
+                    INSERT INTO products (name, description, price, section, image, order_index, is_active, review_links)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (name, description, price, section_id, image_path, order_index, is_active, review_links))
                 conn.commit()
