@@ -1,4 +1,7 @@
+console.log('Загрузка cart2.js');
+
 Telegram.WebApp.ready();
+console.log('Telegram WebApp готов');
 
 // Отключаем возможность закрытия жестом "pull-to-close"
 Telegram.WebApp.disableClosingConfirmation();
@@ -75,13 +78,17 @@ window.removeCartItem = function(productId, li) {
 
 // Делаем функцию доступной глобально
 window.loadCartItems = function() {
+    console.log('Загрузка товаров корзины');
     const cartItemsContainer = document.getElementById('cart-items-product');
     const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;  // Получаем tg_id
+    console.log('TG ID:', tgId);
+    
     fetch(`/api/cart?tg_id=${tgId}`, {
         method: "GET",  // Используем GET
     })
         .then(response => response.json())
         .then(cartItems => {
+            console.log('Получены товары:', cartItems);
             cartItemsContainer.innerHTML = ''; // Очищаем корзину
             let totalSum = 0; // Общая сумма корзины
             
@@ -120,30 +127,42 @@ window.loadCartItems = function() {
                     const decreaseBtn = li.querySelector('.quantity-btn.decrease');
                     const removeBtn = li.querySelector('.remove-btn');
 
-                    console.log('Найдены кнопки:', {
-                        increase: increaseBtn,
-                        decrease: decreaseBtn,
-                        remove: removeBtn
+                    console.log('Найдены кнопки для товара', item.id, ':', {
+                        increase: !!increaseBtn,
+                        decrease: !!decreaseBtn,
+                        remove: !!removeBtn
                     });
 
-                    increaseBtn.addEventListener('click', () => {
-                        console.log('Нажата кнопка увеличения количества');
-                        const currentQuantity = parseInt(li.querySelector('.quantity-value').textContent);
-                        window.updateCartQuantity(item.id, currentQuantity + 1, li);
-                    });
+                    if (increaseBtn) {
+                        increaseBtn.addEventListener('click', (e) => {
+                            console.log('Нажата кнопка увеличения количества для товара', item.id);
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const currentQuantity = parseInt(li.querySelector('.quantity-value').textContent);
+                            window.updateCartQuantity(item.id, currentQuantity + 1, li);
+                        });
+                    }
 
-                    decreaseBtn.addEventListener('click', () => {
-                        console.log('Нажата кнопка уменьшения количества');
-                        const currentQuantity = parseInt(li.querySelector('.quantity-value').textContent);
-                        if (currentQuantity > 1) {
-                            window.updateCartQuantity(item.id, currentQuantity - 1, li);
-                        }
-                    });
+                    if (decreaseBtn) {
+                        decreaseBtn.addEventListener('click', (e) => {
+                            console.log('Нажата кнопка уменьшения количества для товара', item.id);
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const currentQuantity = parseInt(li.querySelector('.quantity-value').textContent);
+                            if (currentQuantity > 1) {
+                                window.updateCartQuantity(item.id, currentQuantity - 1, li);
+                            }
+                        });
+                    }
 
-                    removeBtn.addEventListener('click', () => {
-                        console.log('Нажата кнопка удаления');
-                        window.removeCartItem(item.id, li);
-                    });
+                    if (removeBtn) {
+                        removeBtn.addEventListener('click', (e) => {
+                            console.log('Нажата кнопка удаления для товара', item.id);
+                            e.preventDefault();
+                            e.stopPropagation();
+                            window.removeCartItem(item.id, li);
+                        });
+                    }
 
                     cartItemsContainer.appendChild(li);
                 });
@@ -159,15 +178,32 @@ window.loadCartItems = function() {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM загружен');
+    
     const cartItemsContainer = document.getElementById('cart-items-product');
     const cartDropdown = document.querySelector('.cart-dropdown-product');
     const cartIcon = document.querySelector('.cart-icon-product');
 
+    console.log('Найдены элементы:', {
+        cartItemsContainer: !!cartItemsContainer,
+        cartDropdown: !!cartDropdown,
+        cartIcon: !!cartIcon
+    });
+
+    if (!cartItemsContainer || !cartDropdown || !cartIcon) {
+        console.error('Не все необходимые элементы найдены на странице');
+        return;
+    }
+
     // При клике по значку корзины переключаем класс "active" и загружаем товары
     cartIcon.addEventListener('click', () => {
+        console.log('Клик по иконке корзины');
         cartDropdown.classList.toggle('active');
         if (cartDropdown.classList.contains('active')) {
+            console.log('Корзина открыта, загружаем товары');
             window.loadCartItems();
+        } else {
+            console.log('Корзина закрыта');
         }
     });
 });
