@@ -8,6 +8,13 @@ def admin_panel():
     current_app.logger.info('Открыта панель администратора')
     return render_template('admin/index.html')
 
+@bp.route('/order', methods=['GET'])
+def order_management():
+    current_app.logger.info('Открыта страница управления порядком')
+    sections = db.get_sections()
+    products = db.get_products()
+    return render_template('admin/order.html', sections=sections, products=products)
+
 @bp.route('/add_product', methods=['GET', 'POST'])
 def add_product():
     if request.method == 'POST':

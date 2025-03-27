@@ -1,0 +1,225 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Управление порядком</h2>
+    
+    <!-- Секции -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Порядок разделов</h3>
+        </div>
+        <div class="card-body">
+            <div id="sections-list" class="list-group">
+                {% for section in sections %}
+                <div class="list-group-item" data-id="{{ section.id }}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>{{ section.name }}</span>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-primary move-up" title="Переместить вверх">
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary move-down" title="Переместить вниз">
+                                <i class="fas fa-arrow-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Товары -->
+    <div class="card">
+        <div class="card-header">
+            <h3>Порядок товаров</h3>
+            <select id="section-filter" class="form-control mt-2">
+                <option value="">Все разделы</option>
+                {% for section in sections %}
+                <option value="{{ section.id }}">{{ section.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="card-body">
+            <div id="products-list" class="list-group">
+                {% for product in products %}
+                <div class="list-group-item" data-id="{{ product.id }}" data-section="{{ product.section_id }}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>{{ product.name }}</span>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-primary move-up" title="Переместить вверх">
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary move-down" title="Переместить вниз">
+                                <i class="fas fa-arrow-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Подключаем Sortable.js -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Инициализация Sortable для секций
+    new Sortable(document.getElementById('sections-list'), {
+        animation: 150,
+        onEnd: function(evt) {
+            const sectionIds = Array.from(document.querySelectorAll('#sections-list .list-group-item'))
+                .map(item => parseInt(item.dataset.id));
+            updateSectionsOrder(sectionIds);
+        }
+    });
+
+    // Инициализация Sortable для товаров
+    new Sortable(document.getElementById('products-list'), {
+        animation: 150,
+        onEnd: function(evt) {
+            const productIds = Array.from(document.querySelectorAll('#products-list .list-group-item'))
+                .map(item => parseInt(item.dataset.id));
+            updateProductsOrder(productIds);
+        }
+    });
+
+    // Фильтрация товаров по разделу
+    document.getElementById('section-filter').addEventListener('change', function(e) {
+        const sectionId = e.target.value;
+        const products = document.querySelectorAll('#products-list .list-group-item');
+        
+        products.forEach(product => {
+            if (!sectionId || product.dataset.section === sectionId) {
+                product.style.display = '';
+            } else {
+                product.style.display = 'none';
+            }
+        });
+    });
+
+    // Обработчики кнопок перемещения
+    document.querySelectorAll('.move-up').forEach(button => {
+        button.addEventListener('click', function() {
+            const item = this.closest('.list-group-item');
+            const prev = item.previousElementSibling;
+            if (prev) {
+                item.parentNode.insertBefore(item, prev);
+                updateOrder(item.parentNode);
+            }
+        });
+    });
+
+    document.querySelectorAll('.move-down').forEach(button => {
+        button.addEventListener('click', function() {
+            const item = this.closest('.list-group-item');
+            const next = item.nextElementSibling;
+            if (next) {
+                item.parentNode.insertBefore(next, item);
+                updateOrder(item.parentNode);
+            }
+        });
+    });
+
+    // Функции обновления порядка
+    function updateSectionsOrder(sectionIds) {
+        fetch('/admin/api/sections/reorder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ section_ids: sectionIds })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showNotification('Порядок разделов обновлен', 'success');
+            } else {
+                showNotification('Ошибка при обновлении порядка разделов', 'error');
+            }
+        })
+        .catch(error => {
+            showNotification('Ошибка при обновлении порядка разделов', 'error');
+        });
+    }
+
+    function updateProductsOrder(productIds) {
+        fetch('/admin/api/products/reorder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ product_ids: productIds })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showNotification('Порядок товаров обновлен', 'success');
+            } else {
+                showNotification('Ошибка при обновлении порядка товаров', 'error');
+            }
+        })
+        .catch(error => {
+            showNotification('Ошибка при обновлении порядка товаров', 'error');
+        });
+    }
+
+    function updateOrder(container) {
+        const items = container.querySelectorAll('.list-group-item');
+        const ids = Array.from(items).map(item => parseInt(item.dataset.id));
+        
+        if (container.id === 'sections-list') {
+            updateSectionsOrder(ids);
+        } else {
+            updateProductsOrder(ids);
+        }
+    }
+
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type} position-fixed top-0 end-0 m-3`;
+        notification.style.zIndex = '1000';
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+});
+</script>
+
+<style>
+.list-group-item {
+    cursor: move;
+    user-select: none;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+.btn-group {
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.list-group-item:hover .btn-group {
+    opacity: 1;
+}
+
+.sortable-ghost {
+    opacity: 0.5;
+    background-color: #e9ecef;
+}
+
+.sortable-chosen {
+    background-color: #f8f9fa;
+}
+</style>
+{% endblock %} 
