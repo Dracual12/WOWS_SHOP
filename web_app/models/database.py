@@ -73,7 +73,7 @@ class Database:
                 cursor = conn.cursor()
 
                 cursor.execute('''
-                    SELECT id, name, description, price, section, image, order_index, is_active, review_links
+                    SELECT id, name, description, price, section, image, order_index, is_active, review_link
                     FROM products
                     WHERE is_active = 1
                     ORDER BY order_index
@@ -82,7 +82,7 @@ class Database:
                 products = [dict(zip(columns, row)) for row in cursor.fetchall()]
                 print("Полученные товары:", products)
                 k = cursor.execute('''
-                                    SELECT id, name, description, price, section, image, order_index, is_active, review_links, is_active
+                                    SELECT id, name, description, price, section, image, order_index, is_active, review_link, is_active
                                     FROM products
                                     ORDER BY order_index
                                 ''')
