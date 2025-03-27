@@ -278,4 +278,25 @@ class Database:
                 return True
         except Exception as e:
             print(f"Ошибка при добавлении товара: {e}")
+            return False
+
+    def update_product(self, product_id: int, name: str, description: str, price: float, section_id: int, image_path: str = None, order_index: int = 0, is_active: bool = True, review_links: str = None) -> bool:
+        """Обновляет товар в базе данных"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                # Получаем название секции по ID
+                cursor.execute('SELECT name FROM sections WHERE id = ?', (section_id,))
+                section_name = cursor.fetchone()[0]
+                
+                print(f"Обновление товара: id={product_id}, name={name}, section={section_name}, image_path={image_path}")  # Отладочный вывод
+                cursor.execute('''
+                    UPDATE products 
+                    SET name = ?, description = ?, price = ?, section = ?, image = ?, order_index = ?, is_active = ?, review_link = ?
+                    WHERE id = ?
+                ''', (name, description, price, section_name, image_path, order_index, is_active, review_links, product_id))
+                conn.commit()
+                return True
+        except Exception as e:
+            print(f"Ошибка при обновлении товара: {e}")
             return False 

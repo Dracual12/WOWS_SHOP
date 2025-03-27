@@ -5,7 +5,7 @@ from ..utils.telegram import send_telegram
 from ..config import Config
 from werkzeug.utils import secure_filename
 import os
-from ..utils.auth import admin_required, login_admin, logout_admin, is_admin_logged_in
+from ..utils.auth import admin_required, login_admin, logout_admin, is_admin_logged_in, login_required
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -77,16 +77,60 @@ def add_product():
     sections = db.get_sections()
     return render_template('admin/add_product.html', sections=sections)
 
-@bp.route('/edit_product/<int:product_id>', methods=['GET', 'POST'])
+@bp.route('/products/edit/<int:product_id>', methods=['GET', 'POST'])
+@login_required
 def edit_product(product_id):
+    current_app.logger.info(f'Редактирование товара: {product_id}')
+    
+    # Получаем товар
+    products = db.get_products()
+    product = next((p for p in products if p['id'] == product_id), None)
+    
+    if not product:
+        current_app.logger.error(f'Товар с ID {product_id} не найден')
+        return redirect(url_for('admin.products'))
+    
     if request.method == 'POST':
-        data = request.form
-        current_app.logger.info(f'Попытка редактирования товара {product_id}')
-        # Здесь можно добавить логику редактирования товара
-        current_app.logger.info('Товар успешно отредактирован')
-        return redirect(url_for('admin.admin_panel'))
-    current_app.logger.info(f'Открыта страница редактирования товара {product_id}')
-    return render_template('admin/edit_product.html', product_id=product_id)
+        name = request.form.get('name')
+        description = request.form.get('description')
+        price = float(request.form.get('price'))
+        section_id = int(request.form.get('section'))
+        order_index = int(request.form.get('order_index', 0))
+        is_active = request.form.get('is_active') == 'on'
+        review_links = request.form.get('review_links')
+        
+        image = request.files.get('image')
+        image_path = product.get('image')  # Сохраняем текущий путь к изображению
+        
+        if image:
+            if image.content_length and image.content_length > current_app.config['MAX_CONTENT_LENGTH']:
+                return render_template('admin/edit_product.html', 
+                                     product=product,
+                                     sections=db.get_sections(),
+                                     error='Размер файла превышает максимально допустимый (32MB)')
+            
+            filename = secure_filename(image.filename)
+            image_path = os.path.join('static', 'images', 'products', filename)
+            full_path = os.path.join(current_app.root_path, image_path)
+            os.makedirs(os.path.dirname(full_path), exist_ok=True)
+            image.save(full_path)
+            current_app.logger.info(f'Изображение сохранено: {image_path}')
+        
+        success = db.update_product(product_id, name, description, price, section_id, image_path, order_index, is_active, review_links)
+        
+        if success:
+            current_app.logger.info('Товар успешно обновлен')
+            return redirect(url_for('admin.products'))
+        else:
+            current_app.logger.error('Ошибка при обновлении товара')
+            return render_template('admin/edit_product.html', 
+                                 product=product,
+                                 sections=db.get_sections(),
+                                 error='Ошибка при обновлении товара')
+    
+    return render_template('admin/edit_product.html', 
+                         product=product,
+                         sections=db.get_sections())
 
 @bp.route('/delete_product/<int:product_id>', methods=['POST'])
 def delete_product(product_id):
