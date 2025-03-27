@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <title>{{ product.name }}</title>
+    <title>{% if product %}{{ product.name }}{% else %}Товар не найден{% endif %}</title>
 </head>
 <body>
     <header>
@@ -27,22 +27,30 @@
     </header>
 
     <main>
-        <img src="/{{ product.image }}" alt="{{ product.name }}" class="product-image">
+        {% if product %}
+            <img src="/{{ product.image }}" alt="{{ product.name }}" class="product-image">
 
-        <div class="product-details">
-            <p>Цена: {{ product.price }} рублей</p>
-            <p>{{ product.description }}</p>
-        </div>
+            <div class="product-details">
+                <p>Цена: {{ product.price }} рублей</p>
+                <p>{{ product.description }}</p>
+            </div>
 
-        <!-- Проверяем, есть ли ссылка на обзор -->
-        {% if product.review_link %}
-        <div class="review-container">
-            <h3>Обзор на YouTube:</h3>
-            <iframe class="review-video" src="{{ product.review_link }}" frameborder="0" allowfullscreen></iframe>
-        </div>
+            <!-- Проверяем, есть ли ссылка на обзор -->
+            {% if product.review_link %}
+            <div class="review-container">
+                <h3>Обзор на YouTube:</h3>
+                <iframe class="review-video" src="{{ product.review_link }}" frameborder="0" allowfullscreen></iframe>
+            </div>
+            {% endif %}
+
+            <button class="add_to_cart" data-id="{{ product.id }}">Добавить в корзину</button>
+        {% else %}
+            <div class="error-message">
+                <h2>Товар не найден</h2>
+                <p>Извините, запрашиваемый товар не существует или был удален.</p>
+                <a href="/" class="return-button">Вернуться в магазин</a>
+            </div>
         {% endif %}
-
-        <button class="add_to_cart" data-id="{{ product.id }}">Добавить в корзину</button>
     </main>
 
     <!-- Контейнер для уведомлений -->

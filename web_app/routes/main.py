@@ -71,4 +71,18 @@ def get_latest_order():
 @bp.route('/product/<int:product_id>')
 def product_page(product_id):
     current_app.logger.info(f'Открыта страница товара: {product_id}')
-    return render_template('product.html', product_id=product_id) 
+    try:
+        # Получаем все товары
+        products = db.get_products()
+        # Находим нужный товар
+        product = next((p for p in products if p['id'] == product_id), None)
+        
+        if product:
+            current_app.logger.info(f'Товар найден: {product}')
+            return render_template('product.html', product=product)
+        else:
+            current_app.logger.error(f'Товар с ID {product_id} не найден')
+            return render_template('product.html', product=None)
+    except Exception as e:
+        current_app.logger.error(f'Ошибка при получении товара: {str(e)}')
+        return render_template('product.html', product=None) 
