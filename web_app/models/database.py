@@ -191,4 +191,19 @@ class Database:
                 return True
             except Exception as e:
                 print(f"Ошибка обновления порядка товаров: {e}")
-                return False 
+                return False
+
+    def add_product(self, name: str, description: str, price: float, section_id: int, image_path: str = None, order_index: int = 0, is_active: bool = True) -> bool:
+        """Добавляет новый товар в базу данных"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    INSERT INTO products (name, description, price, section_id, image_path, order_index, is_active)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                ''', (name, description, price, section_id, image_path, order_index, is_active))
+                conn.commit()
+                return True
+        except Exception as e:
+            print(f"Ошибка при добавлении товара: {e}")
+            return False 
