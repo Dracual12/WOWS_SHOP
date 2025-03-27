@@ -3,7 +3,9 @@ let isHandlerAdded = false; // Флаг для проверки
 function setupAddToCartButtons() {
     if (isHandlerAdded) return; // Если обработчик уже добавлен, выходим
 
-    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+    const addToCartButtons = document.querySelectorAll('.add_to_cart'); // Исправляем селектор
+    console.log('Найдено кнопок:', addToCartButtons.length); // Лог для отладки
+    
     addToCartButtons.forEach(button => {
         button.addEventListener('click', handleAddToCart);
     });
@@ -17,8 +19,11 @@ setupAddToCartButtons();
 async function handleAddToCart() {
     console.log('Кнопка нажата'); // Лог для отладки
 
-    const productId = this.getAttribute('data-product-id');
+    const productId = this.getAttribute('data-id'); // Исправляем атрибут
     const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
+    
+    console.log('Product ID:', productId); // Лог для отладки
+    console.log('TG ID:', tgId); // Лог для отладки
 
     try {
         console.log('Отправка запроса на сервер'); // Лог для отладки
@@ -34,6 +39,7 @@ async function handleAddToCart() {
         });
 
         const data = await response.json();
+        console.log('Ответ сервера:', data); // Лог для отладки
         
         if (data.status === 'success') {
             console.log('Товар успешно добавлен'); // Лог для отладки
@@ -42,7 +48,9 @@ async function handleAddToCart() {
             // Обновляем корзину, если она открыта
             const cartDropdown = document.querySelector('.cart-dropdown-product');
             if (cartDropdown && cartDropdown.classList.contains('active')) {
-                loadCartItems();
+                if (typeof window.loadCartItems === 'function') {
+                    window.loadCartItems();
+                }
             }
         } else {
             console.log('Ошибка:', data); // Лог для отладки

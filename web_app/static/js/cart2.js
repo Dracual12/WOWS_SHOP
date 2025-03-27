@@ -21,10 +21,11 @@ window.loadCartItems = function() {
                 cartItems.forEach(item => {
                     const li = document.createElement('li');
                     li.setAttribute('data-product-id', item.id);
-                    // Вычисляем цену за единицу: если quantity > 0, то unitPrice = total / quantity, иначе 0
-                    const unitPrice = item.quantity > 0 ? parseFloat(item.total) / parseFloat(item.quantity) : 0;
+                    
+                    // Используем цену из базы данных напрямую
+                    const unitPrice = parseFloat(item.price);
                     li.setAttribute('data-unit-price', unitPrice);
-                    const itemTotal = unitPrice * item.quantity;
+                    const itemTotal = unitPrice * parseInt(item.quantity);
                     totalSum += itemTotal; // Добавляем к общей сумме
                     
                     li.innerHTML = `
