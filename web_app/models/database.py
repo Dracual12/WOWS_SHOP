@@ -79,6 +79,14 @@ class Database:
             try:
                 print(f"Попытка обновить количество: tg_id={tg_id}, product_id={product_id}, quantity={quantity}")
                 
+                # Проверяем все записи в корзине для этого пользователя
+                cursor.execute("""
+                    SELECT * FROM cart 
+                    WHERE tg_id = ?
+                """, (tg_id,))
+                all_items = cursor.fetchall()
+                print(f"Все товары в корзине пользователя {tg_id}: {all_items}")
+                
                 # Проверяем, существует ли запись
                 cursor.execute("""
                     SELECT quantity FROM cart 
