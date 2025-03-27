@@ -5,7 +5,7 @@ from ..utils.telegram import send_telegram
 from ..config import Config
 from werkzeug.utils import secure_filename
 import os
-from ..utils.auth import admin_required, login_admin, logout_admin, is_admin_logged_in, login_required
+from ..utils.auth import admin_required, login_admin, logout_admin, is_admin_logged_in
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
