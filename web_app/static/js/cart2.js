@@ -8,6 +8,16 @@ Telegram.WebApp.disableClosingConfirmation();
 
 // Функция обновления количества товара
 window.updateCartQuantity = function(productId, newQuantity, li) {
+    // Получаем productId из data-атрибута элемента, если он не передан
+    if (!productId && li) {
+        productId = li.getAttribute('data-product-id');
+    }
+    
+    if (!productId) {
+        console.error('Не удалось получить ID товара');
+        return;
+    }
+
     const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
     console.log('Отправка запроса на обновление количества:', {
         productId,

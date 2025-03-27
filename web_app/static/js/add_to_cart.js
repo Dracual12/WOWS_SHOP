@@ -16,52 +16,6 @@ function setupAddToCartButtons() {
 // Вызываем функцию для настройки кнопок
 setupAddToCartButtons();
 
-async function handleAddToCart() {
-    console.log('Кнопка нажата'); // Лог для отладки
-
-    const productId = this.getAttribute('data-id'); // Исправляем атрибут
-    const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
-    
-    console.log('Product ID:', productId); // Лог для отладки
-    console.log('TG ID:', tgId); // Лог для отладки
-
-    try {
-        console.log('Отправка запроса на сервер'); // Лог для отладки
-        const response = await fetch('/api/cart', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                product_id: productId,
-                tg_id: tgId
-            })
-        });
-
-        const data = await response.json();
-        console.log('Ответ сервера:', data); // Лог для отладки
-        
-        if (data.status === 'success') {
-            console.log('Товар успешно добавлен'); // Лог для отладки
-            showNotification('Товар успешно добавлен в корзину!', 'success');
-            
-            // Обновляем корзину, если она открыта
-            const cartDropdown = document.querySelector('.cart-dropdown-product');
-            if (cartDropdown && cartDropdown.classList.contains('active')) {
-                if (typeof window.loadCartItems === 'function') {
-                    window.loadCartItems();
-                }
-            }
-        } else {
-            console.log('Ошибка:', data); // Лог для отладки
-            showNotification(data.message || 'Ошибка при добавлении товара', 'error');
-        }
-    } catch (err) {
-        console.error('Ошибка при добавлении в корзину:', err);
-        showNotification('Ошибка при добавлении в корзину', 'error');
-    }
-}
-
 // Функция для показа уведомления
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
@@ -93,3 +47,83 @@ function showNotification(message, type = 'info') {
         }, 300);
     }, 3000);
 }
+
+// Функция добавления товара в корзину
+async function handleAddToCart() {
+    console.log('Кнопка нажата'); // Лог для отладки
+
+    const productId = this.getAttribute('data-id');
+    if (!productId) {
+        console.error('Не удалось получить ID товара');
+        showNotification('Ошибка: не удалось получить ID товара', 'error');
+        return;
+    }
+
+    const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
+    if (!tgId) {
+        console.error('Не удалось получить ID пользователя Telegram');
+        showNotification('Ошибка: не удалось получить ID пользователя', 'error');
+        return;
+    }
+    
+    console.log('Product ID:', productId);
+    console.log('TG ID:', tgId);
+
+    try {
+        console.log('Отправка запроса на сервер');
+        const response = await fetch('/api/cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                product_id: productId,
+                tg_id: tgId,
+                quantity: 1
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Ответ сервера:', data);
+        
+        if (data.status === 'success') {
+            console.log('Товар успешно добавлен');
+            showNotification('Товар успешно добавлен в корзину!', 'success');
+            
+            // Обновляем корзину, если она открыта
+            const cartDropdown = document.querySelector('.cart-dropdown-product');
+            if (cartDropdown && cartDropdown.classList.contains('active')) {
+                if (typeof window.loadCartItems === 'function') {
+                    window.loadCartItems();
+                }
+            }
+        } else {
+            console.error('Ошибка:', data);
+            showNotification(data.message || 'Ошибка при добавлении товара', 'error');
+        }
+    } catch (err) {
+        console.error('Ошибка при добавлении в корзину:', err);
+        showNotification('Ошибка при добавлении в корзину', 'error');
+    }
+}
+
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    // Инициализация Telegram WebApp
+    if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.disableClosingConfirmation();
+    }
+
+    // Настройка кнопок добавления в корзину
+    const addToCartButtons = document.querySelectorAll('.add_to_cart');
+    console.log('Найдено кнопок:', addToCartButtons.length);
+    
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', handleAddToCart);
+    });
+});

@@ -60,5 +60,13 @@
     <script src="/static/js/add_to_cart.js"></script>
     <script src="/static/js/cart2.js"></script>
     <script src="/static/js/order2.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Загрузка корзины при загрузке страницы
+            if (typeof window.loadCartItems === 'function') {
+                window.loadCartItems();
+            }
+        });
+    </script>
 </body>
 </html>
