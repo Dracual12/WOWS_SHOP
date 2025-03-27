@@ -8,6 +8,7 @@
     <div class="card mb-4">
         <div class="card-header">
             <h3>Порядок разделов</h3>
+            <p class="text-muted mb-0">Перетащите разделы для изменения порядка или используйте кнопки со стрелками</p>
         </div>
         <div class="card-body">
             <div id="sections-list" class="list-group">
@@ -34,17 +35,18 @@
     <div class="card">
         <div class="card-header">
             <h3>Порядок товаров</h3>
+            <p class="text-muted mb-0">Перетащите товары для изменения порядка или используйте кнопки со стрелками</p>
             <select id="section-filter" class="form-control mt-2">
                 <option value="">Все разделы</option>
                 {% for section in sections %}
-                <option value="{{ section.id }}">{{ section.name }}</option>
+                <option value="{{ section.name }}">{{ section.name }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="card-body">
             <div id="products-list" class="list-group">
                 {% for product in products %}
-                <div class="list-group-item" data-id="{{ product.id }}" data-section="{{ product.section_id }}">
+                <div class="list-group-item" data-id="{{ product.id }}" data-section="{{ product.section }}">
                     <div class="d-flex justify-content-between align-items-center">
                         <span>{{ product.name }}</span>
                         <div class="btn-group">
@@ -90,11 +92,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Фильтрация товаров по разделу
     document.getElementById('section-filter').addEventListener('change', function(e) {
-        const sectionId = e.target.value;
+        const sectionName = e.target.value;
         const products = document.querySelectorAll('#products-list .list-group-item');
         
         products.forEach(product => {
-            if (!sectionId || product.dataset.section === sectionId) {
+            if (!sectionName || product.dataset.section === sectionName) {
                 product.style.display = '';
             } else {
                 product.style.display = 'none';
@@ -198,28 +200,48 @@ document.addEventListener('DOMContentLoaded', function() {
 .list-group-item {
     cursor: move;
     user-select: none;
+    margin-bottom: 0.5rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    padding: 0.75rem 1.25rem;
+    background-color: #fff;
 }
 
 .list-group-item:hover {
     background-color: #f8f9fa;
 }
 
-.btn-group {
-    opacity: 0;
-    transition: opacity 0.2s;
-}
-
-.list-group-item:hover .btn-group {
-    opacity: 1;
-}
-
-.sortable-ghost {
+.list-group-item.sortable-ghost {
     opacity: 0.5;
     background-color: #e9ecef;
 }
 
-.sortable-chosen {
-    background-color: #f8f9fa;
+.btn-group {
+    margin-left: 1rem;
+}
+
+.btn-outline-primary {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.alert {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.alert-error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
 }
 </style>
 {% endblock %} 
