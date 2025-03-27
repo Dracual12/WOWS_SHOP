@@ -31,7 +31,7 @@ class Database:
                     description TEXT,
                     image TEXT,
                     section INTEGER,
-                    review_links TEXT,
+                    review_link TEXT,
                     order_index INTEGER DEFAULT 0,
                     is_active BOOLEAN DEFAULT 1
                 )
@@ -71,7 +71,6 @@ class Database:
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
-
                 cursor.execute('''
                     SELECT id, name, description, price, section, image, order_index, is_active, review_link
                     FROM products
@@ -80,14 +79,7 @@ class Database:
                 ''')
                 columns = [description[0] for description in cursor.description]
                 products = [dict(zip(columns, row)) for row in cursor.fetchall()]
-                print("Полученные товары:", products)
-                k = cursor.execute('''
-                                    SELECT id, name, description, price, section, image, order_index, is_active, review_link, is_active
-                                    FROM products
-                                    ORDER BY order_index
-                                ''')
-                print(k)
-                # Добавляем отладочный вывод
+                print("Полученные товары:", products)  # Добавляем отладочный вывод
                 return products
         except Exception as e:
             print(f"Ошибка при получении списка товаров: {e}")
@@ -273,11 +265,15 @@ class Database:
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
-                print(f"Добавление товара: name={name}, section_id={section_id}, image_path={image_path}")  # Отладочный вывод
+                # Получаем название секции по ID
+                cursor.execute('SELECT name FROM sections WHERE id = ?', (section_id,))
+                section_name = cursor.fetchone()[0]
+                
+                print(f"Добавление товара: name={name}, section={section_name}, image_path={image_path}")  # Отладочный вывод
                 cursor.execute('''
-                    INSERT INTO products (name, description, price, section, image, order_index, is_active, review_links)
+                    INSERT INTO products (name, description, price, section, image, order_index, is_active, review_link)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (name, description, price, section_id, image_path, order_index, is_active, review_links))
+                ''', (name, description, price, section_name, image_path, order_index, is_active, review_links))
                 conn.commit()
                 return True
         except Exception as e:

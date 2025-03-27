@@ -29,7 +29,7 @@ def get_sections():
         # Группируем товары по разделам
         sections_with_products = []
         for section in sorted_sections:
-            section_products = [p for p in products if p.get('section_id') == section['id']]
+            section_products = [p for p in products if p.get('section') == section['name']]
             current_app.logger.info(f'Товары для раздела {section["name"]}: {section_products}')
             sections_with_products.append({
                 'id': section['id'],
