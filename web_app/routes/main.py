@@ -18,21 +18,26 @@ def get_sections():
         sections = db.get_sections()
         products = db.get_products()
         
+        current_app.logger.info(f'Получено разделов: {len(sections)}')
+        current_app.logger.info(f'Получено товаров: {len(products)}')
+        current_app.logger.info(f'Секции: {sections}')
+        current_app.logger.info(f'Товары: {products}')
+        
         # Сортируем секции по order_index
         sorted_sections = sorted(sections, key=lambda x: x['order_index'])
         
         # Группируем товары по разделам
         sections_with_products = []
         for section in sorted_sections:
-            section_products = [p for p in products if p.get('section') == section['name']]
+            section_products = [p for p in products if p.get('section_id') == section['id']]
+            current_app.logger.info(f'Товары для раздела {section["name"]}: {section_products}')
             sections_with_products.append({
                 'id': section['id'],
                 'section_name': section['name'],
                 'products': section_products
             })
         
-        current_app.logger.info(f'Получено разделов: {len(sections_with_products)}')
-        current_app.logger.info(f'Секции: {sections_with_products}')
+        current_app.logger.info(f'Итоговый результат: {sections_with_products}')
         return jsonify(sections_with_products)
     except Exception as e:
         current_app.logger.error(f'Ошибка при получении разделов: {str(e)}')
