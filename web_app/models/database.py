@@ -31,7 +31,7 @@ class Database:
         with self.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT c.*, p.name, p.price 
+                SELECT c.product_id, c.tg_id, c.quantity, p.name, p.price 
                 FROM cart c 
                 JOIN products p ON c.product_id = p.id 
                 WHERE c.tg_id = ?
@@ -47,8 +47,8 @@ class Database:
                 # Сначала проверяем, существует ли запись
                 cursor.execute("""
                     SELECT quantity FROM cart 
-                    WHERE tg_id = ? AND product_id = ?
-                """, (tg_id, product_id))
+                    WHERE product_id = ? AND tg_id = ?
+                """, (product_id, tg_id))
                 existing = cursor.fetchone()
                 
                 if existing:
@@ -57,14 +57,14 @@ class Database:
                     cursor.execute("""
                         UPDATE cart 
                         SET quantity = ? 
-                        WHERE tg_id = ? AND product_id = ?
-                    """, (new_quantity, tg_id, product_id))
+                        WHERE product_id = ? AND tg_id = ?
+                    """, (new_quantity, product_id, tg_id))
                 else:
                     # Если записи нет, создаем новую
                     cursor.execute("""
-                        INSERT INTO cart (tg_id, product_id, quantity)
+                        INSERT INTO cart (product_id, tg_id, quantity)
                         VALUES (?, ?, ?)
-                    """, (tg_id, product_id, quantity))
+                    """, (product_id, tg_id, quantity))
                 
                 conn.commit()
                 return True
@@ -90,8 +90,8 @@ class Database:
                 # Проверяем, существует ли запись
                 cursor.execute("""
                     SELECT quantity FROM cart 
-                    WHERE tg_id = ? AND product_id = ?
-                """, (tg_id, product_id))
+                    WHERE product_id = ? AND tg_id = ?
+                """, (product_id, tg_id))
                 existing = cursor.fetchone()
                 print(f"Существующая запись: {existing}")
                 
@@ -100,8 +100,8 @@ class Database:
                     cursor.execute("""
                         UPDATE cart 
                         SET quantity = ? 
-                        WHERE tg_id = ? AND product_id = ?
-                    """, (quantity, tg_id, product_id))
+                        WHERE product_id = ? AND tg_id = ?
+                    """, (quantity, product_id, tg_id))
                     conn.commit()
                     print("Количество успешно обновлено")
                     return True
@@ -119,8 +119,8 @@ class Database:
             try:
                 cursor.execute("""
                     DELETE FROM cart 
-                    WHERE tg_id = ? AND product_id = ?
-                """, (tg_id, product_id))
+                    WHERE product_id = ? AND tg_id = ?
+                """, (product_id, tg_id))
                 conn.commit()
                 return True
             except Exception as e:
