@@ -5,6 +5,62 @@ import os
 class Database:
     def __init__(self, db_path: str):
         self.db_path = db_path
+        self._create_tables()
+
+    def _create_tables(self):
+        """Создает необходимые таблицы, если они не существуют."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            # Создаем таблицу sections
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS sections (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    order_index INTEGER DEFAULT 0,
+                    is_active BOOLEAN DEFAULT 1
+                )
+            ''')
+            
+            # Создаем таблицу products
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS products (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    price REAL NOT NULL,
+                    description TEXT,
+                    image TEXT,
+                    section INTEGER,
+                    review_links TEXT,
+                    order_index INTEGER DEFAULT 0,
+                    is_active BOOLEAN DEFAULT 1
+                )
+            ''')
+            
+            # Проверяем существующие столбцы в таблице products
+            cursor.execute("PRAGMA table_info(products)")
+            columns = [column[1] for column in cursor.fetchall()]
+            print("Существующие столбцы в таблице products:", columns)
+            
+            # Добавляем отсутствующие столбцы
+            if 'order_index' not in columns:
+                cursor.execute('ALTER TABLE products ADD COLUMN order_index INTEGER DEFAULT 0')
+            if 'is_active' not in columns:
+                cursor.execute('ALTER TABLE products ADD COLUMN is_active BOOLEAN DEFAULT 1')
+            
+            # Создаем таблицу cart
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS cart (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    product_id INTEGER NOT NULL,
+                    tg_id INTEGER NOT NULL,
+                    quantity INTEGER DEFAULT 1,
+                    FOREIGN KEY (product_id) REFERENCES products (id),
+                    UNIQUE(product_id, tg_id)
+                )
+            ''')
+            
+            conn.commit()
 
     def get_connection(self) -> sqlite3.Connection:
         """Создает и возвращает соединение с базой данных."""
@@ -193,15 +249,15 @@ class Database:
                 print(f"Ошибка обновления порядка товаров: {e}")
                 return False
 
-    def add_product(self, name: str, description: str, price: float, section_id: int, image_path: str = None, order_index: int = 0, is_active: bool = True) -> bool:
+    def add_product(self, name: str, description: str, price: float, section_id: int, image_path: str = None, order_index: int = 0, is_active: bool = True, review_links: str = None) -> bool:
         """Добавляет новый товар в базу данных"""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute('''
-                    INSERT INTO products (name, description, price, section_id, image_path, order_index, is_active)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                ''', (name, description, price, section_id, image_path, order_index, is_active))
+                    INSERT INTO products (name, description, price, section, image, order_index, is_active, review_links)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (name, description, price, section_id, image_path, order_index, is_active, review_links))
                 conn.commit()
                 return True
         except Exception as e:

@@ -40,6 +40,7 @@ def add_product():
             section_id = int(request.form.get('section'))
             order_index = int(request.form.get('order_index', 0))
             is_active = request.form.get('is_active') == 'on'
+            review_links = request.form.get('review_links')
             
             image = request.files.get('image')
             image_path = None
@@ -55,8 +56,9 @@ def add_product():
                 full_path = os.path.join(current_app.root_path, image_path)
                 os.makedirs(os.path.dirname(full_path), exist_ok=True)
                 image.save(full_path)
+                current_app.logger.info(f'Изображение сохранено: {image_path}')
             
-            success = db.add_product(name, description, price, section_id, image_path, order_index, is_active)
+            success = db.add_product(name, description, price, section_id, image_path, order_index, is_active, review_links)
             
             if success:
                 current_app.logger.info('Товар успешно добавлен')
