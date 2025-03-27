@@ -71,6 +71,7 @@ class Database:
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
+
                 cursor.execute('''
                     SELECT id, name, description, price, section, image, order_index, is_active, review_links
                     FROM products
@@ -79,7 +80,14 @@ class Database:
                 ''')
                 columns = [description[0] for description in cursor.description]
                 products = [dict(zip(columns, row)) for row in cursor.fetchall()]
-                print("Полученные товары:", products)  # Добавляем отладочный вывод
+                print("Полученные товары:", products)
+                k = cursor.execute('''
+                                    SELECT id, name, description, price, section, image, order_index, is_active, review_links, is_active
+                                    FROM products
+                                    ORDER BY order_index
+                                ''')
+                print(k)
+                # Добавляем отладочный вывод
                 return products
         except Exception as e:
             print(f"Ошибка при получении списка товаров: {e}")
