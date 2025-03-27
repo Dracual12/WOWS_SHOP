@@ -3,6 +3,49 @@ Telegram.WebApp.ready();
 // Отключаем возможность закрытия жестом "pull-to-close"
 Telegram.WebApp.disableClosingConfirmation();
 
+// Функция обновления количества товара
+window.updateCartQuantity = function(productId, newQuantity, li) {
+    const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
+    fetch(`/api/cart/${productId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quantity: newQuantity, tg: tgId }),
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Ошибка обновления корзины');
+            }
+            return response.json();
+        })
+        .then(() => {
+            const unitPrice = parseFloat(li.getAttribute('data-unit-price'));
+            li.querySelector('.quantity-value').textContent = newQuantity;
+            li.querySelector('.item-total').textContent = (unitPrice * newQuantity).toFixed(2) + ' рублей';
+            // Перезагружаем корзину для обновления общей суммы
+            window.loadCartItems();
+        })
+        .catch(error => console.error('Ошибка:', error));
+};
+
+// Функция удаления товара из корзины
+window.removeCartItem = function(productId, li) {
+    const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
+    fetch(`/api/cart/${tgId}/${productId}`, {
+        method: 'DELETE',
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Ошибка удаления товара из корзины');
+            }
+            return response.json();
+        })
+        .then(() => {
+            // Перезагружаем корзину для обновления общей суммы
+            window.loadCartItems();
+        })
+        .catch(error => console.error('Ошибка:', error));
+};
+
 // Делаем функцию доступной глобально
 window.loadCartItems = function() {
     const cartItemsContainer = document.getElementById('cart-items-product');
@@ -52,18 +95,18 @@ window.loadCartItems = function() {
 
                     increaseBtn.addEventListener('click', () => {
                         const currentQuantity = parseInt(li.querySelector('.quantity-value').textContent);
-                        updateCartQuantity(item.id, currentQuantity + 1, li);
+                        window.updateCartQuantity(item.id, currentQuantity + 1, li);
                     });
 
                     decreaseBtn.addEventListener('click', () => {
                         const currentQuantity = parseInt(li.querySelector('.quantity-value').textContent);
                         if (currentQuantity > 1) {
-                            updateCartQuantity(item.id, currentQuantity - 1, li);
+                            window.updateCartQuantity(item.id, currentQuantity - 1, li);
                         }
                     });
 
                     removeBtn.addEventListener('click', () => {
-                        removeCartItem(item.id, li);
+                        window.removeCartItem(item.id, li);
                     });
 
                     cartItemsContainer.appendChild(li);
@@ -88,50 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cartIcon.addEventListener('click', () => {
         cartDropdown.classList.toggle('active');
         if (cartDropdown.classList.contains('active')) {
-            loadCartItems();
+            window.loadCartItems();
         }
     });
-
-    // Функция обновления количества товара
-    function updateCartQuantity(productId, newQuantity, li) {
-        const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
-        fetch(`/api/cart/${productId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ quantity: newQuantity, tg: tgId }),
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Ошибка обновления корзины');
-                }
-                return response.json();
-            })
-            .then(() => {
-                const unitPrice = parseFloat(li.getAttribute('data-unit-price'));
-                li.querySelector('.quantity-value').textContent = newQuantity;
-                li.querySelector('.item-total').textContent = (unitPrice * newQuantity).toFixed(2) + ' рублей';
-                // Перезагружаем корзину для обновления общей суммы
-                loadCartItems();
-            })
-            .catch(error => console.error('Ошибка:', error));
-    }
-
-    // Функция удаления товара из корзины
-    function removeCartItem(productId, li) {
-        const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
-        fetch(`/api/cart/${tgId}/${productId}`, {
-            method: 'DELETE',
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Ошибка удаления товара из корзины');
-                }
-                return response.json();
-            })
-            .then(() => {
-                // Перезагружаем корзину для обновления общей суммы
-                loadCartItems();
-            })
-            .catch(error => console.error('Ошибка:', error));
-    }
 });
