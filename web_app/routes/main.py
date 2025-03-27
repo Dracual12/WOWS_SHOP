@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, jsonify, current_app
-from ..models.database import db
+from web_app import db
 from ..utils.helpers import format_order_summary, order_text
 from ..utils.telegram import send_telegram
 from ..config import Config

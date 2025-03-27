@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, current_app
-from ..models.database import db
+from web_app import db
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
