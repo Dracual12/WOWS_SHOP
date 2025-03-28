@@ -99,7 +99,7 @@ def add_product():
                 flash('Раздел не найден', 'error')
                 return redirect(url_for('admin.add_product'))
             
-            # Преобразуем ссылку на YouTube
+            # Преобразуем ссылки на YouTube
             if review_link:
                 review_link = convert_youtube_link(review_link)
             

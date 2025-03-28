@@ -30,8 +30,8 @@ class Database:
                     price REAL NOT NULL,
                     description TEXT,
                     image TEXT,
-                    section INTEGER,
-                    review_link TEXT,
+                    section TEXT,
+                    review_links TEXT,
                     order_index INTEGER DEFAULT 0,
                     is_active BOOLEAN DEFAULT 1
                 )
@@ -47,6 +47,8 @@ class Database:
                 cursor.execute('ALTER TABLE products ADD COLUMN order_index INTEGER DEFAULT 0')
             if 'is_active' not in columns:
                 cursor.execute('ALTER TABLE products ADD COLUMN is_active BOOLEAN DEFAULT 1')
+            if 'review_links' not in columns:
+                cursor.execute('ALTER TABLE products ADD COLUMN review_links TEXT')
             
             # Создаем таблицу cart
             cursor.execute('''
@@ -260,7 +262,7 @@ class Database:
                 print(f"Ошибка обновления порядка товаров: {e}")
                 return False
 
-    def add_product(self, name: str, description: str, price: float, section_id: int, image_path: str = None, order_index: int = 0, is_active: bool = True, review_links: str = None) -> bool:
+    def add_product(self, name: str, description: str, price: float, section_id: int, image_path: str = None, order_index: int = 0, is_active: bool = True, review_link: str = None) -> bool:
         """Добавляет новый товар в базу данных"""
         try:
             with sqlite3.connect(self.db_path) as conn:
@@ -273,7 +275,7 @@ class Database:
                 cursor.execute('''
                     INSERT INTO products (name, description, price, section, image, order_index, is_active, review_link)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (name, description, price, section_name, image_path, order_index, is_active, review_links))
+                ''', (name, description, price, section_name, image_path, order_index, is_active, review_link))
                 conn.commit()
                 return True
         except Exception as e:
