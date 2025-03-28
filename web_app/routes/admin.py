@@ -185,7 +185,9 @@ def edit_product(product_id):
             return redirect(url_for('admin.edit_product', product_id=product_id))
     
     # GET запрос - показываем форму редактирования
-    product = db.get_product(product_id)
+    products = db.get_products()
+    product = next((p for p in products if p['id'] == product_id), None)
+    
     if not product:
         flash('Товар не найден', 'error')
         return redirect(url_for('admin.products'))
