@@ -57,9 +57,17 @@ def add_product():
                         raise ValueError('Файл слишком большой')
                     
                     filename = secure_filename(file.filename)
-                    file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                    # Создаем директорию для изображений, если её нет
+                    upload_dir = os.path.join(current_app.root_path, 'static', 'images', 'products')
+                    os.makedirs(upload_dir, exist_ok=True)
+                    
+                    # Сохраняем файл
+                    file_path = os.path.join(upload_dir, filename)
                     file.save(file_path)
-                    image_path = os.path.join('bot', 'assets', filename)
+                    
+                    # Сохраняем относительный путь для базы данных
+                    image_path = os.path.join('static', 'images', 'products', filename)
+                    current_app.logger.info(f'Изображение сохранено: {image_path}')
             
             if db.add_product(name, description, price, section_id, image_path, order_index, is_active, review_links):
                 current_app.logger.info(f'Товар {name} успешно добавлен')
