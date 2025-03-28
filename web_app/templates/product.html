@@ -59,7 +59,7 @@
 
                 {% if product.price > 0 %}
                 <div class="d-grid gap-2">
-                    <button class="btn btn-primary btn-lg" onclick="addToCart({{ product.id }})">
+                    <button class="btn btn-primary btn-lg add_to_cart" data-id="{{ product.id }}">
                         <i class="fas fa-shopping-cart"></i> Добавить в корзину
                     </button>
                 </div>

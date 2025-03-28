@@ -3,7 +3,7 @@ let isHandlerAdded = false; // Флаг для проверки
 function setupAddToCartButtons() {
     if (isHandlerAdded) return; // Если обработчик уже добавлен, выходим
 
-    const addToCartButtons = document.querySelectorAll('.add_to_cart'); // Исправляем селектор
+    const addToCartButtons = document.querySelectorAll('.add_to_cart');
     console.log('Найдено кнопок:', addToCartButtons.length); // Лог для отладки
     
     addToCartButtons.forEach(button => {
@@ -13,8 +13,10 @@ function setupAddToCartButtons() {
     isHandlerAdded = true; // Устанавливаем флаг
 }
 
-// Вызываем функцию для настройки кнопок
-setupAddToCartButtons();
+// Вызываем функцию для настройки кнопок при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    setupAddToCartButtons();
+});
 
 // Функция для показа уведомления
 function showNotification(message, type = 'info') {
@@ -102,12 +104,12 @@ async function handleAddToCart() {
                 }
             }
         } else {
-            console.error('Ошибка:', data);
-            showNotification(data.message || 'Ошибка при добавлении товара', 'error');
+            console.error('Ошибка при добавлении товара:', data.message);
+            showNotification(data.message || 'Ошибка при добавлении товара в корзину', 'error');
         }
-    } catch (err) {
-        console.error('Ошибка при добавлении в корзину:', err);
-        showNotification('Ошибка при добавлении в корзину', 'error');
+    } catch (error) {
+        console.error('Ошибка при добавлении товара:', error);
+        showNotification('Ошибка при добавлении товара в корзину', 'error');
     }
 }
 

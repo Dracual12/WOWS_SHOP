@@ -117,4 +117,30 @@ def product_page(product_id):
             return render_template('product.html', product=None)
     except Exception as e:
         current_app.logger.error(f'Ошибка при получении товара: {str(e)}')
-        return render_template('product.html', product=None) 
+        return render_template('product.html', product=None)
+
+@bp.route('/api/cart', methods=['POST'])
+def add_to_cart():
+    current_app.logger.info('Получен запрос на добавление товара в корзину')
+    try:
+        data = request.get_json()
+        product_id = data.get('product_id')
+        tg_id = data.get('tg_id')
+        quantity = data.get('quantity', 1)
+        
+        if not product_id or not tg_id:
+            current_app.logger.error('Отсутствуют обязательные параметры')
+            return jsonify({"status": "error", "message": "Отсутствуют обязательные параметры"}), 400
+        
+        current_app.logger.info(f'Добавление товара {product_id} в корзину пользователя {tg_id}')
+        
+        if db.add_to_cart(tg_id, product_id, quantity):
+            current_app.logger.info('Товар успешно добавлен в корзину')
+            return jsonify({"status": "success"})
+        else:
+            current_app.logger.error('Ошибка при добавлении товара в корзину')
+            return jsonify({"status": "error", "message": "Ошибка при добавлении товара в корзину"}), 500
+            
+    except Exception as e:
+        current_app.logger.error(f'Ошибка при добавлении товара в корзину: {str(e)}')
+        return jsonify({"status": "error", "message": str(e)}), 500 
