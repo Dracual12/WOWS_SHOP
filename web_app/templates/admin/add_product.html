@@ -25,7 +25,14 @@
 
                 <div class="mb-3">
                     <label for="price" class="form-label">Цена</label>
-                    <input type="number" class="form-control" id="price" name="price" step="0.01" required>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="price" name="price" step="0.01" min="0">
+                        <div class="input-group-text">₽</div>
+                    </div>
+                    <div class="form-check mt-2">
+                        <input type="checkbox" class="form-check-input" id="is_free" name="is_free">
+                        <label class="form-check-label" for="is_free">Бесплатный товар</label>
+                    </div>
                 </div>
 
                 <div class="mb-3">
@@ -93,16 +100,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Обработка чекбокса бесплатного товара
+    const isFreeCheckbox = document.getElementById('is_free');
+    const priceInput = document.getElementById('price');
+    
+    isFreeCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            priceInput.value = '';
+            priceInput.disabled = true;
+            priceInput.required = false;
+        } else {
+            priceInput.disabled = false;
+            priceInput.required = true;
+        }
+    });
+
     // Валидация формы
     const form = document.querySelector('form');
     form.addEventListener('submit', function(e) {
-        const price = document.getElementById('price').value;
-        if (price <= 0) {
-            e.preventDefault();
-            alert('Цена должна быть больше 0');
-            return;
-        }
-
         const section = document.getElementById('section').value;
         if (!section) {
             e.preventDefault();

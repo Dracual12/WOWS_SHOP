@@ -36,43 +36,43 @@ def add_product():
         try:
             name = request.form.get('name')
             description = request.form.get('description')
-            price = float(request.form.get('price'))
-            section_id = int(request.form.get('section'))
+            section_id = request.form.get('section')
+            review_links = request.form.get('review_link')
             order_index = int(request.form.get('order_index', 0))
-            is_active = request.form.get('is_active') == 'on'
-            review_links = request.form.get('review_links')
+            is_active = 'is_active' in request.form
+            is_free = 'is_free' in request.form
             
-            image = request.files.get('image')
+            # Обработка цены
+            if is_free:
+                price = 0
+            else:
+                price = float(request.form.get('price', 0))
+            
+            # Обработка изображения
             image_path = None
+            if 'image' in request.files:
+                file = request.files['image']
+                if file and file.filename:
+                    if file.content_length > current_app.config['MAX_CONTENT_LENGTH']:
+                        raise ValueError('Файл слишком большой')
+                    
+                    filename = secure_filename(file.filename)
+                    file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                    file.save(file_path)
+                    image_path = os.path.join('bot', 'assets', filename)
             
-            if image:
-                if image.content_length and image.content_length > current_app.config['MAX_CONTENT_LENGTH']:
-                    return render_template('admin/add_product.html', 
-                                         sections=db.get_sections(),
-                                         error='Размер файла превышает максимально допустимый (32MB)')
-                
-                filename = secure_filename(image.filename)
-                image_path = os.path.join('static', 'images', 'products', filename)
-                full_path = os.path.join(current_app.root_path, image_path)
-                os.makedirs(os.path.dirname(full_path), exist_ok=True)
-                image.save(full_path)
-                current_app.logger.info(f'Изображение сохранено: {image_path}')
-            
-            success = db.add_product(name, description, price, section_id, image_path, order_index, is_active, review_links)
-            
-            if success:
-                current_app.logger.info('Товар успешно добавлен')
+            if db.add_product(name, description, price, section_id, image_path, order_index, is_active, review_links):
+                current_app.logger.info(f'Товар {name} успешно добавлен')
                 return redirect(url_for('admin.products'))
             else:
                 current_app.logger.error('Ошибка при добавлении товара')
-                return render_template('admin/add_product.html', 
-                                     sections=db.get_sections(),
-                                     error='Ошибка при добавлении товара')
+                return render_template('admin/add_product.html', error='Ошибка при добавлении товара')
+        except ValueError as e:
+            current_app.logger.error(f'Ошибка валидации: {str(e)}')
+            return render_template('admin/add_product.html', error=str(e))
         except Exception as e:
             current_app.logger.error(f'Ошибка при добавлении товара: {str(e)}')
-            return render_template('admin/add_product.html', 
-                                 sections=db.get_sections(),
-                                 error=f'Ошибка при добавлении товара: {str(e)}')
+            return render_template('admin/add_product.html', error='Произошла ошибка при добавлении товара')
     
     sections = db.get_sections()
     return render_template('admin/add_product.html', sections=sections)

@@ -31,7 +31,22 @@
             <img src="/{{ product.image }}" alt="{{ product.name }}" class="product-image">
 
             <div class="product-details">
-                <p>Цена: {{ product.price }} рублей</p>
+                <div class="product-price mb-3">
+                    {% if product.price > 0 %}
+                        <span class="h4">{{ product.price }} ₽</span>
+                    {% else %}
+                        <span class="h4 text-success">Бесплатно</span>
+                    {% endif %}
+                </div>
+
+                {% if product.price > 0 %}
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary btn-lg" onclick="addToCart({{ product.id }})">
+                        <i class="fas fa-shopping-cart"></i> Добавить в корзину
+                    </button>
+                </div>
+                {% endif %}
+
                 <p>{{ product.description }}</p>
             </div>
 
@@ -42,8 +57,6 @@
                 <iframe class="review-video" src="{{ product.review_link }}" frameborder="0" allowfullscreen></iframe>
             </div>
             {% endif %}
-
-            <button class="add_to_cart" data-id="{{ product.id }}">Добавить в корзину</button>
         {% else %}
             <div class="error-message">
                 <h2>Товар не найден</h2>
