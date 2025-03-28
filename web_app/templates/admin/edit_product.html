@@ -18,15 +18,20 @@
             <label for="description">Описание:</label>
             <textarea class="form-control" id="description" name="description" rows="3">{{ product.description }}</textarea>
         </div>
+
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="is_free" name="is_free" {% if product.price == 0 %}checked{% endif %}>
+            <label class="form-check-label" for="is_free">Бесплатный товар</label>
+        </div>
         
         <div class="form-group">
             <label for="price">Цена:</label>
-            <input type="number" class="form-control" id="price" name="price" value="{{ product.price }}" required>
+            <input type="number" class="form-control" id="price" name="price" value="{{ product.price }}" {% if product.price == 0 %}disabled{% endif %}>
         </div>
         
         <div class="form-group">
             <label for="section">Раздел:</label>
-            <select class="form-control" id="section" name="section" required>
+            <select class="form-control" id="section" name="section_id" required>
                 {% for section in sections %}
                 <option value="{{ section.id }}" {% if section.name == product.section %}selected{% endif %}>
                     {{ section.name }}
@@ -64,4 +69,16 @@
         <a href="{{ url_for('admin.products') }}" class="btn btn-secondary">Отмена</a>
     </form>
 </div>
+
+<script>
+document.getElementById('is_free').addEventListener('change', function() {
+    const priceInput = document.getElementById('price');
+    if (this.checked) {
+        priceInput.value = '0';
+        priceInput.disabled = true;
+    } else {
+        priceInput.disabled = false;
+    }
+});
+</script>
 {% endblock %} 

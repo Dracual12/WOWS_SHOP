@@ -12,6 +12,11 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from aiogram.filters import Command
 import bot.config as config
 from bot.db import add_user, get_db_connection, add_column
+import logging
+
+# Настройка логирования
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Настройка пути к проекту
 
@@ -54,7 +59,20 @@ def main_menu():
 
 # Запуск бота
 async def main():
-    await dp.start_polling(botik)
+    try:
+        logger.info("Starting bot...")
+        await dp.start_polling(botik, allowed_updates=dp.resolve_used_update_types())
+    except Exception as e:
+        logger.error(f"Error while starting bot: {e}")
+        # Даем время на освобождение ресурсов
+        await asyncio.sleep(5)
+        # Пробуем перезапустить бота
+        await main()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        logger.info("Bot stopped by user")
+    except Exception as e:
+        logger.error(f"Fatal error: {e}")
