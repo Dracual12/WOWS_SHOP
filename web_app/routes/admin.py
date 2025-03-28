@@ -136,9 +136,15 @@ def edit_product(product_id):
 @admin_required
 def delete_product(product_id):
     current_app.logger.info(f'Попытка удаления товара {product_id}')
-    # Здесь можно добавить логику удаления товара
-    current_app.logger.info('Товар успешно удален')
-    return redirect(url_for('admin.admin_panel'))
+    try:
+        if db.delete_product(product_id):
+            current_app.logger.info(f'Товар {product_id} успешно удален')
+        else:
+            current_app.logger.error(f'Ошибка при удалении товара {product_id}')
+    except Exception as e:
+        current_app.logger.error(f'Ошибка при удалении товара {product_id}: {str(e)}')
+    
+    return redirect(url_for('admin.products'))
 
 @bp.route('/add_section', methods=['GET', 'POST'])
 @admin_required

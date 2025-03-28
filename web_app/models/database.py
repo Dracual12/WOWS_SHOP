@@ -299,4 +299,26 @@ class Database:
                 return True
         except Exception as e:
             print(f"Ошибка при обновлении товара: {e}")
+            return False
+
+    def delete_product(self, product_id: int) -> bool:
+        """Удаляет товар из базы данных"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                # Сначала получаем информацию о товаре, чтобы удалить его изображение
+                cursor.execute('SELECT image FROM products WHERE id = ?', (product_id,))
+                result = cursor.fetchone()
+                if result and result[0]:
+                    image_path = result[0]
+                    full_path = os.path.join(os.path.dirname(self.db_path), '..', 'web_app', image_path)
+                    if os.path.exists(full_path):
+                        os.remove(full_path)
+                
+                # Удаляем товар из базы данных
+                cursor.execute('DELETE FROM products WHERE id = ?', (product_id,))
+                conn.commit()
+                return True
+        except Exception as e:
+            print(f"Ошибка при удалении товара: {e}")
             return False 
