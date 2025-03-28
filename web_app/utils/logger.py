@@ -1,36 +1,55 @@
 import os
 import logging
 from logging.handlers import RotatingFileHandler
+from flask import current_app
 
-def setup_logger():
-    # Создаем директорию для логов, если она не существует
-    log_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'logs')
-    os.makedirs(log_dir, exist_ok=True)
+def setup_logger(app):
+    """
+    Настраивает систему логирования для приложения.
+    
+    Args:
+        app: Flask приложение
+    """
+    # Создаем директорию для логов, если её нет
+    if not os.path.exists('logs'):
+        os.mkdir('logs')
     
     # Настраиваем формат логов
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
     
-    # Настраиваем файл для всех логов
-    app_log = os.path.join(log_dir, 'app.log')
-    app_handler = RotatingFileHandler(app_log, maxBytes=10*1024*1024, backupCount=5)
-    app_handler.setFormatter(formatter)
-    app_handler.setLevel(logging.INFO)
+    # Настраиваем файловый обработчик
+    file_handler = RotatingFileHandler(
+        'logs/app.log',
+        maxBytes=10240,  # 10KB
+        backupCount=10
+    )
+    file_handler.setFormatter(formatter)
+    file_handler.setLevel(logging.INFO)
     
-    # Настраиваем файл для ошибок
-    error_log = os.path.join(log_dir, 'error.log')
-    error_handler = RotatingFileHandler(error_log, maxBytes=10*1024*1024, backupCount=5)
-    error_handler.setFormatter(formatter)
-    error_handler.setLevel(logging.ERROR)
+    # Настраиваем обработчик для ошибок
+    error_file_handler = RotatingFileHandler(
+        'logs/error.log',
+        maxBytes=10240,
+        backupCount=10
+    )
+    error_file_handler.setFormatter(formatter)
+    error_file_handler.setLevel(logging.ERROR)
     
-    # Настраиваем корневой логгер
-    root_logger = logging.getLogger()
-    root_logger.setLevel(logging.INFO)
-    root_logger.addHandler(app_handler)
-    root_logger.addHandler(error_handler)
-    
-    # Добавляем вывод в консоль
+    # Настраиваем консольный обработчик
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(formatter)
-    root_logger.addHandler(console_handler)
+    console_handler.setLevel(logging.INFO)
     
-    return root_logger 
+    # Добавляем обработчики к логгеру приложения
+    app.logger.addHandler(file_handler)
+    app.logger.addHandler(error_file_handler)
+    app.logger.addHandler(console_handler)
+    app.logger.setLevel(logging.INFO)
+    
+    # Отключаем логирование от Werkzeug (по умолчанию)
+    logging.getLogger('werkzeug').setLevel(logging.WARNING)
+    
+    # Логируем информацию о запуске приложения
+    app.logger.info('Логирование настроено') 
