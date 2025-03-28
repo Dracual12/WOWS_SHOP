@@ -7,47 +7,96 @@
     <div class="row mt-4">
         <div class="col-md-6">
             <div class="card">
-                <div class="card-header">
-                    <h3>Разделы</h3>
-                </div>
                 <div class="card-body">
-                    <p>Управление разделами каталога</p>
-                    <a href="{{ url_for('admin.add_section') }}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Добавить раздел
-                    </a>
+                    <h5 class="card-title">Управление разделами</h5>
+                    <p class="card-text">Добавляйте, редактируйте и удаляйте разделы магазина.</p>
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('admin.add_section') }}" class="btn btn-primary">Добавить раздел</a>
+                        <a href="{{ url_for('admin.sections') }}" class="btn btn-secondary">Список разделов</a>
+                    </div>
                 </div>
             </div>
         </div>
         
         <div class="col-md-6">
             <div class="card">
-                <div class="card-header">
-                    <h3>Товары</h3>
-                </div>
                 <div class="card-body">
-                    <p>Управление товарами</p>
-                    <a href="{{ url_for('admin.add_product') }}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Добавить товар
-                    </a>
+                    <h5 class="card-title">Управление товарами</h5>
+                    <p class="card-text">Добавляйте, редактируйте и удаляйте товары в магазине.</p>
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('admin.add_product') }}" class="btn btn-primary">Добавить товар</a>
+                        <a href="{{ url_for('admin.products') }}" class="btn btn-secondary">Список товаров</a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     
     <div class="row mt-4">
-        <div class="col-12">
+        <div class="col-md-6">
             <div class="card">
-                <div class="card-header">
-                    <h3>Порядок отображения</h3>
-                </div>
                 <div class="card-body">
-                    <p>Управление порядком отображения разделов и товаров</p>
-                    <a href="{{ url_for('admin.order_management') }}" class="btn btn-primary">
-                        <i class="fas fa-sort"></i> Управление порядком
-                    </a>
+                    <h5 class="card-title">Управление порядком</h5>
+                    <p class="card-text">Изменяйте порядок отображения разделов и товаров.</p>
+                    <a href="{{ url_for('admin.order_management') }}" class="btn btn-primary">Управление порядком</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Заказы</h5>
+                    <p class="card-text">Просматривайте и управляйте заказами.</p>
+                    <a href="{{ url_for('admin.orders') }}" class="btn btn-primary">Список заказов</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.card {
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card-title {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.card-text {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.btn {
+    padding: 8px 16px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #545b62;
+    border-color: #4e555b;
+}
+
+.gap-2 {
+    gap: 0.5rem;
+}
+</style>
 {% endblock %} 

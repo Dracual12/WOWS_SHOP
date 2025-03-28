@@ -289,4 +289,10 @@ def login():
 @bp.route('/logout')
 def logout():
     logout_admin()
-    return redirect(url_for('admin.login')) 
+    return redirect(url_for('admin.login'))
+
+@bp.route('/sections', methods=['GET'])
+@admin_required
+def sections():
+    sections = db.get_sections()
+    return render_template('admin/sections.html', sections=sections) 
