@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for, current_app, session
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, current_app, session, flash
 from web_app import db
 from ..utils.helpers import format_order_summary, order_text
 from ..utils.telegram import send_telegram
@@ -29,6 +29,30 @@ def products():
     sections = db.get_sections()
     return render_template('admin/products.html', products=products, sections=sections)
 
+def convert_youtube_link(link):
+    """Преобразует обычную ссылку YouTube в формат для встраивания"""
+    if not link:
+        return None
+    
+    # Удаляем пробелы и переносы строк
+    link = link.strip()
+    
+    # Если это уже ссылка для встраивания, возвращаем как есть
+    if 'youtube.com/embed/' in link:
+        return link
+    
+    # Извлекаем ID видео
+    video_id = None
+    if 'youtube.com/watch?v=' in link:
+        video_id = link.split('watch?v=')[1].split('&')[0]
+    elif 'youtu.be/' in link:
+        video_id = link.split('youtu.be/')[1].split('?')[0]
+    
+    if video_id:
+        return f'https://www.youtube.com/embed/{video_id}'
+    
+    return link
+
 @bp.route('/add_product', methods=['GET', 'POST'])
 @admin_required
 def add_product():
@@ -37,7 +61,7 @@ def add_product():
             name = request.form.get('name')
             description = request.form.get('description')
             section_id = request.form.get('section')
-            review_links = request.form.get('review_link')
+            review_link = request.form.get('review_link')
             order_index = int(request.form.get('order_index', 0))
             is_active = 'is_active' in request.form
             is_free = 'is_free' in request.form
@@ -69,17 +93,31 @@ def add_product():
                     image_path = os.path.join('static', 'images', 'products', filename)
                     current_app.logger.info(f'Изображение сохранено: {image_path}')
             
-            if db.add_product(name, description, price, section_id, image_path, order_index, is_active, review_links):
+            # Получаем название раздела
+            section_name = db.get_section_name(section_id)
+            if not section_name:
+                flash('Раздел не найден', 'error')
+                return redirect(url_for('admin.add_product'))
+            
+            # Преобразуем ссылку на YouTube
+            if review_link:
+                review_link = convert_youtube_link(review_link)
+            
+            if db.add_product(name, description, price, section_id, image_path, order_index, is_active, review_link):
                 current_app.logger.info(f'Товар {name} успешно добавлен')
+                flash('Товар успешно добавлен', 'success')
                 return redirect(url_for('admin.products'))
             else:
                 current_app.logger.error('Ошибка при добавлении товара')
+                flash('Ошибка при добавлении товара', 'error')
                 return render_template('admin/add_product.html', error='Ошибка при добавлении товара')
         except ValueError as e:
             current_app.logger.error(f'Ошибка валидации: {str(e)}')
+            flash(f'Ошибка валидации: {str(e)}', 'error')
             return render_template('admin/add_product.html', error=str(e))
         except Exception as e:
             current_app.logger.error(f'Ошибка при добавлении товара: {str(e)}')
+            flash('Произошла ошибка при добавлении товара', 'error')
             return render_template('admin/add_product.html', error='Произошла ошибка при добавлении товара')
     
     sections = db.get_sections()
@@ -88,57 +126,72 @@ def add_product():
 @bp.route('/products/edit/<int:product_id>', methods=['GET', 'POST'])
 @admin_required
 def edit_product(product_id):
-    current_app.logger.info(f'Редактирование товара: {product_id}')
+    if request.method == 'POST':
+        try:
+            name = request.form.get('name')
+            description = request.form.get('description')
+            section_id = request.form.get('section_id')
+            review_link = request.form.get('review_link')
+            order_index = request.form.get('order_index', 0)
+            is_active = 'is_active' in request.form
+            is_free = 'is_free' in request.form
+            
+            # Обработка цены
+            if is_free:
+                price = 0
+            else:
+                price = float(request.form.get('price', 0))
+            
+            # Обработка изображения
+            image_path = None
+            if 'image' in request.files and request.files['image'].filename:
+                file = request.files['image']
+                if file and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    # Создаем директорию, если она не существует
+                    upload_dir = os.path.join(current_app.root_path, 'static', 'images', 'products')
+                    os.makedirs(upload_dir, exist_ok=True)
+                    file_path = os.path.join(upload_dir, filename)
+                    file.save(file_path)
+                    image_path = f'/static/images/products/{filename}'
+                    current_app.logger.info(f"Изображение сохранено: {image_path}")
+                else:
+                    flash('Неподдерживаемый формат файла', 'error')
+                    return redirect(url_for('admin.edit_product', product_id=product_id))
+            
+            # Получаем название раздела
+            section_name = db.get_section_name(section_id)
+            if not section_name:
+                flash('Раздел не найден', 'error')
+                return redirect(url_for('admin.edit_product', product_id=product_id))
+            
+            # Преобразуем ссылку на YouTube
+            if review_link:
+                review_link = convert_youtube_link(review_link)
+            
+            # Обновляем товар
+            if db.update_product(product_id, name, description, price, section_id, image_path, order_index, is_active, review_link):
+                flash('Товар успешно обновлен', 'success')
+                current_app.logger.info(f"Товар {product_id} успешно обновлен")
+            else:
+                flash('Ошибка при обновлении товара', 'error')
+                current_app.logger.error(f"Ошибка при обновлении товара {product_id}")
+            
+            return redirect(url_for('admin.products'))
+            
+        except Exception as e:
+            current_app.logger.error(f"Ошибка при обновлении товара: {str(e)}")
+            flash('Произошла ошибка при обновлении товара', 'error')
+            return redirect(url_for('admin.edit_product', product_id=product_id))
     
-    # Получаем товар
-    products = db.get_products()
-    product = next((p for p in products if p['id'] == product_id), None)
-    
+    # GET запрос - показываем форму редактирования
+    product = db.get_product(product_id)
     if not product:
-        current_app.logger.error(f'Товар с ID {product_id} не найден')
+        flash('Товар не найден', 'error')
         return redirect(url_for('admin.products'))
     
-    if request.method == 'POST':
-        name = request.form.get('name')
-        description = request.form.get('description')
-        price = float(request.form.get('price'))
-        section_id = int(request.form.get('section'))
-        order_index = int(request.form.get('order_index', 0))
-        is_active = request.form.get('is_active') == 'on'
-        review_links = request.form.get('review_links')
-        
-        image = request.files.get('image')
-        image_path = product.get('image')  # Сохраняем текущий путь к изображению
-        
-        if image:
-            if image.content_length and image.content_length > current_app.config['MAX_CONTENT_LENGTH']:
-                return render_template('admin/edit_product.html', 
-                                     product=product,
-                                     sections=db.get_sections(),
-                                     error='Размер файла превышает максимально допустимый (32MB)')
-            
-            filename = secure_filename(image.filename)
-            image_path = os.path.join('static', 'images', 'products', filename)
-            full_path = os.path.join(current_app.root_path, image_path)
-            os.makedirs(os.path.dirname(full_path), exist_ok=True)
-            image.save(full_path)
-            current_app.logger.info(f'Изображение сохранено: {image_path}')
-        
-        success = db.update_product(product_id, name, description, price, section_id, image_path, order_index, is_active, review_links)
-        
-        if success:
-            current_app.logger.info('Товар успешно обновлен')
-            return redirect(url_for('admin.products'))
-        else:
-            current_app.logger.error('Ошибка при обновлении товара')
-            return render_template('admin/edit_product.html', 
-                                 product=product,
-                                 sections=db.get_sections(),
-                                 error='Ошибка при обновлении товара')
-    
-    return render_template('admin/edit_product.html', 
-                         product=product,
-                         sections=db.get_sections())
+    sections = db.get_sections()
+    return render_template('admin/edit_product.html', product=product, sections=sections)
 
 @bp.route('/delete_product/<int:product_id>', methods=['POST'])
 @admin_required
