@@ -321,4 +321,26 @@ class Database:
                 return True
         except Exception as e:
             print(f"Ошибка при удалении товара: {e}")
-            return False 
+            return False
+
+    def add_section(self, name, order_index=0, is_active=True):
+        """Добавляет новый раздел"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                INSERT INTO sections (name, order_index, is_active)
+                VALUES (?, ?, ?)
+            ''', (name, order_index, is_active))
+            
+            conn.commit()
+            print(f"Раздел '{name}' успешно добавлен")
+            return True
+            
+        except Exception as e:
+            print(f"Ошибка при добавлении раздела: {str(e)}")
+            return False
+        finally:
+            if conn:
+                conn.close() 
