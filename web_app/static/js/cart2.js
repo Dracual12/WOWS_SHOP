@@ -73,9 +73,25 @@ window.removeCartItem = function(productId, li) {
 
 // Функция оформления заказа
 function checkout() {
-    const tg = window.Telegram.WebApp;
-    const userId = tg.initDataUnsafe.user.id;
-    window.location.href = `/order_form?tg_id=${userId}`;
+    console.log('Функция checkout вызвана');
+    try {
+        const tg = window.Telegram.WebApp;
+        if (!tg) {
+            console.error('Telegram WebApp не инициализирован');
+            return;
+        }
+        
+        const userId = tg.initDataUnsafe.user.id;
+        if (!userId) {
+            console.error('Не удалось получить ID пользователя');
+            return;
+        }
+        
+        console.log('Перенаправление на форму заказа с ID:', userId);
+        window.location.href = `/order?tg_id=${userId}`;
+    } catch (error) {
+        console.error('Ошибка при оформлении заказа:', error);
+    }
 }
 
 // Функция загрузки товаров корзины
