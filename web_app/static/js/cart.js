@@ -9,7 +9,7 @@ Telegram.WebApp.disableClosingConfirmation();
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM загружен');
     
-    const cartItemsContainer = document.getElementById('cart-items');
+    const cartItemsContainer = document.getElementById('cartItems');
     const cartDropdown = document.querySelector('.cart-dropdown');
     const cartIcon = document.querySelector('.cart-icon');
 
@@ -125,7 +125,7 @@ window.removeCartItem = function(productId, li) {
 
 // Функция загрузки товаров корзины
 window.loadCartItems = function() {
-    const cartItemsContainer = document.getElementById('cart-items');
+    const cartItemsContainer = document.getElementById('cartItems');
     const cartTotalElement = document.getElementById('cartTotal');
     
     // Получаем товары из localStorage

@@ -49,6 +49,95 @@
             padding: 15px;
             border-top: 1px solid var(--tg-theme-hint-color);
         }
+        
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid var(--tg-theme-hint-color);
+        }
+        
+        .cart-item-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 5px;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+        
+        .cart-item-details {
+            flex-grow: 1;
+        }
+        
+        .cart-item-name {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .cart-item-price {
+            color: var(--tg-theme-link-color);
+            font-weight: 500;
+        }
+        
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .cart-item-quantity button {
+            background: var(--tg-theme-button-color);
+            color: var(--tg-theme-button-text-color);
+            border: none;
+            border-radius: 4px;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+        
+        .remove-item {
+            background: none;
+            border: none;
+            color: var(--tg-theme-hint-color);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0 8px;
+        }
+        
+        .total-sum {
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .checkout-button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: var(--tg-theme-button-color);
+            color: var(--tg-theme-button-text-color);
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .cart-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--tg-theme-bg-color);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            min-width: 300px;
+            z-index: 1000;
+        }
+        
+        .cart-dropdown.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
