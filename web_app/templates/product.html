@@ -95,12 +95,18 @@
             const cartItems = document.getElementById('cartItems');
             const cartTotal = document.getElementById('cartTotal');
 
+            // Получаем tg_id из Telegram WebApp
+            const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
+            if (!tgId) {
+                console.error('tg_id не найден в Telegram WebApp');
+                return;
+            }
+
             // Обработчик для кнопки добавления в корзину
             const addToCartButton = document.querySelector('.add_to_cart');
             if (addToCartButton) {
                 addToCartButton.addEventListener('click', function() {
                     const productId = this.dataset.id;
-                    const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
                     
                     fetch('/api/cart', {
                         method: 'POST',
@@ -151,7 +157,10 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ quantity: newQuantity })
+                    body: JSON.stringify({ 
+                        quantity: newQuantity,
+                        tg_id: tgId
+                    })
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -165,7 +174,11 @@
             // Функция удаления товара из корзины
             window.removeFromCart = function(productId) {
                 fetch(`/api/cart/remove/${productId}`, {
-                    method: 'POST'
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ tg_id: tgId })
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -178,23 +191,15 @@
 
             // Функция оформления заказа
             window.checkout = function() {
-                const tgId = new URLSearchParams(window.location.search).get('tg_id');
-                if (tgId) {
-                    window.location.href = `/order_form?tg_id=${tgId}`;
-                }
+                window.location.href = `/order_form?tg_id=${tgId}`;
             };
 
-            // Переопределяем функцию loadCartItems для страницы продукта
+            // Функция загрузки корзины
             function loadCartItems() {
-                const tgId = new URLSearchParams(window.location.search).get('tg_id');
-                if (!tgId) {
-                    console.error('tg_id не найден в URL');
-                    return;
-                }
-
                 fetch(`/api/cart?tg_id=${tgId}`)
                     .then(response => response.json())
                     .then(data => {
+                        console.log('Данные корзины:', data); // Для отладки
                         cartItems.innerHTML = '';
                         let total = 0;
 
