@@ -20,6 +20,151 @@
             border-radius: 8px;
             margin-bottom: 20px;
         }
+
+        /* Стили для корзины */
+        .cart-icon {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--tg-theme-bg-color, #ffffff);
+            padding: 10px;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .cart-icon i {
+            font-size: 20px;
+            color: var(--tg-theme-text-color, #000000);
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .cart-dropdown {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: var(--tg-theme-bg-color, #ffffff);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px;
+            width: 300px;
+            max-height: 80vh;
+            overflow-y: auto;
+            z-index: 999;
+            display: none;
+        }
+
+        .cart-dropdown.active {
+            display: block;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--tg-theme-hint-color, #999999);
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item-details {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--tg-theme-text-color, #000000);
+        }
+
+        .cart-item-price {
+            color: var(--tg-theme-button-color, #2481cc);
+            font-weight: bold;
+        }
+
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cart-item-quantity button {
+            background: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            border-radius: 5px;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quantity-value {
+            min-width: 20px;
+            text-align: center;
+            color: var(--tg-theme-text-color, #000000);
+        }
+
+        .remove-item {
+            background: none;
+            border: none;
+            color: var(--tg-theme-destructive-text-color, #ff3b30);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .cart-total {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--tg-theme-hint-color, #999999);
+            font-weight: bold;
+            color: var(--tg-theme-text-color, #000000);
+        }
+
+        .checkout-button {
+            width: 100%;
+            padding: 10px;
+            background: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .empty-cart {
+            text-align: center;
+            color: var(--tg-theme-hint-color, #999999);
+            padding: 20px 0;
+        }
     </style>
 </head>
 <body>
