@@ -897,7 +897,7 @@ button:hover {
 }
 
 
-/* Стили для корзины на product.html */
+/* === Стили для корзины на странице продукта === */
 .floating-cart-product {
     position: fixed;
     top: 20px;
@@ -924,79 +924,73 @@ button:hover {
 }
 
 .cart-dropdown-product {
+    display: none;
     position: absolute;
+    top: 100%;
     right: 0;
-    top: 3.5vw;
-    width: 50vw;
-    max-width: 90vw;
-    max-height: 55vw;
-    overflow-y: auto;
-    overflow-x: hidden;
-    background-color: #2c2c2c;
-    border: 0.1vw solid #ccc;
-    border-radius: 2vw;
-    box-shadow: 0 0.5vw 0.8vw rgba(0, 0, 0, 0.3);
+    background: #1d1e1f;
+    border: 1px solid #2a2b2c;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    width: 260px;
+    max-height: 400px;
     z-index: 1000;
-    padding: 1.5vw;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-2vw);
-    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
-    white-space: normal;
-    display: flex;
-    flex-direction: column;
+    overflow-y: auto;
 }
 
 .cart-dropdown-product.active {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
+    display: block;
 }
 
-.cart-dropdown-product ul {
-    list-style: none;
-    padding: 0;
+.cart-dropdown-product .cart-header {
+    padding: 10px 15px;
+    border-bottom: 1px solid #2a2b2c;
+    font-weight: 500;
+    color: #ffffff;
+    background: #1d1e1f;
+}
+
+.cart-dropdown-product .cart-items {
     margin: 0;
-    width: 100%;
-    overflow-x: hidden;
+    padding: 0;
+    list-style: none;
+    max-height: 300px;
+    overflow-y: auto;
+    background: #1d1e1f;
 }
 
 .cart-dropdown-product .cart-item {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding: 1vw;
-    border-bottom: 0.1vw solid #444;
-    text-align: center;
+    width: 90%;
+    padding: 8px 12px;
+    border-bottom: 1px solid #2a2b2c;
+    background: #1d1e1f;
+    transition: all 0.2s ease;
+}
+
+.cart-dropdown-product .cart-item-details {
     width: 100%;
-    overflow-x: hidden;
+    margin-bottom: 8px;
 }
 
 .cart-dropdown-product .cart-item-top {
-    overflow: visible;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 0.8vw;
+    align-items: flex-start;
     width: 100%;
-    box-sizing: border-box;
+    margin-bottom: 8px;
 }
 
-.cart-dropdown-product .cart-item-top .item-name {
-    flex: 0 0 auto;
-    min-width: 0;
-    overflow-wrap: break-word;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-.cart-dropdown-product .item-total {
-    flex: 0 0 auto;
+.cart-dropdown-product .cart-item-name {
+    font-size: 12px;
+    color: #ffffff;
+    flex-grow: 1;
+    padding-right: 8px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 50%;
+    max-width: 180px;
 }
 
 .cart-dropdown-product .cart-item-bottom {
@@ -1004,87 +998,100 @@ button:hover {
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    margin-top: 1vw;
+    margin-top: 4px;
 }
 
 .cart-dropdown-product .cart-item-price {
-    color: #42a5f5;
-    font-weight: bold;
+    font-size: 13px;
+    color: #8774e1;
+    font-weight: 500;
+    white-space: nowrap;
 }
 
 .cart-dropdown-product .cart-item-quantity {
     display: flex;
     align-items: center;
-    gap: 1vw;
+    gap: 6px;
 }
 
 .cart-dropdown-product .cart-item-quantity button {
-    background: #42a5f5;
-    color: white;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    background: #2a2b2c;
+    color: #ffffff;
     border: none;
-    border-radius: 50%;
-    width: 3vw;
-    height: 3vw;
+    border-radius: 4px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.3s ease;
+    transition: background-color 0.2s ease;
 }
 
 .cart-dropdown-product .cart-item-quantity button:hover {
-    background: #0d47a1;
+    background: #3a3b3c;
 }
 
-.cart-dropdown-product .quantity-value {
-    font-size: 1.1em;
-    font-weight: bold;
+.cart-dropdown-product .cart-item-quantity span {
     color: #ffffff;
-    min-width: 3vw;
+    min-width: 16px;
     text-align: center;
+    font-size: 12px;
 }
 
 .cart-dropdown-product .remove-item {
     background: none;
     border: none;
-    color: #ff3b30;
-    font-size: 1.5em;
+    color: #7d7d7d;
+    font-size: 16px;
     cursor: pointer;
-    padding: 0.5vw;
+    padding: 0;
+    transition: color 0.2s ease;
+    line-height: 1;
+}
+
+.cart-dropdown-product .remove-item:hover {
+    color: #ff4d4d;
 }
 
 .cart-dropdown-product .cart-total {
-    margin-top: 1.5vw;
-    padding-top: 1.5vw;
-    border-top: 0.1vw solid #444;
-    font-weight: bold;
+    padding: 12px;
+    background: #1d1e1f;
+    border-top: 1px solid #2a2b2c;
+}
+
+.cart-dropdown-product .total-sum {
+    font-size: 14px;
+    margin-bottom: 10px;
     color: #ffffff;
-    text-align: right;
+    text-align: center;
+    font-weight: 500;
 }
 
 .cart-dropdown-product .checkout-button {
+    display: block;
     width: 100%;
-    padding: 1vw;
-    font-size: 1.1em;
-    font-weight: bold;
+    padding: 8px;
+    background: #8774e1;
+    color: #ffffff;
     border: none;
-    border-radius: 0.5vw;
-    background: linear-gradient(90deg, #42a5f5, #0d47a1);
-    color: white;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
-    transition: background 0.3s, transform 0.2s;
-    margin-top: 1vw;
+    transition: background-color 0.2s ease;
 }
 
 .cart-dropdown-product .checkout-button:hover {
-    background: linear-gradient(90deg, #0d47a1, #42a5f5);
-    transform: scale(1.02);
+    background: #7665d0;
 }
 
 .cart-dropdown-product .empty-cart {
     text-align: center;
-    color: #999999;
-    padding: 2vw 0;
+    color: #7d7d7d;
+    padding: 20px 0;
+    font-size: 14px;
 }
 
 /* === Стили для иконки корзины на странице продукта === */
