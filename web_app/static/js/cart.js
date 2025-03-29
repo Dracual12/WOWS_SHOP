@@ -156,7 +156,6 @@ window.loadCartItems = function() {
                 li.setAttribute('data-unit-price', item.price);
                 
                 li.innerHTML = `
-                    <img src="${item.image}" alt="${item.name}" class="cart-item-image" onerror="this.src='/static/images/default.png'">
                     <div class="cart-item-details">
                         <div class="cart-item-name">${item.name}</div>
                         <div class="cart-item-price">${item.price} ₽</div>
