@@ -27,18 +27,16 @@
         <a href="/" class="return-link">
             <img src="/static/images/return.png" alt="Вернуться в магазин" class="return-btn">
         </a>
-        <!-- Добавляем корзину в header -->
-        <div class="floating-cart-product">
-            <img src="/static/images/cart-icon.png" class="cart-icon-product">
-            <!-- Контейнер для выпадающей корзины -->
-            <div class="cart-dropdown-product">
-                <ul id="cart-items-product">
-                    <!-- Товары в корзине будут добавляться динамически -->
-                </ul>
-                <button id="checkout-button-product">Оформить заказ</button>
-            </div>
+        <div class="cart-icon">
+            <span class="cart-count">0</span>
+            <i class="fas fa-shopping-cart"></i>
         </div>
     </header>
+
+    <div class="cart-dropdown">
+        <div id="cartItems"></div>
+        <div id="cartTotal"></div>
+    </div>
 
     <main>
         {% if product %}
@@ -68,11 +66,12 @@
                 <p>{{ product.description }}</p>
             </div>
 
-            <!-- Проверяем, есть ли ссылка на обзор -->
-            {% if product.review_link %}
+            {% if product.review_links %}
             <div class="review-container">
-                <h3>Обзор на YouTube:</h3>
-                <iframe class="review-video" src="{{ product.review_link }}" frameborder="0" allowfullscreen></iframe>
+                <h3>Обзоры:</h3>
+                <div class="review-links">
+                    {{ product.review_links | safe }}
+                </div>
             </div>
             {% endif %}
         {% else %}
@@ -88,14 +87,45 @@
     <div id="notification-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;"></div>
 
     <!-- Подключаем скрипты -->
-    <script src="/static/js/add_to_cart.js"></script>
-    <script src="/static/js/cart2.js"></script>
-    <script src="/static/js/order2.js"></script>
+    <script src="/static/js/cart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Загрузка корзины при загрузке страницы
-            if (typeof window.loadCartItems === 'function') {
-                window.loadCartItems();
+            // Инициализация корзины
+            window.loadCartItems();
+            
+            // Обработчик для кнопки добавления в корзину
+            const addToCartButton = document.querySelector('.add_to_cart');
+            if (addToCartButton) {
+                addToCartButton.addEventListener('click', function() {
+                    const productId = this.dataset.id;
+                    const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
+                    
+                    fetch('/api/cart', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            product_id: productId,
+                            quantity: 1,
+                            tg_id: tgId
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Обновляем корзину
+                            window.loadCartItems();
+                            // Показываем уведомление
+                            alert('Товар добавлен в корзину!');
+                        } else {
+                            console.error('Ошибка добавления в корзину:', data);
+                            alert('Ошибка при добавлении товара в корзину');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Ошибка:', error);
+                        alert('Ошибка при добавлении товара в корзину');
+                    });
+                });
             }
         });
     </script>
