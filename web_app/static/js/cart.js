@@ -45,6 +45,12 @@ window.updateCartQuantity = function(productId, newQuantity, li) {
         return;
     }
 
+    // Обновляем отображение количества сразу, не дожидаясь ответа сервера
+    const quantitySpan = li.querySelector('.quantity-value');
+    if (quantitySpan) {
+        quantitySpan.textContent = newQuantity;
+    }
+
     const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
     console.log('Отправка запроса на обновление количества:', {
         productId,
@@ -63,16 +69,43 @@ window.updateCartQuantity = function(productId, newQuantity, li) {
     })
     .then(data => {
         if (data.status === 'success') {
-            // Перезагружаем всю корзину для обновления данных
-            window.loadCartItems();
+            // Обновляем только общую сумму
+            updateTotalSum();
         } else {
             console.error('Ошибка обновления:', data);
+            // Возвращаем предыдущее значение в случае ошибки
+            if (quantitySpan) {
+                quantitySpan.textContent = newQuantity - 1;
+            }
         }
     })
     .catch(error => {
         console.error('Ошибка:', error);
+        // Возвращаем предыдущее значение в случае ошибки
+        if (quantitySpan) {
+            quantitySpan.textContent = newQuantity - 1;
+        }
     });
 };
+
+// Функция обновления общей суммы
+function updateTotalSum() {
+    const cartItems = document.querySelectorAll('.cart-item');
+    let totalSum = 0;
+    
+    cartItems.forEach(item => {
+        const price = parseFloat(item.querySelector('.cart-item-price').textContent);
+        const quantity = parseInt(item.querySelector('.quantity-value').textContent);
+        if (!isNaN(price) && !isNaN(quantity)) {
+            totalSum += price * quantity;
+        }
+    });
+    
+    const totalElement = document.querySelector('.total-sum');
+    if (totalElement) {
+        totalElement.textContent = `Итого: ${totalSum.toFixed(2)} ₽`;
+    }
+}
 
 // Функция удаления товара из корзины
 window.removeCartItem = function(productId, li) {
