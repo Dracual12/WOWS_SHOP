@@ -94,6 +94,41 @@
             const cartItems = document.getElementById('cartItems');
             const cartTotal = document.getElementById('cartTotal');
 
+            // Обработчик для кнопки добавления в корзину
+            const addToCartButton = document.querySelector('.add_to_cart');
+            if (addToCartButton) {
+                addToCartButton.addEventListener('click', function() {
+                    const productId = this.dataset.id;
+                    const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
+                    
+                    fetch('/api/cart', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            product_id: productId,
+                            quantity: 1,
+                            tg_id: tgId
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Обновляем корзину
+                            loadCartItems();
+                            // Показываем уведомление
+                            alert('Товар добавлен в корзину!');
+                        } else {
+                            console.error('Ошибка добавления в корзину:', data);
+                            alert('Ошибка при добавлении товара в корзину');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Ошибка:', error);
+                        alert('Ошибка при добавлении товара в корзину');
+                    });
+                });
+            }
+
             // Открытие/закрытие корзины
             cartIcon.addEventListener('click', function() {
                 cartDropdown.classList.toggle('active');
