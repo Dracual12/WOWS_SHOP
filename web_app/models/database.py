@@ -416,20 +416,31 @@ class Database:
     def get_cart_items(self, tg_id):
         """Получает все товары из корзины пользователя"""
         try:
-            cursor = self.get_connection().cursor()
-            cursor.execute('''
-                SELECT 
-                    c.product_id,
-                    p.name,
-                    p.price,
-                    c.quantity,
-                    p.image as image_path
-                FROM cart c
-                JOIN products p ON c.product_id = p.id
-                WHERE c.tg_id = ?
-            ''', (tg_id,))
-            items = cursor.fetchall()
-            return [dict(item) for item in items]
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    SELECT 
+                        c.product_id,
+                        p.name,
+                        p.price,
+                        c.quantity,
+                        p.image as image_path
+                    FROM cart c
+                    JOIN products p ON c.product_id = p.id
+                    WHERE c.tg_id = ?
+                ''', (tg_id,))
+                
+                # Получаем названия столбцов
+                columns = [description[0] for description in cursor.description]
+                
+                # Преобразуем результаты в список словарей
+                items = []
+                for row in cursor.fetchall():
+                    item_dict = dict(zip(columns, row))
+                    items.append(item_dict)
+                
+                print(f"Получены товары из корзины: {items}")  # Отладочный вывод
+                return items
         except Exception as e:
             print(f"Ошибка при получении товаров из корзины: {e}")
             return []
