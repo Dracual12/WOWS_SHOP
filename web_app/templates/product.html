@@ -161,7 +161,7 @@
         async function addToCart(productId, tgId) {
             console.log('Вызов функции addToCart с параметрами:', { productId, tgId });
             try {
-                const response = await fetch('/api/cart/add', {
+                const response = await fetch('/api/cart', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
