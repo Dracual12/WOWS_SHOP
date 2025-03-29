@@ -1155,13 +1155,17 @@ button:hover {
     max-width: 800px;
     margin: 20px auto;
     padding: 30px;
-    background: #1e1e1e;
+    background-color: #1e1e1e !important;
+    color: #ffffff !important;
     border-radius: 15px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
 .order-form h2 {
-    color: #42a5f5;
+    color: #42a5f5 !important;
     margin-bottom: 30px;
     text-align: center;
     font-size: 24px;
@@ -1174,7 +1178,7 @@ button:hover {
 .form-group label {
     display: block;
     margin-bottom: 10px;
-    color: #e0e0e0;
+    color: #ffffff !important;
     font-weight: 500;
     font-size: 16px;
 }
@@ -1184,10 +1188,13 @@ button:hover {
     padding: 15px;
     border: 2px solid #424242;
     border-radius: 8px;
-    background: #2c2c2c;
-    color: #e0e0e0;
+    background-color: #2c2c2c !important;
+    color: #ffffff !important;
     font-size: 16px;
     transition: all 0.3s ease;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
 .form-group input:focus {
@@ -1199,8 +1206,8 @@ button:hover {
 .submit-btn {
     width: 100%;
     padding: 18px;
-    background: linear-gradient(135deg, #42a5f5, #0d47a1);
-    color: white;
+    background: linear-gradient(135deg, #42a5f5, #0d47a1) !important;
+    color: white !important;
     border: none;
     border-radius: 8px;
     font-size: 18px;
@@ -1209,10 +1216,13 @@ button:hover {
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 1px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
 .submit-btn:hover {
-    background: linear-gradient(135deg, #0d47a1, #42a5f5);
+    background: linear-gradient(135deg, #0d47a1, #42a5f5) !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(66, 165, 245, 0.3);
 }
@@ -1228,29 +1238,22 @@ button:hover {
         padding: 20px;
         width: calc(100% - 30px);
         box-sizing: border-box;
+        background-color: #1e1e1e !important;
     }
 
     .order-form h2 {
         font-size: 24px;
         margin-bottom: 25px;
-    }
-
-    .form-group {
-        margin-bottom: 20px;
+        color: #42a5f5 !important;
     }
 
     .form-group label {
-        font-size: 16px;
+        color: #ffffff !important;
     }
 
     .form-group input {
-        padding: 15px;
-        font-size: 16px;
-    }
-
-    .submit-btn {
-        padding: 15px;
-        font-size: 18px;
+        background-color: #2c2c2c !important;
+        color: #ffffff !important;
     }
 }
 
@@ -1259,28 +1262,6 @@ button:hover {
         margin: 10px;
         padding: 20px;
         width: calc(100% - 20px);
-    }
-
-    .order-form h2 {
-        font-size: 24px;
-        margin-bottom: 20px;
-    }
-
-    .form-group {
-        margin-bottom: 20px;
-    }
-
-    .form-group label {
-        font-size: 16px;
-    }
-
-    .form-group input {
-        padding: 15px;
-        font-size: 16px;
-    }
-
-    .submit-btn {
-        padding: 15px;
-        font-size: 18px;
+        background-color: #1e1e1e !important;
     }
 }
