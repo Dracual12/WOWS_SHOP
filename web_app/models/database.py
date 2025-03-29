@@ -31,7 +31,7 @@ class Database:
                     description TEXT,
                     image TEXT,
                     section TEXT,
-                    review_links TEXT,
+                    review_link TEXT,
                     order_index INTEGER DEFAULT 0,
                     is_active BOOLEAN DEFAULT 1
                 )
@@ -47,8 +47,8 @@ class Database:
                 cursor.execute('ALTER TABLE products ADD COLUMN order_index INTEGER DEFAULT 0')
             if 'is_active' not in columns:
                 cursor.execute('ALTER TABLE products ADD COLUMN is_active BOOLEAN DEFAULT 1')
-            if 'review_links' not in columns:
-                cursor.execute('ALTER TABLE products ADD COLUMN review_links TEXT')
+            if 'review_link' not in columns:
+                cursor.execute('ALTER TABLE products ADD COLUMN review_link TEXT')
             
             # Создаем таблицу cart
             cursor.execute('''
@@ -59,6 +59,32 @@ class Database:
                     quantity INTEGER DEFAULT 1,
                     FOREIGN KEY (product_id) REFERENCES products (id),
                     UNIQUE(product_id, tg_id)
+                )
+            ''')
+            
+            # Создаем таблицу orders
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS orders (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    tg_id INTEGER NOT NULL,
+                    email TEXT NOT NULL,
+                    psn_id TEXT NOT NULL,
+                    total_price REAL NOT NULL,
+                    status TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
+            # Создаем таблицу order_items
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS order_items (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    order_id INTEGER NOT NULL,
+                    product_id INTEGER NOT NULL,
+                    quantity INTEGER NOT NULL,
+                    price REAL NOT NULL,
+                    FOREIGN KEY (order_id) REFERENCES orders (id),
+                    FOREIGN KEY (product_id) REFERENCES products (id)
                 )
             ''')
             
@@ -345,4 +371,44 @@ class Database:
             return False
         finally:
             if conn:
-                conn.close() 
+                conn.close()
+
+    def create_order(self, tg_id: int, email: str, psn_id: str, items: list, total_price: float) -> int:
+        """Создает новый заказ"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                
+                # Создаем заказ
+                cursor.execute('''
+                    INSERT INTO orders (tg_id, email, psn_id, total_price, status)
+                    VALUES (?, ?, ?, ?, ?)
+                ''', (tg_id, email, psn_id, total_price, 'new'))
+                
+                order_id = cursor.lastrowid
+                
+                # Добавляем товары заказа
+                for item in items:
+                    cursor.execute('''
+                        INSERT INTO order_items (order_id, product_id, quantity, price)
+                        VALUES (?, ?, ?, ?)
+                    ''', (order_id, item['product_id'], item['quantity'], item['price']))
+                
+                conn.commit()
+                return order_id
+                
+        except Exception as e:
+            print(f"Ошибка при создании заказа: {e}")
+            return None
+            
+    def clear_cart(self, tg_id: int) -> bool:
+        """Очищает корзину пользователя"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute('DELETE FROM cart WHERE tg_id = ?', (tg_id,))
+                conn.commit()
+                return True
+        except Exception as e:
+            print(f"Ошибка при очистке корзины: {e}")
+            return False 

@@ -143,4 +143,76 @@ def add_to_cart():
             
     except Exception as e:
         current_app.logger.error(f'Ошибка при добавлении товара в корзину: {str(e)}')
-        return jsonify({"status": "error", "message": str(e)}), 500 
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@bp.route('/order', methods=['GET'])
+def order_form():
+    """Отображает форму заказа"""
+    tg_id = request.args.get('tg_id')
+    if not tg_id:
+        return jsonify({"status": "error", "message": "Не указан ID пользователя"}), 400
+    
+    # Получаем товары из корзины
+    cart_items = db.get_cart_items(tg_id)
+    if not cart_items:
+        return jsonify({"status": "error", "message": "Корзина пуста"}), 400
+    
+    # Вычисляем общую сумму
+    total_price = sum(item['price'] * item['quantity'] for item in cart_items)
+    
+    return render_template('order_form.html', 
+                         cart_items=cart_items,
+                         total_price=total_price)
+
+@bp.route('/api/create_order', methods=['POST'])
+def create_order():
+    """Создает новый заказ"""
+    try:
+        data = request.get_json()
+        
+        # Проверяем обязательные поля
+        required_fields = ['email', 'psn', 'tg_id']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({
+                    "status": "error",
+                    "message": f"Не указано поле {field}"
+                }), 400
+        
+        # Получаем товары из корзины
+        cart_items = db.get_cart_items(data['tg_id'])
+        if not cart_items:
+            return jsonify({
+                "status": "error",
+                "message": "Корзина пуста"
+            }), 400
+        
+        # Создаем заказ
+        order_id = db.create_order(
+            tg_id=data['tg_id'],
+            email=data['email'],
+            psn_id=data['psn'],
+            items=cart_items,
+            total_price=sum(item['price'] * item['quantity'] for item in cart_items)
+        )
+        
+        if order_id:
+            # Очищаем корзину
+            db.clear_cart(data['tg_id'])
+            
+            return jsonify({
+                "status": "success",
+                "order_id": order_id
+            })
+        else:
+            return jsonify({
+                "status": "error",
+                "message": "Ошибка при создании заказа"
+            }), 500
+            
+    except Exception as e:
+        current_app.logger.error(f"Ошибка при создании заказа: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "message": "Произошла ошибка при создании заказа"
+        }), 500 

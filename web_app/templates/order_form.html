@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оформление заказа</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --tg-theme-bg-color: #000000;
+            --tg-theme-text-color: #ffffff;
+            --tg-theme-hint-color: #7d7d7d;
+            --tg-theme-link-color: #8774e1;
+            --tg-theme-button-color: #8774e1;
+            --tg-theme-button-text-color: #ffffff;
+        }
+
+        body {
+            background-color: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 16px;
+            font-size: 16px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .back-button {
+            color: var(--tg-theme-link-color);
+            text-decoration: none;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .cart-total {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: var(--tg-theme-link-color);
+        }
+
+        .cart-items {
+            margin-bottom: 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .cart-item img {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            margin-right: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--tg-theme-hint-color);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--tg-theme-text-color);
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .form-group input::placeholder {
+            color: var(--tg-theme-hint-color);
+        }
+
+        .clear-data {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: none;
+            border: none;
+            color: var(--tg-theme-link-color);
+            font-size: 16px;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        .submit-button {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background: var(--tg-theme-button-color);
+            color: var(--tg-theme-button-text-color);
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .checkbox-group {
+            margin-top: 20px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            color: var(--tg-theme-hint-color);
+        }
+
+        .checkbox-label input {
+            margin-right: 8px;
+        }
+
+        .checkbox-label a {
+            color: var(--tg-theme-link-color);
+            text-decoration: none;
+        }
+
+        .promo-toggle {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            color: var(--tg-theme-hint-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="#" class="back-button" onclick="window.history.back()">Назад</a>
+        <h1 class="title">Корзина</h1>
+    </div>
+
+    <div class="cart-items">
+        {% for item in cart_items %}
+        <div class="cart-item">
+            <img src="{{ item.image }}" alt="{{ item.name }}">
+            <div>
+                <div>{{ item.name }}</div>
+                <div>{{ item.price }} ₽</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="cart-total">{{ total_price }} ₽</div>
+
+    <form id="orderForm" onsubmit="submitOrder(event)">
+        <div class="form-group">
+            <label for="email">Email для получения товара</label>
+            <input type="email" id="email" name="email" required placeholder="Введите email">
+        </div>
+
+        <div class="form-group">
+            <label for="psn">PSN ID</label>
+            <input type="text" id="psn" name="psn" required placeholder="Введите PSN ID">
+        </div>
+
+        <button type="button" class="clear-data" onclick="clearFormData()">Очистить данные</button>
+
+        <div class="promo-toggle">
+            <input type="checkbox" id="hasPromo" name="hasPromo">
+            <label for="hasPromo">У меня есть промокод</label>
+        </div>
+
+        <div class="checkbox-group">
+            <label class="checkbox-label">
+                <input type="checkbox" required name="agreement">
+                Согласен с условиями <a href="/terms" target="_blank">Пользовательского соглашения</a> и <a href="/privacy" target="_blank">Политики конфиденциальности</a>
+            </label>
+        </div>
+
+        <button type="submit" class="submit-button">Оформить заказ</button>
+    </form>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.enableClosingConfirmation();
+
+        // Загрузка сохраненных данных
+        window.onload = function() {
+            const savedData = localStorage.getItem('orderFormData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                document.getElementById('email').value = data.email || '';
+                document.getElementById('psn').value = data.psn || '';
+            }
+        }
+
+        // Сохранение данных формы
+        function saveFormData() {
+            const data = {
+                email: document.getElementById('email').value,
+                psn: document.getElementById('psn').value
+            };
+            localStorage.setItem('orderFormData', JSON.stringify(data));
+        }
+
+        // Очистка сохраненных данных
+        function clearFormData() {
+            localStorage.removeItem('orderFormData');
+            document.getElementById('orderForm').reset();
+        }
+
+        // Отправка формы
+        async function submitOrder(event) {
+            event.preventDefault();
+            
+            const formData = {
+                email: document.getElementById('email').value,
+                psn: document.getElementById('psn').value,
+                cart_items: {{ cart_items|tojson|safe }},
+                total_price: {{ total_price }},
+                tg_id: tg.initDataUnsafe.user.id
+            };
+
+            try {
+                const response = await fetch('/api/create_order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    saveFormData(); // Сохраняем данные только при успешном заказе
+                    tg.close();
+                } else {
+                    alert(result.message || 'Произошла ошибка при оформлении заказа');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Произошла ошибка при оформлении заказа');
+            }
+        }
+    </script>
+</body>
+</html> 

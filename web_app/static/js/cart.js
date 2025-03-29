@@ -242,3 +242,20 @@ window.loadCartItems = function() {
         })
         .catch(error => console.error('Ошибка загрузки корзины:', error));
 };
+
+// Функция для оформления заказа
+function checkout() {
+    const tg = window.Telegram.WebApp;
+    const tgId = tg.initDataUnsafe.user.id;
+    
+    // Открываем форму заказа
+    window.location.href = `/order?tg_id=${tgId}`;
+}
+
+// Добавляем обработчик для кнопки оформления заказа
+document.addEventListener('DOMContentLoaded', function() {
+    const checkoutButton = document.querySelector('.checkout-button');
+    if (checkoutButton) {
+        checkoutButton.addEventListener('click', checkout);
+    }
+});
