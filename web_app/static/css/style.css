@@ -776,14 +776,17 @@ button:hover {
 
 
 .notification {
-    background-color: #323232;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #4CAF50;
     color: white;
-    padding: 15px 20px;
+    padding: 15px 25px;
     border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    margin-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 1000;
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(100px);
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
