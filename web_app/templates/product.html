@@ -27,9 +27,9 @@
         <a href="/" class="return-link">
             <img src="/static/images/return.png" alt="Вернуться в магазин" class="return-btn">
         </a>
-        <div class="floating-cart-product">
-            <img src="/static/images/cart-icon.png" class="cart-icon-product">
-            <div class="cart-dropdown-product">
+        <div class="floating-cart">
+            <img src="/static/images/cart-icon.png" class="cart-icon">
+            <div class="cart-dropdown">
                 <ul id="cartItems"></ul>
                 <div id="cartTotal"></div>
             </div>
@@ -127,8 +127,8 @@
             }
 
             // Обработчик для иконки корзины
-            const cartIcon = document.querySelector('.cart-icon-product');
-            const cartDropdown = document.querySelector('.cart-dropdown-product');
+            const cartIcon = document.querySelector('.cart-icon');
+            const cartDropdown = document.querySelector('.cart-dropdown');
             
             if (cartIcon && cartDropdown) {
                 cartIcon.addEventListener('click', function(e) {
@@ -138,6 +138,13 @@
 
                 // Закрываем корзину при клике вне её
                 document.addEventListener('click', function(e) {
+                    // Проверяем, что клик был не по кнопкам в корзине
+                    if (e.target.closest('.cart-item-quantity button') || 
+                        e.target.closest('.remove-item') || 
+                        e.target.closest('.checkout-button')) {
+                        return;
+                    }
+                    
                     if (!cartDropdown.contains(e.target) && !cartIcon.contains(e.target)) {
                         cartDropdown.classList.remove('active');
                     }
