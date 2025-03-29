@@ -39,15 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Функция обновления количества товара
 window.updateCartQuantity = function(productId, newQuantity, li) {
-    // Получаем productId из data-атрибута элемента, если он не передан
-    if (!productId && li) {
-        productId = li.getAttribute('data-product-id');
-    }
-    
-    if (!productId) {
-        console.error('Не удалось получить ID товара');
-        console.log('Элемент li:', li);
-        console.log('data-product-id:', li ? li.getAttribute('data-product-id') : 'нет элемента');
+    if (newQuantity < 1) {
+        // Если количество меньше 1, удаляем товар
+        window.removeCartItem(productId, li);
         return;
     }
 
@@ -55,40 +49,29 @@ window.updateCartQuantity = function(productId, newQuantity, li) {
     console.log('Отправка запроса на обновление количества:', {
         productId,
         newQuantity,
-        tgId,
-        li: li ? {
-            'data-product-id': li.getAttribute('data-product-id'),
-            'data-unit-price': li.getAttribute('data-unit-price')
-        } : 'нет элемента'
+        tgId
     });
     
     fetch(`/api/cart/${productId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quantity: newQuantity, tg_id: tgId }),
+        body: JSON.stringify({ quantity: newQuantity, tg_id: tgId })
     })
-        .then(response => {
-            console.log('Получен ответ:', response.status);
-            if (!response.ok) {
-                throw new Error('Ошибка обновления корзины');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Данные ответа:', data);
-            if (data.status === 'success') {
-                const unitPrice = parseFloat(li.getAttribute('data-unit-price'));
-                li.querySelector('.quantity-value').textContent = newQuantity;
-                li.querySelector('.item-total').textContent = (unitPrice * newQuantity).toFixed(2) + ' рублей';
-                // Перезагружаем корзину для обновления общей суммы
-                window.loadCartItems();
-            } else {
-                console.error('Ошибка обновления:', data);
-            }
-        })
-        .catch(error => {
-            console.error('Ошибка:', error);
-        });
+    .then(response => {
+        if (!response.ok) throw new Error('Ошибка обновления корзины');
+        return response.json();
+    })
+    .then(data => {
+        if (data.status === 'success') {
+            // Перезагружаем всю корзину для обновления данных
+            window.loadCartItems();
+        } else {
+            console.error('Ошибка обновления:', data);
+        }
+    })
+    .catch(error => {
+        console.error('Ошибка:', error);
+    });
 };
 
 // Функция удаления товара из корзины
@@ -157,15 +140,19 @@ window.loadCartItems = function() {
                 
                 li.innerHTML = `
                     <div class="cart-item-details">
-                        <div class="cart-item-name">${item.name}</div>
-                        <div class="cart-item-price">${item.price} ₽</div>
-                        <div class="cart-item-quantity">
-                            <button onclick="updateCartQuantity(${item.product_id}, ${item.quantity - 1}, this.parentElement.parentElement.parentElement)">-</button>
-                            <span class="quantity-value">${item.quantity}</span>
-                            <button onclick="updateCartQuantity(${item.product_id}, ${item.quantity + 1}, this.parentElement.parentElement.parentElement)">+</button>
+                        <div class="cart-item-top">
+                            <div class="cart-item-name">${item.name}</div>
+                            <button onclick="removeCartItem(${item.product_id}, this.parentElement.parentElement.parentElement)" class="remove-item">×</button>
+                        </div>
+                        <div class="cart-item-bottom">
+                            <div class="cart-item-price">${item.price} ₽</div>
+                            <div class="cart-item-quantity">
+                                <button onclick="updateCartQuantity(${item.product_id}, ${item.quantity - 1}, this.parentElement.parentElement.parentElement)">-</button>
+                                <span class="quantity-value">${item.quantity}</span>
+                                <button onclick="updateCartQuantity(${item.product_id}, ${item.quantity + 1}, this.parentElement.parentElement.parentElement)">+</button>
+                            </div>
                         </div>
                     </div>
-                    <button onclick="removeCartItem(${item.product_id}, this.parentElement)" class="remove-item">×</button>
                 `;
                 
                 cartItemsContainer.appendChild(li);
