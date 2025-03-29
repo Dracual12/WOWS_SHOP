@@ -45,13 +45,16 @@ window.updateCartQuantity = function(productId, newQuantity, li) {
         return;
     }
 
+    const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
+    
     // Обновляем отображение количества сразу, не дожидаясь ответа сервера
     const quantitySpan = li.querySelector('.quantity-value');
+    const oldQuantity = parseInt(quantitySpan.textContent);
+    
     if (quantitySpan) {
         quantitySpan.textContent = newQuantity;
     }
 
-    const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
     console.log('Отправка запроса на обновление количества:', {
         productId,
         newQuantity,
@@ -75,16 +78,18 @@ window.updateCartQuantity = function(productId, newQuantity, li) {
             console.error('Ошибка обновления:', data);
             // Возвращаем предыдущее значение в случае ошибки
             if (quantitySpan) {
-                quantitySpan.textContent = newQuantity - 1;
+                quantitySpan.textContent = oldQuantity;
             }
+            updateTotalSum();
         }
     })
     .catch(error => {
         console.error('Ошибка:', error);
         // Возвращаем предыдущее значение в случае ошибки
         if (quantitySpan) {
-            quantitySpan.textContent = newQuantity - 1;
+            quantitySpan.textContent = oldQuantity;
         }
+        updateTotalSum();
     });
 };
 
@@ -94,8 +99,13 @@ function updateTotalSum() {
     let totalSum = 0;
     
     cartItems.forEach(item => {
-        const price = parseFloat(item.querySelector('.cart-item-price').textContent);
+        // Извлекаем только числовое значение цены
+        const priceText = item.querySelector('.cart-item-price').textContent;
+        const price = parseFloat(priceText.replace(/[^0-9.]/g, ''));
         const quantity = parseInt(item.querySelector('.quantity-value').textContent);
+        
+        console.log('Подсчет суммы:', { price, quantity, total: price * quantity });
+        
         if (!isNaN(price) && !isNaN(quantity)) {
             totalSum += price * quantity;
         }
@@ -105,6 +115,8 @@ function updateTotalSum() {
     if (totalElement) {
         totalElement.textContent = `Итого: ${totalSum.toFixed(2)} ₽`;
     }
+    
+    console.log('Общая сумма:', totalSum);
 }
 
 // Функция удаления товара из корзины
