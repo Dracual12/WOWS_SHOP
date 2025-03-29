@@ -189,10 +189,12 @@
                 fetch('/api/cart')
                     .then(response => response.json())
                     .then(data => {
+                        console.log('Данные корзины:', data);
                         cartItems.innerHTML = '';
                         let total = 0;
 
-                        if (data.items && data.items.length > 0) {
+                        if (data && data.items && data.items.length > 0) {
+                            console.log('Товары в корзине:', data.items);
                             data.items.forEach(item => {
                                 const li = document.createElement('li');
                                 li.className = 'cart-item';
@@ -221,6 +223,7 @@
                                 <button class="checkout-button" onclick="checkout()">Оформить заказ</button>
                             `;
                         } else {
+                            console.log('Корзина пуста или нет данных:', data);
                             cartItems.innerHTML = '<li class="empty-cart">Корзина пуста</li>';
                             cartTotal.innerHTML = '';
                         }
