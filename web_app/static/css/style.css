@@ -614,7 +614,10 @@ button:hover {
 
 /* === Значок корзины === */
 .floating-cart {
-  position: relative;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -623,7 +626,6 @@ button:hover {
   width: 3vw;
   height: 3vw;
   cursor: pointer;
-  margin-left: 1vw;
 }
 .floating-cart img {
   width: 1.8vw;
@@ -1230,4 +1232,11 @@ button:hover {
     background-color: #ccc; /* Серый фон */
     cursor: not-allowed; /* Курсор "недоступно" */
     opacity: 0.7; /* Полупрозрачность */
+}
+
+/* Удаляем дублирующиеся стили для корзины */
+.floating-cart-product,
+.cart-icon-product,
+.cart-dropdown-product {
+    display: none;
 }
