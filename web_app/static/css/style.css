@@ -1164,7 +1164,7 @@ button:hover {
     color: #42a5f5;
     margin-bottom: 30px;
     text-align: center;
-    font-size: 2em;
+    font-size: 24px;
 }
 
 .form-group {
@@ -1176,7 +1176,7 @@ button:hover {
     margin-bottom: 10px;
     color: #e0e0e0;
     font-weight: 500;
-    font-size: 1.1em;
+    font-size: 16px;
 }
 
 .form-group input {
@@ -1186,7 +1186,7 @@ button:hover {
     border-radius: 8px;
     background: #2c2c2c;
     color: #e0e0e0;
-    font-size: 1.1em;
+    font-size: 16px;
     transition: all 0.3s ease;
 }
 
@@ -1203,7 +1203,7 @@ button:hover {
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 1.2em;
+    font-size: 18px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -1226,10 +1226,12 @@ button:hover {
     .order-form {
         margin: 15px;
         padding: 20px;
+        width: calc(100% - 30px);
+        box-sizing: border-box;
     }
 
     .order-form h2 {
-        font-size: 1.8em;
+        font-size: 24px;
         margin-bottom: 25px;
     }
 
@@ -1238,46 +1240,47 @@ button:hover {
     }
 
     .form-group label {
-        font-size: 1em;
+        font-size: 16px;
     }
 
     .form-group input {
-        padding: 12px;
-        font-size: 1em;
+        padding: 15px;
+        font-size: 16px;
     }
 
     .submit-btn {
         padding: 15px;
-        font-size: 1.1em;
+        font-size: 18px;
     }
 }
 
 @media screen and (max-width: 480px) {
     .order-form {
         margin: 10px;
-        padding: 15px;
+        padding: 20px;
+        width: calc(100% - 20px);
     }
 
     .order-form h2 {
-        font-size: 1.5em;
+        font-size: 24px;
         margin-bottom: 20px;
     }
 
     .form-group {
-        margin-bottom: 15px;
+        margin-bottom: 20px;
     }
 
     .form-group label {
-        font-size: 0.9em;
+        font-size: 16px;
     }
 
     .form-group input {
-        padding: 10px;
-        font-size: 0.9em;
+        padding: 15px;
+        font-size: 16px;
     }
 
     .submit-btn {
-        padding: 12px;
-        font-size: 1em;
+        padding: 15px;
+        font-size: 18px;
     }
 }
