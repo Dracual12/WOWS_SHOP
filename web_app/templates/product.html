@@ -114,7 +114,7 @@
                     .then(data => {
                         if (data.status === 'success') {
                             // Обновляем корзину
-                            loadCartItems();
+                            window.loadCartItems();
                             // Показываем уведомление
                             alert('Товар добавлен в корзину!');
                         } else {
@@ -141,52 +141,6 @@
                 }
             });
 
-            // Загрузка товаров в корзину
-            function loadCartItems() {
-                fetch('/api/cart')
-                    .then(response => response.json())
-                    .then(data => {
-                        cartItems.innerHTML = '';
-                        let total = 0;
-
-                        if (data.items && data.items.length > 0) {
-                            data.items.forEach(item => {
-                                const li = document.createElement('li');
-                                li.className = 'cart-item';
-                                li.innerHTML = `
-                                    <div class="cart-item-top">
-                                        <span class="item-name">${item.name}</span>
-                                        <span class="item-total">${item.price} ₽</span>
-                                    </div>
-                                    <div class="cart-item-bottom">
-                                        <span class="cart-item-price">${item.price} ₽</span>
-                                        <div class="cart-item-quantity">
-                                            <button onclick="updateCartQuantity(${item.id}, ${item.quantity - 1})">-</button>
-                                            <span class="quantity-value">${item.quantity}</span>
-                                            <button onclick="updateCartQuantity(${item.id}, ${item.quantity + 1})">+</button>
-                                        </div>
-                                        <button class="remove-item" onclick="removeFromCart(${item.id})">×</button>
-                                    </div>
-                                `;
-                                cartItems.appendChild(li);
-                                total += item.price * item.quantity;
-                            });
-
-                            cartTotal.innerHTML = `
-                                <div class="cart-total">Итого: ${total} ₽</div>
-                                <button class="checkout-button" onclick="checkout()">Оформить заказ</button>
-                            `;
-                        } else {
-                            cartItems.innerHTML = '<li class="empty-cart">Корзина пуста</li>';
-                            cartTotal.innerHTML = '';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Ошибка при загрузке корзины:', error);
-                        cartItems.innerHTML = '<li class="empty-cart">Ошибка загрузки корзины</li>';
-                    });
-            }
-
             // Функция обновления количества товара
             window.updateCartQuantity = function(productId, newQuantity) {
                 if (newQuantity < 1) return;
@@ -201,7 +155,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        loadCartItems();
+                        window.loadCartItems();
                     }
                 })
                 .catch(error => console.error('Ошибка:', error));
@@ -215,7 +169,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        loadCartItems();
+                        window.loadCartItems();
                     }
                 })
                 .catch(error => console.error('Ошибка:', error));
@@ -230,7 +184,7 @@
             };
 
             // Загрузка корзины при загрузке страницы
-            loadCartItems();
+            window.loadCartItems();
         });
     </script>
 </body>
