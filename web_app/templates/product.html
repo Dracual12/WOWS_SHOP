@@ -143,8 +143,15 @@
 
             // Закрытие корзины при клике вне её
             document.addEventListener('click', function(event) {
+                // Проверяем, что клик был не по иконке корзины и не по выпадающему меню
                 if (!cartDropdown.contains(event.target) && !cartIcon.contains(event.target)) {
-                    cartDropdown.classList.remove('active');
+                    // Проверяем, что клик был не по кнопкам внутри корзины
+                    const isCartButton = event.target.closest('.cart-item-quantity button') || 
+                                       event.target.closest('.remove-item') || 
+                                       event.target.closest('.checkout-button');
+                    if (!isCartButton) {
+                        cartDropdown.classList.remove('active');
+                    }
                 }
             });
 
