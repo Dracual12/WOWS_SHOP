@@ -186,7 +186,13 @@
 
             // Переопределяем функцию loadCartItems для страницы продукта
             function loadCartItems() {
-                fetch('/api/cart')
+                const tgId = new URLSearchParams(window.location.search).get('tg_id');
+                if (!tgId) {
+                    console.error('tg_id не найден в URL');
+                    return;
+                }
+
+                fetch(`/api/cart?tg_id=${tgId}`)
                     .then(response => response.json())
                     .then(data => {
                         cartItems.innerHTML = '';
