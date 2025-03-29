@@ -47,14 +47,6 @@ window.updateCartQuantity = function(productId, newQuantity, li) {
 
     const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
     
-    // Обновляем отображение количества сразу, не дожидаясь ответа сервера
-    const quantitySpan = li.querySelector('.quantity-value');
-    const oldQuantity = parseInt(quantitySpan.textContent);
-    
-    if (quantitySpan) {
-        quantitySpan.textContent = newQuantity;
-    }
-
     console.log('Отправка запроса на обновление количества:', {
         productId,
         newQuantity,
@@ -72,24 +64,16 @@ window.updateCartQuantity = function(productId, newQuantity, li) {
     })
     .then(data => {
         if (data.status === 'success') {
-            // Обновляем только общую сумму
-            updateTotalSum();
+            // Перезагружаем корзину для получения актуальных данных
+            window.loadCartItems();
         } else {
             console.error('Ошибка обновления:', data);
-            // Возвращаем предыдущее значение в случае ошибки
-            if (quantitySpan) {
-                quantitySpan.textContent = oldQuantity;
-            }
-            updateTotalSum();
+            window.loadCartItems();
         }
     })
     .catch(error => {
         console.error('Ошибка:', error);
-        // Возвращаем предыдущее значение в случае ошибки
-        if (quantitySpan) {
-            quantitySpan.textContent = oldQuantity;
-        }
-        updateTotalSum();
+        window.loadCartItems();
     });
 };
 
@@ -181,7 +165,6 @@ window.loadCartItems = function() {
                 const li = document.createElement('li');
                 li.className = 'cart-item';
                 li.setAttribute('data-product-id', item.product_id);
-                li.setAttribute('data-unit-price', item.price);
                 
                 li.innerHTML = `
                     <div class="cart-item-details">
