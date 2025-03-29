@@ -174,94 +174,66 @@ window.removeCartItem = function(productId, li) {
         });
 };
 
-// Функция загрузки товаров корзины
+// Функция для загрузки товаров в корзину
 window.loadCartItems = function() {
-    const cartItemsContainer = document.getElementById('cartItems');
-    const cartTotalElement = document.getElementById('cartTotal');
-    const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
-    
-    console.log('Загрузка товаров корзины для пользователя:', tgId);
-    
-    // Очищаем контейнер
-    cartItemsContainer.innerHTML = '';
-    
-    fetch(`/api/cart?tg_id=${tgId}`)
+    fetch('/api/cart')
         .then(response => response.json())
         .then(data => {
-            console.log('Получены данные корзины:', data);
-            
-            if (!data || data.length === 0) {
-                // Если корзина пуста
-                cartItemsContainer.innerHTML = '<li class="empty-cart">Корзина пуста</li>';
-                cartTotalElement.innerHTML = '';
+            console.log('Данные корзины:', data);
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+            const cartIcon = document.querySelector('.cart-icon-product') || document.querySelector('.cart-icon');
+            const cartDropdown = document.querySelector('.cart-dropdown-product') || document.querySelector('.cart-dropdown');
+
+            if (!cartItems || !cartTotal) {
+                console.error('Элементы корзины не найдены');
                 return;
             }
-            
-            let totalSum = 0;
-            
-            // Добавляем каждый товар
-            data.forEach(item => {
-                const li = document.createElement('li');
-                li.className = 'cart-item';
-                li.setAttribute('data-product-id', item.product_id);
-                
-                li.innerHTML = `
-                    <div class="cart-item-details">
-                        <div class="cart-item-top">
-                            <div class="cart-item-name">${item.name}</div>
-                            <button class="remove-item">×</button>
-                        </div>
-                        <div class="cart-item-bottom">
-                            <div class="cart-item-price">${item.price} ₽</div>
-                            <div class="cart-item-quantity">
-                                <button>-</button>
-                                <span class="quantity-value">${item.quantity}</span>
-                                <button>+</button>
+
+            cartItems.innerHTML = '';
+            let total = 0;
+
+            if (data && data.items && data.items.length > 0) {
+                console.log('Товары в корзине:', data.items);
+                data.items.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'cart-item';
+                    li.innerHTML = `
+                        <div class="cart-item-details">
+                            <div class="cart-item-top">
+                                <span class="cart-item-name">${item.name}</span>
+                                <span class="cart-item-price">${item.price} ₽</span>
+                            </div>
+                            <div class="cart-item-bottom">
+                                <div class="cart-item-quantity">
+                                    <button onclick="updateCartQuantity(${item.id}, ${item.quantity - 1})">-</button>
+                                    <span>${item.quantity}</span>
+                                    <button onclick="updateCartQuantity(${item.id}, ${item.quantity + 1})">+</button>
+                                </div>
+                                <button class="remove-item" onclick="removeFromCart(${item.id})">×</button>
                             </div>
                         </div>
-                    </div>
+                    `;
+                    cartItems.appendChild(li);
+                    total += item.price * item.quantity;
+                });
+
+                cartTotal.innerHTML = `
+                    <div class="total-sum">Итого: ${total} ₽</div>
+                    <button class="checkout-button" onclick="checkout()">Оформить заказ</button>
                 `;
-                
-                // Добавляем обработчики событий
-                const removeButton = li.querySelector('.remove-item');
-                const minusButton = li.querySelector('.cart-item-quantity button:first-child');
-                const plusButton = li.querySelector('.cart-item-quantity button:last-child');
-                
-                removeButton.addEventListener('click', () => {
-                    removeCartItem(item.product_id, li);
-                });
-                
-                minusButton.addEventListener('click', () => {
-                    updateCartQuantity(item.product_id, item.quantity - 1, li);
-                });
-                
-                plusButton.addEventListener('click', () => {
-                    updateCartQuantity(item.product_id, item.quantity + 1, li);
-                });
-                
-                cartItemsContainer.appendChild(li);
-                totalSum += item.price * item.quantity;
-            });
-            
-            // Обновляем общую сумму и добавляем кнопку оформления заказа
-            cartTotalElement.innerHTML = `
-                <div class="total-sum">Итого: ${totalSum.toFixed(2)} ₽</div>
-                <button class="checkout-button">Оформить заказ</button>
-            `;
-            
-            // Добавляем обработчик для кнопки оформления заказа
-            const checkoutButton = cartTotalElement.querySelector('.checkout-button');
-            if (checkoutButton) {
-                checkoutButton.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    checkout();
-                });
+            } else {
+                console.log('Корзина пуста или нет данных:', data);
+                cartItems.innerHTML = '<li class="empty-cart">Корзина пуста</li>';
+                cartTotal.innerHTML = '';
             }
         })
         .catch(error => {
             console.error('Ошибка при загрузке корзины:', error);
-            cartItemsContainer.innerHTML = '<li class="empty-cart">Ошибка загрузки корзины</li>';
+            const cartItems = document.getElementById('cartItems');
+            if (cartItems) {
+                cartItems.innerHTML = '<li class="empty-cart">Ошибка загрузки корзины</li>';
+            }
         });
 };
 
