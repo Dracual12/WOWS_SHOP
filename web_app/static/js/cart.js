@@ -86,15 +86,18 @@ function updateItemUI(li, quantity) {
     const quantityElement = li.querySelector('.quantity-value');
     const priceElement = li.querySelector('.cart-item-price');
     const price = parseFloat(priceElement.textContent.replace(/[^0-9.]/g, ''));
+    const productId = li.dataset.productId;
     
     // Обновляем количество
     quantityElement.textContent = quantity;
     
-    // Обновляем кнопки
+    // Обновляем кнопки с новым значением количества
     const minusButton = li.querySelector('.cart-item-quantity button:first-child');
     const plusButton = li.querySelector('.cart-item-quantity button:last-child');
-    minusButton.setAttribute('onclick', `updateCartQuantity(${li.dataset.productId}, ${quantity - 1}, this.parentElement.parentElement.parentElement)`);
-    plusButton.setAttribute('onclick', `updateCartQuantity(${li.dataset.productId}, ${quantity + 1}, this.parentElement.parentElement.parentElement)`);
+    
+    // Обновляем атрибуты onclick с новым значением количества
+    minusButton.setAttribute('onclick', `updateCartQuantity(${productId}, ${quantity - 1}, this.parentElement.parentElement.parentElement)`);
+    plusButton.setAttribute('onclick', `updateCartQuantity(${productId}, ${quantity + 1}, this.parentElement.parentElement.parentElement)`);
     
     // Обновляем общую сумму
     updateTotalSum();
