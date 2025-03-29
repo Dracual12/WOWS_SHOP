@@ -148,47 +148,6 @@
                 }
             });
 
-            // Функция обновления количества товара
-            window.updateCartQuantity = function(productId, newQuantity) {
-                if (newQuantity < 1) return;
-                
-                fetch(`/api/cart/update/${productId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ 
-                        quantity: newQuantity,
-                        tg_id: tgId
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        window.loadCartItems();
-                    }
-                })
-                .catch(error => console.error('Ошибка:', error));
-            };
-
-            // Функция удаления товара из корзины
-            window.removeFromCart = function(productId) {
-                fetch(`/api/cart/remove/${productId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ tg_id: tgId })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        window.loadCartItems();
-                    }
-                })
-                .catch(error => console.error('Ошибка:', error));
-            };
-
             // Функция оформления заказа
             window.checkout = function() {
                 window.location.href = `/order_form?tg_id=${tgId}`;
