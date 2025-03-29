@@ -96,20 +96,36 @@
             const cartTotal = document.getElementById('cartTotal');
 
             // Получаем tg_id из Telegram WebApp
-            const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
+            let tgId;
+            try {
+                tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
+                console.log('Получен tg_id:', tgId);
+            } catch (error) {
+                console.error('Ошибка при получении tg_id:', error);
+                // Если не удалось получить tg_id из WebApp, пробуем получить из URL
+                const urlParams = new URLSearchParams(window.location.search);
+                tgId = urlParams.get('tg_id');
+                console.log('Получен tg_id из URL:', tgId);
+            }
+
             if (!tgId) {
-                console.error('tg_id не найден в Telegram WebApp');
+                console.error('tg_id не найден');
                 return;
             }
 
             // Обработчик для кнопки добавления в корзину
             const addToCartButton = document.querySelector('.add_to_cart');
             if (addToCartButton) {
-                addToCartButton.addEventListener('click', function() {
+                console.log('Кнопка добавления в корзину найдена');
+                addToCartButton.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
                     const productId = this.dataset.id;
-                    
+                    console.log('Нажата кнопка добавления в корзину. ID товара:', productId);
                     addToCart(productId, tgId);
                 });
+            } else {
+                console.error('Кнопка добавления в корзину не найдена');
             }
 
             // Открытие/закрытие корзины
@@ -143,6 +159,7 @@
         });
 
         async function addToCart(productId, tgId) {
+            console.log('Вызов функции addToCart с параметрами:', { productId, tgId });
             try {
                 const response = await fetch('/api/cart/add', {
                     method: 'POST',
@@ -155,6 +172,10 @@
                         tg_id: tgId
                     })
                 });
+
+                console.log('Ответ сервера:', response.status);
+                const data = await response.json();
+                console.log('Данные ответа:', data);
 
                 if (response.ok) {
                     // Создаем элемент уведомления
@@ -175,10 +196,10 @@
                     // Обновляем корзину
                     window.loadCartItems();
                 } else {
-                    console.error('Ошибка при добавлении товара в корзину');
+                    console.error('Ошибка при добавлении товара в корзину:', data);
                 }
             } catch (error) {
-                console.error('Ошибка:', error);
+                console.error('Ошибка при выполнении запроса:', error);
             }
         }
     </script>
