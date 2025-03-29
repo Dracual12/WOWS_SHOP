@@ -123,133 +123,117 @@ window.removeCartItem = function(productId, li) {
         });
 };
 
-// Делаем функцию доступной глобально
+// Функция загрузки товаров корзины
 window.loadCartItems = function() {
-    console.log('Загрузка товаров корзины');
     const cartItemsContainer = document.getElementById('cart-items');
-    const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;  // Получаем tg_id
-    console.log('TG ID:', tgId);
+    const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
     
     fetch(`/api/cart?tg_id=${tgId}`, {
-        method: "GET",  // Используем GET
+        method: "GET"
     })
         .then(response => response.json())
         .then(cartItems => {
-            console.log('Получены товары:', cartItems);
-            cartItemsContainer.innerHTML = ''; // Очищаем корзину
-            let totalSum = 0; // Общая сумма корзины
+            cartItemsContainer.innerHTML = '';
+            let totalSum = 0;
             
             if (cartItems.length === 0) {
                 cartItemsContainer.innerHTML = '<li>Корзина пуста</li>';
-            } else {
-                cartItems.forEach(item => {
-                    console.log('Создание элемента корзины для товара:', item);
-                    const li = document.createElement('li');
-                    
-                    // Проверяем наличие product_id в item
-                    if (!item.product_id) {
-                        console.error('У товара отсутствует product_id:', item);
-                        return;
-                    }
-                    
-                    li.setAttribute('data-product-id', item.product_id);
-                    
-                    // Используем цену из базы данных напрямую
-                    const unitPrice = parseFloat(item.price);
-                    if (isNaN(unitPrice)) {
-                        console.error('Некорректная цена для товара:', item);
-                        return;
-                    }
-                    
-                    li.setAttribute('data-unit-price', unitPrice);
-                    const itemTotal = unitPrice * parseInt(item.quantity);
-                    totalSum += itemTotal; // Добавляем к общей сумме
-                    
-                    console.log('Созданный элемент li:', {
-                        'data-product-id': li.getAttribute('data-product-id'),
-                        'data-unit-price': li.getAttribute('data-unit-price'),
-                        itemTotal
-                    });
+                return;
+            }
 
-                    li.innerHTML = `
-                        <div class="cart-item-top">
-                            <span class="item-name">${item.name}</span>
-                            <button class="remove-btn">
-                                <img src="/static/images/delete_good.png" alt="Удалить">
-                            </button>
-                        </div>
-                        <div class="item-quantity">
-                            <button class="quantity-btn decrease">-</button>
-                            <span class="quantity-value">${item.quantity}</span>
-                            <button class="quantity-btn increase">+</button>
-                        </div>
-                        <div class='item-price'>
-                            <span class="item-total">${itemTotal.toFixed(2)} рублей</span>
-                        </div>
-                    `;
-
-                    // Привязываем обработчики для этого элемента
-                    const increaseBtn = li.querySelector('.quantity-btn.increase');
-                    const decreaseBtn = li.querySelector('.quantity-btn.decrease');
-                    const removeBtn = li.querySelector('.remove-btn');
-
-                    console.log('Найдены кнопки для товара', item.product_id, ':', {
-                        increase: !!increaseBtn,
-                        decrease: !!decreaseBtn,
-                        remove: !!removeBtn
-                    });
-
-                    if (increaseBtn) {
-                        increaseBtn.addEventListener('click', (e) => {
-                            console.log('Нажата кнопка увеличения количества для товара', item.product_id);
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const currentQuantity = parseInt(li.querySelector('.quantity-value').textContent);
-                            window.updateCartQuantity(item.product_id, currentQuantity + 1, li);
-                        });
-                    }
-
-                    if (decreaseBtn) {
-                        decreaseBtn.addEventListener('click', (e) => {
-                            console.log('Нажата кнопка уменьшения количества для товара', item.product_id);
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const currentQuantity = parseInt(li.querySelector('.quantity-value').textContent);
-                            if (currentQuantity > 1) {
-                                window.updateCartQuantity(item.product_id, currentQuantity - 1, li);
-                            }
-                        });
-                    }
-
-                    if (removeBtn) {
-                        removeBtn.addEventListener('click', (e) => {
-                            console.log('Нажата кнопка удаления для товара', item.product_id);
-                            e.preventDefault();
-                            e.stopPropagation();
-                            window.removeCartItem(item.product_id, li);
-                        });
-                    }
-
-                    cartItemsContainer.appendChild(li);
-                });
+            cartItems.forEach(item => {
+                const li = document.createElement('li');
+                li.setAttribute('data-product-id', item.product_id);
                 
-                // Добавляем общую сумму в конец корзины
-                const totalElement = document.createElement('li');
-                totalElement.className = 'cart-total';
-                totalElement.innerHTML = `<div class="total-sum">Итого: ${totalSum.toFixed(2)} рублей</div>`;
-                cartItemsContainer.appendChild(totalElement);
+                const unitPrice = parseFloat(item.price);
+                if (isNaN(unitPrice)) {
+                    console.error('Некорректная цена для товара:', item);
+                    return;
+                }
+                
+                li.setAttribute('data-unit-price', unitPrice);
+                const itemTotal = unitPrice * parseInt(item.quantity);
+                totalSum += itemTotal;
+
+                li.innerHTML = `
+                    <div class="cart-item-top">
+                        <span class="item-name">${item.name}</span>
+                        <button class="remove-btn">
+                            <img src="/static/images/delete_good.png" alt="Удалить">
+                        </button>
+                    </div>
+                    <div class="item-quantity">
+                        <button class="quantity-btn decrease">-</button>
+                        <span class="quantity-value">${item.quantity}</span>
+                        <button class="quantity-btn increase">+</button>
+                    </div>
+                    <div class='item-price'>
+                        <span class="item-total">${itemTotal.toFixed(2)} рублей</span>
+                    </div>
+                `;
+
+                const increaseBtn = li.querySelector('.quantity-btn.increase');
+                const decreaseBtn = li.querySelector('.quantity-btn.decrease');
+                const removeBtn = li.querySelector('.remove-btn');
+
+                if (increaseBtn) {
+                    increaseBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const currentQuantity = parseInt(li.querySelector('.quantity-value').textContent);
+                        window.updateCartQuantity(item.product_id, currentQuantity + 1, li);
+                    });
+                }
+
+                if (decreaseBtn) {
+                    decreaseBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const currentQuantity = parseInt(li.querySelector('.quantity-value').textContent);
+                        if (currentQuantity > 1) {
+                            window.updateCartQuantity(item.product_id, currentQuantity - 1, li);
+                        }
+                    });
+                }
+
+                if (removeBtn) {
+                    removeBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        window.removeCartItem(item.product_id, li);
+                    });
+                }
+
+                cartItemsContainer.appendChild(li);
+            });
+
+            // Добавляем общую сумму и кнопку оформления заказа
+            const totalElement = document.createElement('li');
+            totalElement.className = 'cart-total';
+            totalElement.innerHTML = `
+                <div class="total-sum">Итого: ${totalSum.toFixed(2)} рублей</div>
+                <button class="checkout-button">Оформить заказ</button>
+            `;
+            cartItemsContainer.appendChild(totalElement);
+
+            // Добавляем обработчик для кнопки оформления заказа
+            const checkoutButton = totalElement.querySelector('.checkout-button');
+            if (checkoutButton) {
+                checkoutButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    checkout();
+                });
             }
         })
         .catch(error => console.error('Ошибка загрузки корзины:', error));
 };
 
-// Функция для оформления заказа
+// Функция оформления заказа
 function checkout() {
     const tg = window.Telegram.WebApp;
-    const tgId = tg.initDataUnsafe.user.id;
-    
-    // Открываем форму заказа
-    window.location.href = `/order?tg_id=${tgId}`;
+    const userId = tg.initDataUnsafe.user.id;
+    window.location.href = `/order_form?tg_id=${userId}`;
 }
 
 // Добавляем обработчик для кнопки оформления заказа
