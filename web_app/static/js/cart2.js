@@ -242,3 +242,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+function checkout() {
+    const tg = window.Telegram.WebApp;
+    const userId = tg.initDataUnsafe.user.id;
+    window.location.href = `/order_form?tg_id=${userId}`;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const checkoutButton = document.querySelector('.checkout-button');
+    if (checkoutButton) {
+        checkoutButton.addEventListener('click', checkout);
+    }
+});
