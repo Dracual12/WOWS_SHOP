@@ -137,26 +137,28 @@
             }
 
             // Открытие/закрытие корзины
-            cartIcon.addEventListener('click', function() {
+            cartIcon.addEventListener('click', function(event) {
+                event.stopPropagation();
                 cartDropdown.classList.toggle('active');
+            });
+
+            // Предотвращаем закрытие корзины при клике внутри неё
+            cartDropdown.addEventListener('click', function(event) {
+                event.stopPropagation();
             });
 
             // Закрытие корзины при клике вне её
             document.addEventListener('click', function(event) {
-                // Проверяем, что клик был не по иконке корзины и не по выпадающему меню
                 if (!cartDropdown.contains(event.target) && !cartIcon.contains(event.target)) {
-                    // Проверяем, что клик был не по кнопкам внутри корзины
-                    const isCartButton = event.target.closest('.cart-item-quantity button') || 
-                                       event.target.closest('.remove-item') || 
-                                       event.target.closest('.checkout-button');
-                    if (!isCartButton) {
-                        cartDropdown.classList.remove('active');
-                    }
+                    cartDropdown.classList.remove('active');
                 }
             });
 
             // Функция оформления заказа
-            window.checkout = function() {
+            window.checkout = function(event) {
+                if (event) {
+                    event.stopPropagation();
+                }
                 window.location.href = `/order_form?tg_id=${tgId}`;
             };
 
