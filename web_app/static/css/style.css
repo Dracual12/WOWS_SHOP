@@ -1149,3 +1149,123 @@ button:hover {
     cursor: not-allowed; /* Курсор "недоступно" */
     opacity: 0.7; /* Полупрозрачность */
 }
+
+/* === Стили для страницы оформления заказа === */
+.order-form {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #1e1e1e;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.order-form h2 {
+    color: #42a5f5;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #e0e0e0;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #424242;
+    border-radius: 5px;
+    background: #2c2c2c;
+    color: #e0e0e0;
+    font-size: 16px;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #42a5f5;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 15px;
+    background: #42a5f5;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.submit-btn:hover {
+    background: #0d47a1;
+}
+
+/* Адаптивные стили для мобильных устройств */
+@media screen and (max-width: 768px) {
+    .order-form {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    .order-form h2 {
+        font-size: 1.5em;
+        margin-bottom: 15px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        font-size: 14px;
+    }
+
+    .form-group input {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .submit-btn {
+        padding: 12px;
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .order-form {
+        margin: 5px;
+        padding: 10px;
+    }
+
+    .order-form h2 {
+        font-size: 1.2em;
+        margin-bottom: 12px;
+    }
+
+    .form-group {
+        margin-bottom: 12px;
+    }
+
+    .form-group label {
+        font-size: 13px;
+    }
+
+    .form-group input {
+        padding: 8px;
+        font-size: 13px;
+    }
+
+    .submit-btn {
+        padding: 10px;
+        font-size: 13px;
+    }
+}
