@@ -127,58 +127,72 @@ window.removeCartItem = function(productId, li) {
 window.loadCartItems = function() {
     const cartItemsContainer = document.getElementById('cartItems');
     const cartTotalElement = document.getElementById('cartTotal');
+    const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
     
-    // Получаем товары из localStorage
-    const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+    console.log('Загрузка товаров корзины для пользователя:', tgId);
     
     // Очищаем контейнер
     cartItemsContainer.innerHTML = '';
     
-    if (cartItems.length === 0) {
-        // Если корзина пуста
-        cartItemsContainer.innerHTML = '<li class="empty-cart">Корзина пуста</li>';
-        cartTotalElement.innerHTML = '';
-        return;
-    }
-    
-    let totalSum = 0;
-    
-    // Добавляем каждый товар
-    cartItems.forEach(item => {
-        const li = document.createElement('li');
-        li.className = 'cart-item';
-        li.innerHTML = `
-            <img src="${item.image}" alt="${item.name}" class="cart-item-image">
-            <div class="cart-item-details">
-                <div class="cart-item-name">${item.name}</div>
-                <div class="cart-item-price">${item.price} ₽</div>
-                <div class="cart-item-quantity">
-                    <button onclick="updateQuantity(${item.id}, -1)">-</button>
-                    <span>${item.quantity}</span>
-                    <button onclick="updateQuantity(${item.id}, 1)">+</button>
-                </div>
-            </div>
-            <button onclick="removeFromCart(${item.id})" class="remove-item">×</button>
-        `;
-        cartItemsContainer.appendChild(li);
-        totalSum += item.price * item.quantity;
-    });
-    
-    // Обновляем общую сумму и добавляем кнопку оформления заказа
-    cartTotalElement.innerHTML = `
-        <div class="total-sum">Итого: ${totalSum.toFixed(2)} ₽</div>
-        <button class="checkout-button">Оформить заказ</button>
-    `;
-    
-    // Добавляем обработчик для кнопки оформления заказа
-    const checkoutButton = cartTotalElement.querySelector('.checkout-button');
-    if (checkoutButton) {
-        checkoutButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            checkout();
+    fetch(`/api/cart?tg_id=${tgId}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Получены данные корзины:', data);
+            
+            if (!data || data.length === 0) {
+                // Если корзина пуста
+                cartItemsContainer.innerHTML = '<li class="empty-cart">Корзина пуста</li>';
+                cartTotalElement.innerHTML = '';
+                return;
+            }
+            
+            let totalSum = 0;
+            
+            // Добавляем каждый товар
+            data.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'cart-item';
+                li.setAttribute('data-product-id', item.product_id);
+                li.setAttribute('data-unit-price', item.price);
+                
+                li.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}" class="cart-item-image" onerror="this.src='/static/images/default.png'">
+                    <div class="cart-item-details">
+                        <div class="cart-item-name">${item.name}</div>
+                        <div class="cart-item-price">${item.price} ₽</div>
+                        <div class="cart-item-quantity">
+                            <button onclick="updateCartQuantity(${item.product_id}, ${item.quantity - 1}, this.parentElement.parentElement.parentElement)">-</button>
+                            <span class="quantity-value">${item.quantity}</span>
+                            <button onclick="updateCartQuantity(${item.product_id}, ${item.quantity + 1}, this.parentElement.parentElement.parentElement)">+</button>
+                        </div>
+                    </div>
+                    <button onclick="removeCartItem(${item.product_id}, this.parentElement)" class="remove-item">×</button>
+                `;
+                
+                cartItemsContainer.appendChild(li);
+                totalSum += item.price * item.quantity;
+            });
+            
+            // Обновляем общую сумму и добавляем кнопку оформления заказа
+            cartTotalElement.innerHTML = `
+                <div class="total-sum">Итого: ${totalSum.toFixed(2)} ₽</div>
+                <button class="checkout-button">Оформить заказ</button>
+            `;
+            
+            // Добавляем обработчик для кнопки оформления заказа
+            const checkoutButton = cartTotalElement.querySelector('.checkout-button');
+            if (checkoutButton) {
+                checkoutButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    checkout();
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка при загрузке корзины:', error);
+            cartItemsContainer.innerHTML = '<li class="empty-cart">Ошибка загрузки корзины</li>';
         });
-    }
 };
 
 // Функция оформления заказа
