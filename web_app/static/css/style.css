@@ -1279,18 +1279,44 @@ button:hover {
 
 /* Принудительные стили для светлой темы */
 @media (prefers-color-scheme: light) {
-    body {
+    html, body, main, header, .section, .product-carousel, .carousel-item {
         background: #121212 !important;
         color: #e0e0e0 !important;
+        color-scheme: dark !important;
     }
 
-    .order-form {
+    .order-form, .form-group input, .form-table td {
         background-color: #1e1e1e !important;
         color: #ffffff !important;
     }
+}
 
-    .form-group input {
-        background-color: #2c2c2c !important;
+/* === Принудительные темные стили === */
+html, body {
+    background: #121212 !important;
+    color: #e0e0e0 !important;
+    color-scheme: dark !important;
+}
+
+main, header, .section, .product-carousel, .carousel-item {
+    background: #121212 !important;
+    color: #e0e0e0 !important;
+}
+
+.order-form, .form-group input, .form-table td {
+    background-color: #1e1e1e !important;
+    color: #ffffff !important;
+}
+
+@media (prefers-color-scheme: light) {
+    html, body, main, header, .section, .product-carousel, .carousel-item {
+        background: #121212 !important;
+        color: #e0e0e0 !important;
+        color-scheme: dark !important;
+    }
+
+    .order-form, .form-group input, .form-table td {
+        background-color: #1e1e1e !important;
         color: #ffffff !important;
     }
 }
