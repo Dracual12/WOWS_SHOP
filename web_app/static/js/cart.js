@@ -47,6 +47,9 @@ window.updateCartQuantity = function(productId, newQuantity, li) {
 
     const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
     
+    // Сначала обновляем UI
+    updateItemUI(li, newQuantity);
+    
     console.log('Отправка запроса на обновление количества:', {
         productId,
         newQuantity,
@@ -59,23 +62,43 @@ window.updateCartQuantity = function(productId, newQuantity, li) {
         body: JSON.stringify({ quantity: newQuantity, tg_id: tgId })
     })
     .then(response => {
-        if (!response.ok) throw new Error('Ошибка обновления корзины');
+        if (!response.ok) {
+            // В случае ошибки откатываем изменения
+            updateItemUI(li, newQuantity - 1);
+            throw new Error('Ошибка обновления корзины');
+        }
         return response.json();
     })
     .then(data => {
-        if (data.status === 'success') {
-            // Перезагружаем корзину для получения актуальных данных
-            window.loadCartItems();
-        } else {
+        if (data.status !== 'success') {
+            // В случае ошибки откатываем изменения
+            updateItemUI(li, newQuantity - 1);
             console.error('Ошибка обновления:', data);
-            window.loadCartItems();
         }
     })
     .catch(error => {
         console.error('Ошибка:', error);
-        window.loadCartItems();
     });
 };
+
+// Функция локального обновления UI элемента корзины
+function updateItemUI(li, quantity) {
+    const quantityElement = li.querySelector('.quantity-value');
+    const priceElement = li.querySelector('.cart-item-price');
+    const price = parseFloat(priceElement.textContent.replace(/[^0-9.]/g, ''));
+    
+    // Обновляем количество
+    quantityElement.textContent = quantity;
+    
+    // Обновляем кнопки
+    const minusButton = li.querySelector('.cart-item-quantity button:first-child');
+    const plusButton = li.querySelector('.cart-item-quantity button:last-child');
+    minusButton.setAttribute('onclick', `updateCartQuantity(${li.dataset.productId}, ${quantity - 1}, this.parentElement.parentElement.parentElement)`);
+    plusButton.setAttribute('onclick', `updateCartQuantity(${li.dataset.productId}, ${quantity + 1}, this.parentElement.parentElement.parentElement)`);
+    
+    // Обновляем общую сумму
+    updateTotalSum();
+}
 
 // Функция обновления общей суммы
 function updateTotalSum() {
