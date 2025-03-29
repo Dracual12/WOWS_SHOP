@@ -237,16 +237,16 @@ button:hover {
   width: 3vw;
   height: 3vw;
   cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.floating-cart:hover {
+  transform: scale(1.1);
 }
 
 .cart-icon {
   width: 1.8vw;
   height: 1.8vw;
-  transition: transform 0.2s;
-}
-
-.cart-icon:hover {
-  transform: scale(1.1);
 }
 
 .cart-dropdown {
@@ -1234,7 +1234,10 @@ button:hover {
     opacity: 0.7; /* Полупрозрачность */
 }
 
-/* Удаляем дублирующиеся стили для корзины */
+/* Удаляем все дублирующиеся стили для корзины */
+.floating-cart2,
+.cart-icon2,
+.cart-dropdown2,
 .floating-cart-product,
 .cart-icon-product,
 .cart-dropdown-product {
