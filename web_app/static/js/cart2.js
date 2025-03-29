@@ -202,15 +202,35 @@ window.loadCartItems = function() {
                     cartItemsContainer.appendChild(li);
                 });
                 
-                // Добавляем общую сумму в конец корзины
+                // Добавляем общую сумму и кнопку оформления заказа
                 const totalElement = document.createElement('li');
                 totalElement.className = 'cart-total';
-                totalElement.innerHTML = `<div class="total-sum">Итого: ${totalSum.toFixed(2)} рублей</div>`;
+                totalElement.innerHTML = `
+                    <div class="total-sum">Итого: ${totalSum.toFixed(2)} рублей</div>
+                    <button class="checkout-button">Оформить заказ</button>
+                `;
                 cartItemsContainer.appendChild(totalElement);
+
+                // Добавляем обработчик для кнопки оформления заказа
+                const checkoutButton = totalElement.querySelector('.checkout-button');
+                if (checkoutButton) {
+                    checkoutButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        checkout();
+                    });
+                }
             }
         })
         .catch(error => console.error('Ошибка загрузки корзины:', error));
 };
+
+// Функция оформления заказа
+function checkout() {
+    const tg = window.Telegram.WebApp;
+    const userId = tg.initDataUnsafe.user.id;
+    window.location.href = `/order_form?tg_id=${userId}`;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM загружен');
@@ -241,17 +261,4 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Корзина закрыта');
         }
     });
-});
-
-function checkout() {
-    const tg = window.Telegram.WebApp;
-    const userId = tg.initDataUnsafe.user.id;
-    window.location.href = `/order_form?tg_id=${userId}`;
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    const checkoutButton = document.querySelector('.checkout-button');
-    if (checkoutButton) {
-        checkoutButton.addEventListener('click', checkout);
-    }
 });
