@@ -83,8 +83,8 @@ window.updateCartQuantity = function(productId, newQuantity, li) {
 
 // Функция локального обновления UI элемента корзины
 function updateItemUI(li, quantity) {
-    const quantityElement = li.querySelector('.quantity-value-product');
-    const priceElement = li.querySelector('.cart-item-price-product');
+    const quantityElement = li.querySelector('.quantity-value');
+    const priceElement = li.querySelector('.cart-item-price');
     const price = parseFloat(priceElement.textContent.replace(/[^0-9.]/g, ''));
     const productId = li.dataset.productId;
     
@@ -92,16 +92,16 @@ function updateItemUI(li, quantity) {
     quantityElement.textContent = quantity;
     
     // Обновляем кнопки с новым значением количества
-    const minusButton = li.querySelector('.cart-item-quantity-product button:first-child');
-    const plusButton = li.querySelector('.cart-item-quantity-product button:last-child');
+    const minusButton = li.querySelector('.cart-item-quantity button:first-child');
+    const plusButton = li.querySelector('.cart-item-quantity button:last-child');
     
     // Удаляем старые обработчики
     minusButton.replaceWith(minusButton.cloneNode(true));
     plusButton.replaceWith(plusButton.cloneNode(true));
     
     // Получаем новые кнопки после замены
-    const newMinusButton = li.querySelector('.cart-item-quantity-product button:first-child');
-    const newPlusButton = li.querySelector('.cart-item-quantity-product button:last-child');
+    const newMinusButton = li.querySelector('.cart-item-quantity button:first-child');
+    const newPlusButton = li.querySelector('.cart-item-quantity button:last-child');
     
     // Добавляем новые обработчики
     newMinusButton.addEventListener('click', () => {
@@ -118,14 +118,14 @@ function updateItemUI(li, quantity) {
 
 // Функция обновления общей суммы
 function updateTotalSum() {
-    const cartItems = document.querySelectorAll('.cart-item-product');
+    const cartItems = document.querySelectorAll('.cart-item');
     let totalSum = 0;
     
     cartItems.forEach(item => {
         // Извлекаем только числовое значение цены
-        const priceText = item.querySelector('.cart-item-price-product').textContent;
+        const priceText = item.querySelector('.cart-item-price').textContent;
         const price = parseFloat(priceText.replace(/[^0-9.]/g, ''));
-        const quantity = parseInt(item.querySelector('.quantity-value-product').textContent);
+        const quantity = parseInt(item.querySelector('.quantity-value').textContent);
         
         console.log('Подсчет суммы:', { price, quantity, total: price * quantity });
         
@@ -134,7 +134,7 @@ function updateTotalSum() {
         }
     });
     
-    const totalElement = document.querySelector('.cart-total-product');
+    const totalElement = document.querySelector('.total-sum');
     if (totalElement) {
         totalElement.textContent = `Итого: ${totalSum.toFixed(2)} ₽`;
     }
@@ -192,7 +192,7 @@ window.loadCartItems = function() {
             
             if (!data || data.length === 0) {
                 // Если корзина пуста
-                cartItemsContainer.innerHTML = '<li class="empty-cart-product">Корзина пуста</li>';
+                cartItemsContainer.innerHTML = '<li class="empty-cart">Корзина пуста</li>';
                 cartTotalElement.innerHTML = '';
                 return;
             }
@@ -202,20 +202,20 @@ window.loadCartItems = function() {
             // Добавляем каждый товар
             data.forEach(item => {
                 const li = document.createElement('li');
-                li.className = 'cart-item-product';
+                li.className = 'cart-item';
                 li.setAttribute('data-product-id', item.product_id);
                 
                 li.innerHTML = `
-                    <div class="cart-item-details-product">
+                    <div class="cart-item-details">
                         <div class="cart-item-top">
-                            <div class="cart-item-name-product">${item.name}</div>
-                            <button class="remove-item-product">×</button>
+                            <div class="cart-item-name">${item.name}</div>
+                            <button class="remove-item">×</button>
                         </div>
                         <div class="cart-item-bottom">
-                            <div class="cart-item-price-product">${item.price} ₽</div>
-                            <div class="cart-item-quantity-product">
+                            <div class="cart-item-price">${item.price} ₽</div>
+                            <div class="cart-item-quantity">
                                 <button>-</button>
-                                <span class="quantity-value-product">${item.quantity}</span>
+                                <span class="quantity-value">${item.quantity}</span>
                                 <button>+</button>
                             </div>
                         </div>
@@ -223,9 +223,9 @@ window.loadCartItems = function() {
                 `;
                 
                 // Добавляем обработчики событий
-                const removeButton = li.querySelector('.remove-item-product');
-                const minusButton = li.querySelector('.cart-item-quantity-product button:first-child');
-                const plusButton = li.querySelector('.cart-item-quantity-product button:last-child');
+                const removeButton = li.querySelector('.remove-item');
+                const minusButton = li.querySelector('.cart-item-quantity button:first-child');
+                const plusButton = li.querySelector('.cart-item-quantity button:last-child');
                 
                 removeButton.addEventListener('click', () => {
                     removeCartItem(item.product_id, li);
@@ -245,12 +245,12 @@ window.loadCartItems = function() {
             
             // Обновляем общую сумму и добавляем кнопку оформления заказа
             cartTotalElement.innerHTML = `
-                <div class="cart-total-product">Итого: ${totalSum.toFixed(2)} ₽</div>
-                <button class="checkout-button-product">Оформить заказ</button>
+                <div class="total-sum">Итого: ${totalSum.toFixed(2)} ₽</div>
+                <button class="checkout-button">Оформить заказ</button>
             `;
             
             // Добавляем обработчик для кнопки оформления заказа
-            const checkoutButton = cartTotalElement.querySelector('.checkout-button-product');
+            const checkoutButton = cartTotalElement.querySelector('.checkout-button');
             if (checkoutButton) {
                 checkoutButton.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -261,7 +261,7 @@ window.loadCartItems = function() {
         })
         .catch(error => {
             console.error('Ошибка при загрузке корзины:', error);
-            cartItemsContainer.innerHTML = '<li class="empty-cart-product">Ошибка загрузки корзины</li>';
+            cartItemsContainer.innerHTML = '<li class="empty-cart">Ошибка загрузки корзины</li>';
         });
 };
 
