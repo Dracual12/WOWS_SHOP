@@ -899,18 +899,10 @@ button:hover {
 
 /* Стили для корзины на product.html */
 .floating-cart-product {
-    position: fixed; /* Фиксированное позиционирование */
-    top: 3vh; /* Отступ сверху */
-    right: 2vw; /* Отступ справа */
-    z-index: 1000; /* Чтобы корзина была поверх других элементов */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #42a5f5;
-    border-radius: 50%;
-    width: 5vw;
-    height: 5vw;
-    cursor: pointer;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
 }
 
 .floating-cart-product img {
