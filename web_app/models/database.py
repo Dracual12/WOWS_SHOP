@@ -411,4 +411,73 @@ class Database:
                 return True
         except Exception as e:
             print(f"Ошибка при очистке корзины: {e}")
+            return False
+
+    def get_cart_items(self, tg_id):
+        """Получает все товары из корзины пользователя"""
+        try:
+            cursor = self.get_connection().cursor()
+            cursor.execute('''
+                SELECT 
+                    c.product_id,
+                    p.name,
+                    p.price,
+                    c.quantity,
+                    p.image as image_path
+                FROM cart c
+                JOIN products p ON c.product_id = p.id
+                WHERE c.tg_id = ?
+            ''', (tg_id,))
+            items = cursor.fetchall()
+            return [dict(item) for item in items]
+        except Exception as e:
+            print(f"Ошибка при получении товаров из корзины: {e}")
+            return []
+
+    def init_db(self):
+        """Инициализирует базу данных"""
+        try:
+            cursor = self.get_connection().cursor()
+            
+            # Создаем таблицу products
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS products (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    description TEXT,
+                    price REAL NOT NULL,
+                    section TEXT NOT NULL,
+                    image TEXT,
+                    review_links TEXT,
+                    order_index INTEGER DEFAULT 0,
+                    is_active BOOLEAN DEFAULT 1
+                )
+            ''')
+            
+            # Создаем таблицу sections
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS sections (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    order_index INTEGER DEFAULT 0,
+                    is_active BOOLEAN DEFAULT 1
+                )
+            ''')
+            
+            # Создаем таблицу cart
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS cart (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    tg_id INTEGER NOT NULL,
+                    product_id INTEGER NOT NULL,
+                    quantity INTEGER DEFAULT 1,
+                    FOREIGN KEY (product_id) REFERENCES products (id)
+                )
+            ''')
+            
+            self.connection.commit()
+            print("База данных успешно инициализирована")
+            return True
+        except Exception as e:
+            print(f"Ошибка при инициализации базы данных: {e}")
             return False 
