@@ -31,6 +31,24 @@
         .product-card:hover {
             transform: translateY(-5px);
         }
+        
+        .empty-cart {
+            text-align: center;
+            padding: 20px;
+            color: var(--tg-theme-hint-color);
+            font-style: italic;
+        }
+        
+        .cart-header {
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--tg-theme-hint-color);
+            font-weight: 500;
+        }
+        
+        .cart-total {
+            padding: 15px;
+            border-top: 1px solid var(--tg-theme-hint-color);
+        }
     </style>
 </head>
 <body>
@@ -41,9 +59,13 @@
                 <img src="/static/images/cart-icon.png" class="cart-icon">
                 <!-- Контейнер для выпадающей корзины -->
                 <div class="cart-dropdown">
-                    <ul id="cart-items">
-                        <!-- Товары в корзине будут добавляться динамически -->
+                    <div class="cart-header">Корзина</div>
+                    <ul class="cart-items" id="cartItems">
+                        <!-- Товары будут добавляться сюда динамически -->
                     </ul>
+                    <div class="cart-total" id="cartTotal">
+                        <!-- Общая сумма будет обновляться динамически -->
+                    </div>
                 </div>
             </div>
         </div>
