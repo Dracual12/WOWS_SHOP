@@ -174,9 +174,7 @@
                 });
 
                 console.log('Ответ сервера:', response.status);
-                const data = await response.json();
-                console.log('Данные ответа:', data);
-
+                
                 if (response.ok) {
                     // Создаем элемент уведомления
                     const notification = document.createElement('div');
@@ -196,7 +194,7 @@
                     // Обновляем корзину
                     window.loadCartItems();
                 } else {
-                    console.error('Ошибка при добавлении товара в корзину:', data);
+                    console.error('Ошибка при добавлении товара в корзину:', response.status);
                 }
             } catch (error) {
                 console.error('Ошибка при выполнении запроса:', error);
