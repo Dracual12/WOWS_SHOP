@@ -115,7 +115,7 @@
                     .then(data => {
                         if (data.status === 'success') {
                             // Обновляем корзину
-                            window.loadCartItems();
+                            loadCartItems();
                             // Показываем уведомление
                             alert('Товар добавлен в корзину!');
                         } else {
@@ -156,7 +156,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        window.loadCartItems();
+                        loadCartItems();
                     }
                 })
                 .catch(error => console.error('Ошибка:', error));
@@ -170,7 +170,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        window.loadCartItems();
+                        loadCartItems();
                     }
                 })
                 .catch(error => console.error('Ошибка:', error));
@@ -185,7 +185,7 @@
             };
 
             // Переопределяем функцию loadCartItems для страницы продукта
-            window.loadCartItems = function() {
+            function loadCartItems() {
                 fetch('/api/cart')
                     .then(response => response.json())
                     .then(data => {
@@ -229,10 +229,13 @@
                         console.error('Ошибка при загрузке корзины:', error);
                         cartItems.innerHTML = '<li class="empty-cart">Ошибка загрузки корзины</li>';
                     });
-            };
+            }
+
+            // Делаем функцию доступной глобально
+            window.loadCartItems = loadCartItems;
 
             // Загрузка корзины при загрузке страницы
-            window.loadCartItems();
+            loadCartItems();
         });
     </script>
 </body>
