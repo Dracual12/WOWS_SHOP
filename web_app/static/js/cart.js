@@ -95,9 +95,22 @@ function updateItemUI(li, quantity) {
     const minusButton = li.querySelector('.cart-item-quantity button:first-child');
     const plusButton = li.querySelector('.cart-item-quantity button:last-child');
     
-    // Обновляем атрибуты onclick с новым значением количества
-    minusButton.setAttribute('onclick', `updateCartQuantity(${productId}, ${quantity - 1}, this.parentElement.parentElement.parentElement)`);
-    plusButton.setAttribute('onclick', `updateCartQuantity(${productId}, ${quantity + 1}, this.parentElement.parentElement.parentElement)`);
+    // Удаляем старые обработчики
+    minusButton.replaceWith(minusButton.cloneNode(true));
+    plusButton.replaceWith(plusButton.cloneNode(true));
+    
+    // Получаем новые кнопки после замены
+    const newMinusButton = li.querySelector('.cart-item-quantity button:first-child');
+    const newPlusButton = li.querySelector('.cart-item-quantity button:last-child');
+    
+    // Добавляем новые обработчики
+    newMinusButton.addEventListener('click', () => {
+        updateCartQuantity(productId, quantity - 1, li);
+    });
+    
+    newPlusButton.addEventListener('click', () => {
+        updateCartQuantity(productId, quantity + 1, li);
+    });
     
     // Обновляем общую сумму
     updateTotalSum();
@@ -196,18 +209,35 @@ window.loadCartItems = function() {
                     <div class="cart-item-details">
                         <div class="cart-item-top">
                             <div class="cart-item-name">${item.name}</div>
-                            <button onclick="removeCartItem(${item.product_id}, this.parentElement.parentElement.parentElement)" class="remove-item">×</button>
+                            <button class="remove-item">×</button>
                         </div>
                         <div class="cart-item-bottom">
                             <div class="cart-item-price">${item.price} ₽</div>
                             <div class="cart-item-quantity">
-                                <button onclick="updateCartQuantity(${item.product_id}, ${item.quantity - 1}, this.parentElement.parentElement.parentElement)">-</button>
+                                <button>-</button>
                                 <span class="quantity-value">${item.quantity}</span>
-                                <button onclick="updateCartQuantity(${item.product_id}, ${item.quantity + 1}, this.parentElement.parentElement.parentElement)">+</button>
+                                <button>+</button>
                             </div>
                         </div>
                     </div>
                 `;
+                
+                // Добавляем обработчики событий
+                const removeButton = li.querySelector('.remove-item');
+                const minusButton = li.querySelector('.cart-item-quantity button:first-child');
+                const plusButton = li.querySelector('.cart-item-quantity button:last-child');
+                
+                removeButton.addEventListener('click', () => {
+                    removeCartItem(item.product_id, li);
+                });
+                
+                minusButton.addEventListener('click', () => {
+                    updateCartQuantity(item.product_id, item.quantity - 1, li);
+                });
+                
+                plusButton.addEventListener('click', () => {
+                    updateCartQuantity(item.product_id, item.quantity + 1, li);
+                });
                 
                 cartItemsContainer.appendChild(li);
                 totalSum += item.price * item.quantity;
