@@ -298,6 +298,23 @@
                 alert('Произошла ошибка при оформлении заказа');
             }
         }
+
+        // Обработчик клика вне полей ввода
+        document.addEventListener('click', function(event) {
+            // Проверяем, был ли клик вне поля ввода
+            if (!event.target.matches('.form-group input')) {
+                // Скрываем клавиатуру, убирая фокус с активного поля
+                document.activeElement.blur();
+            }
+        });
+
+        // Предотвращаем всплытие события клика при нажатии на поля ввода
+        const inputs = document.querySelectorAll('.form-group input');
+        inputs.forEach(input => {
+            input.addEventListener('click', function(event) {
+                event.stopPropagation();
+            });
+        });
     </script>
 </body>
 </html> 

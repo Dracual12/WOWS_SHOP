@@ -1166,6 +1166,7 @@ button:hover {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
+    -webkit-tap-highlight-color: transparent; /* Убираем подсветку при тапе */
 }
 
 .order-form h2 {
@@ -1173,10 +1174,13 @@ button:hover {
     margin-bottom: 30px;
     text-align: center;
     font-size: 24px;
+    user-select: none; /* Запрещаем выделение текста */
+    -webkit-user-select: none;
 }
 
 .form-group {
     margin-bottom: 25px;
+    position: relative; /* Для позиционирования полей ввода */
 }
 
 .form-group label {
@@ -1185,6 +1189,8 @@ button:hover {
     color: #ffffff !important;
     font-weight: 500;
     font-size: 16px;
+    user-select: none; /* Запрещаем выделение текста */
+    -webkit-user-select: none;
 }
 
 .form-group input {
@@ -1199,12 +1205,33 @@ button:hover {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
+    outline: none; /* Убираем стандартное выделение */
 }
 
+/* Добавляем стили для области вне формы */
+.order-form-container {
+    min-height: 100vh;
+    width: 100%;
+    position: relative;
+    background-color: #121212 !important;
+    cursor: default; /* Стандартный курсор для области вне формы */
+}
+
+/* Стили для активного поля ввода */
 .form-group input:focus {
-    outline: none;
     border-color: #42a5f5;
     box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.2);
+}
+
+/* Стили для области вне полей ввода */
+.form-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1; /* Размещаем под формой */
+    cursor: default;
 }
 
 .submit-btn {
