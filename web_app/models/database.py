@@ -373,7 +373,7 @@ class Database:
             if conn:
                 conn.close()
 
-    def create_order(self, tg_id: int, email: str, psn_id: str, items: list, total_price: float) -> int:
+    def create_order(self, user_id: int, email: str, psn_id: str, items: List[Dict], total_price: float) -> Optional[int]:
         """Создает новый заказ"""
         try:
             with self.get_connection() as conn:
@@ -381,9 +381,9 @@ class Database:
                 
                 # Создаем заказ
                 cursor.execute('''
-                    INSERT INTO orders (tg_id, email, psn_id, total_price, status)
+                    INSERT INTO orders (user_id, email, psn_id, total_price, status)
                     VALUES (?, ?, ?, ?, ?)
-                ''', (tg_id, email, psn_id, total_price, 'new'))
+                ''', (user_id, email, psn_id, total_price, 'new'))
                 
                 order_id = cursor.lastrowid
                 

