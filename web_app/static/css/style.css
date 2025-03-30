@@ -9,6 +9,7 @@ body {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+  min-height: 100vh;
 }
 
 /* === Заголовок страницы === */
@@ -1277,46 +1278,74 @@ button:hover {
     }
 }
 
-/* Принудительные стили для светлой темы */
-@media (prefers-color-scheme: light) {
-    html, body, main, header, .section, .product-carousel, .carousel-item {
-        background: #121212 !important;
-        color: #e0e0e0 !important;
-        color-scheme: dark !important;
-    }
-
-    .order-form, .form-group input, .form-table td {
-        background-color: #1e1e1e !important;
-        color: #ffffff !important;
-    }
-}
-
 /* === Принудительные темные стили === */
-html, body {
-    background: #121212 !important;
-    color: #e0e0e0 !important;
+:root {
     color-scheme: dark !important;
 }
 
-main, header, .section, .product-carousel, .carousel-item {
+html {
     background: #121212 !important;
     color: #e0e0e0 !important;
 }
 
-.order-form, .form-group input, .form-table td {
+/* Принудительный темный фон для всех основных контейнеров */
+main, 
+header, 
+.section, 
+.product-carousel, 
+.carousel-item,
+.search-bar-container,
+.cart-dropdown,
+.order-popup,
+.notification {
+    background-color: #121212 !important;
+    color: #e0e0e0 !important;
+}
+
+/* Принудительный темный фон для формы заказа */
+.order-form {
     background-color: #1e1e1e !important;
     color: #ffffff !important;
 }
 
-@media (prefers-color-scheme: light) {
-    html, body, main, header, .section, .product-carousel, .carousel-item {
+.form-group input,
+.form-table td,
+input[type="text"],
+input[type="number"],
+input[type="url"],
+input[type="file"],
+select {
+    background-color: #2c2c2c !important;
+    color: #ffffff !important;
+    border-color: #424242 !important;
+}
+
+/* Отключаем все медиа-запросы для смены темы */
+@media (prefers-color-scheme: light), 
+       (prefers-color-scheme: dark) {
+    html, 
+    body {
         background: #121212 !important;
         color: #e0e0e0 !important;
-        color-scheme: dark !important;
     }
 
-    .order-form, .form-group input, .form-table td {
+    main,
+    header,
+    .section,
+    .product-carousel,
+    .carousel-item {
+        background: #121212 !important;
+        color: #e0e0e0 !important;
+    }
+
+    .order-form {
         background-color: #1e1e1e !important;
+        color: #ffffff !important;
+    }
+
+    .form-group input,
+    .form-table td {
+        background-color: #2c2c2c !important;
         color: #ffffff !important;
     }
 }
