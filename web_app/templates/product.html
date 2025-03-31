@@ -29,10 +29,15 @@
         </a>
         <div class="floating-cart-product">
             <img src="/static/images/cart-icon.png" class="cart-icon-product">
-            <div class="cart-dropdown-product">
+            <div class="cart-dropdown">
                 <div class="cart-header">Корзина</div>
-                <ul class="cart-items" id="cartItems"></ul>
-                <div class="cart-total" id="cartTotal"></div>
+                <ul class="cart-items" id="cartItems">
+                    <!-- Товары будут добавляться сюда динамически -->
+                </ul>
+                <div class="cart-total" id="cartTotal">
+                    <!-- Общая сумма будет обновляться динамически -->
+                </div>
+                <button id="checkout-button" class="checkout-button" onclick="checkout()">Оформить заказ</button>
             </div>
         </div>
     </header>
@@ -91,7 +96,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Инициализация корзины
             const cartIcon = document.querySelector('.cart-icon-product');
-            const cartDropdown = document.querySelector('.cart-dropdown-product');
+            const cartDropdown = document.querySelector('.cart-dropdown');
             const cartItems = document.getElementById('cartItems');
             const cartTotal = document.getElementById('cartTotal');
 
@@ -147,12 +152,21 @@
             });
 
             // Функция оформления заказа
-            window.checkout = function(event) {
-                if (event) {
-                    event.stopPropagation();
+            function checkout() {
+                const tg = window.Telegram.WebApp;
+                if (!tg) {
+                    console.error('Telegram WebApp не инициализирован');
+                    return;
                 }
-                window.location.href = `/order_form?tg_id=${tgId}`;
-            };
+                
+                const userId = tg.initDataUnsafe.user.id;
+                if (!userId) {
+                    console.error('Не удалось получить ID пользователя');
+                    return;
+                }
+                
+                window.location.href = `/order?tg_id=${userId}`;
+            }
 
             // Загрузка корзины при загрузке страницы
             window.loadCartItems();
