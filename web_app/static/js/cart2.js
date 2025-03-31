@@ -121,6 +121,9 @@ async function updateCart() {
         }
 
         const response = await fetch(`/api/cart?tg_id=${userId}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
         
         const cartItems = document.getElementById('cart-items-product');
@@ -129,17 +132,30 @@ async function updateCart() {
         if (data && data.length > 0) {
             let total = 0;
             cartItems.innerHTML = data.map(item => {
-                total += item.price * item.quantity;
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
                 return `
                     <li class="cart-item">
-                        <span>${item.name}</span>
-                        <span>${item.price} ₽ × ${item.quantity}</span>
+                        <div class="cart-item-top">
+                            <span class="item-name">${item.name}</span>
+                            <button class="remove-btn" onclick="removeCartItem(${item.product_id}, this.parentElement.parentElement)">
+                                <img src="/static/images/delete_good.png" alt="Удалить">
+                            </button>
+                        </div>
+                        <div class="item-quantity">
+                            <button class="quantity-btn decrease" onclick="updateCartQuantity(${item.product_id}, ${item.quantity - 1}, this.parentElement.parentElement)">-</button>
+                            <span class="quantity-value">${item.quantity}</span>
+                            <button class="quantity-btn increase" onclick="updateCartQuantity(${item.product_id}, ${item.quantity + 1}, this.parentElement.parentElement)">+</button>
+                        </div>
+                        <div class="item-price">
+                            <span class="item-total">${itemTotal.toFixed(2)} ₽</span>
+                        </div>
                     </li>
                 `;
             }).join('');
             
             cartTotal.innerHTML = `
-                <div class="total">Итого: ${total} ₽</div>
+                <div class="total">Итого: ${total.toFixed(2)} ₽</div>
                 <button class="checkout-button">Оформить заказ</button>
             `;
             
