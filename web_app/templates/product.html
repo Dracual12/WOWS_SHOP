@@ -111,6 +111,7 @@
             <div class="cart-dropdown-product">
                 <div class="cart-header">Корзина</div>
                 <ul class="cart-items" id="cart-items-product"></ul>
+                <div class="cart-total" id="cart-total-product"></div>
             </div>
         </div>
     </header>
@@ -171,6 +172,7 @@
             const cartIcon = document.querySelector('.cart-icon-product');
             const cartDropdown = document.querySelector('.cart-dropdown-product');
             const cartItems = document.getElementById('cart-items-product');
+            const cartTotal = document.getElementById('cart-total-product');
 
             // Получаем tg_id из Telegram WebApp
             let tgId;
@@ -260,6 +262,7 @@
                 } catch (error) {
                     console.error('Ошибка при загрузке корзины:', error);
                     cartItems.innerHTML = '<li class="error">Ошибка загрузки</li>';
+                    cartTotal.innerHTML = '';
                 }
             };
 
