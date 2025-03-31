@@ -72,7 +72,7 @@ window.removeCartItem = function(productId, li) {
 };
 
 // Функция оформления заказа
-function checkout() {
+window.checkout = function() {
     console.log('Функция checkout вызвана');
     try {
         const tg = window.Telegram.WebApp;
@@ -96,7 +96,7 @@ function checkout() {
 
 // Функция загрузки товаров корзины
 window.loadCartItems = function() {
-    const cartItemsContainer = document.getElementById('cart-items-product');
+    const cartItemsContainer = document.getElementById('cartItems');
     const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
     
     fetch(`/api/cart?tg_id=${tgId}`, {
@@ -204,7 +204,7 @@ window.loadCartItems = function() {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM загружен');
     
-    const cartItemsContainer = document.getElementById('cart-items-product');
+    const cartItemsContainer = document.getElementById('cartItems');
     const cartDropdown = document.querySelector('.cart-dropdown-product');
     const cartIcon = document.querySelector('.cart-icon-product');
 

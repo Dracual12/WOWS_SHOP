@@ -73,6 +73,10 @@
                 </div>
             </div>
             {% endif %}
+
+            <button class="checkout-button" id="checkout-button">
+                <img src="/static/images/checkout.png" alt="Оформить заказ">
+            </button>
         {% else %}
             <div class="error-message">
                 <h2>Товар не найден</h2>
@@ -86,6 +90,24 @@
     <div id="notification-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;"></div>
 
     <!-- Подключаем скрипты -->
+    <script>
+        window.Telegram = {
+            WebApp: {
+                initDataUnsafe: {
+                    user: {
+                        id: {{ tg_id }},
+                        first_name: "{{ first_name }}",
+                        last_name: "{{ last_name }}",
+                        username: "{{ username }}",
+                        language_code: "{{ language_code }}",
+                        start_param: "{{ start_param }}",
+                        auth_date: {{ auth_date }},
+                        hash: "{{ hash }}"
+                    }
+                }
+            }
+        };
+    </script>
     <script src="/static/js/cart2.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
