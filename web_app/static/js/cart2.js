@@ -120,15 +120,15 @@ async function updateCart() {
             return;
         }
 
-        const response = await fetch(`/api/cart/items?tg_id=${userId}`);
+        const response = await fetch(`/api/cart?tg_id=${userId}`);
         const data = await response.json();
         
         const cartItems = document.getElementById('cart-items-product');
         const cartTotal = document.getElementById('cart-total-product');
         
-        if (data.items && data.items.length > 0) {
+        if (data && data.length > 0) {
             let total = 0;
-            cartItems.innerHTML = data.items.map(item => {
+            cartItems.innerHTML = data.map(item => {
                 total += item.price * item.quantity;
                 return `
                     <li class="cart-item">
