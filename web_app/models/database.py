@@ -167,58 +167,60 @@ class Database:
                 print(f"Ошибка добавления в корзину: {e}")
                 return False
 
-    def update_cart_item(self, tg_id: int, product_id: int, quantity: int) -> bool:
-        """Обновляет количество товара в корзине"""
-        try:
-            with self.get_connection() as conn:
-                cursor = conn.cursor()
+    def update_cart_quantity(self, tg_id: int, product_id: int, quantity: int) -> bool:
+        """Обновляет количество товара в корзине."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            try:
+                print(f"Попытка обновить количество: tg_id={tg_id}, product_id={product_id}, quantity={quantity}")
+                
+                # Проверяем все записи в корзине для этого пользователя
                 cursor.execute("""
-                    INSERT INTO cart (tg_id, product_id, quantity)
-                    VALUES (?, ?, ?)
-                    ON CONFLICT(tg_id, product_id) 
-                    DO UPDATE SET quantity = ?
-                """, (tg_id, product_id, quantity, quantity))
-                return True
-        except Exception as e:
-            print(f"Ошибка при обновлении товара в корзине: {e}")
-            return False
+                    SELECT * FROM cart 
+                    WHERE tg_id = ?
+                """, (tg_id,))
+                all_items = cursor.fetchall()
+                print(f"Все товары в корзине пользователя {tg_id}: {all_items}")
+                
+                # Проверяем, существует ли запись
+                cursor.execute("""
+                    SELECT quantity FROM cart 
+                    WHERE product_id = ? AND tg_id = ?
+                """, (product_id, tg_id))
+                existing = cursor.fetchone()
+                print(f"Существующая запись: {existing}")
+                
+                if existing:
+                    print("Запись найдена, обновляем количество")
+                    cursor.execute("""
+                        UPDATE cart 
+                        SET quantity = ? 
+                        WHERE product_id = ? AND tg_id = ?
+                    """, (quantity, product_id, tg_id))
+                    conn.commit()
+                    print("Количество успешно обновлено")
+                    return True
+                else:
+                    print("Запись не найдена")
+                    return False
+            except Exception as e:
+                print(f"Ошибка обновления корзины: {e}")
+                return False
 
-    def remove_from_cart(self, tg_id: int, product_id: int) -> bool:
-        """Удаляет товар из корзины"""
-        try:
-            with self.get_connection() as conn:
-                cursor = conn.cursor()
+    def delete_cart_item(self, tg_id: int, product_id: int) -> bool:
+        """Удаляет товар из корзины."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            try:
                 cursor.execute("""
                     DELETE FROM cart 
-                    WHERE tg_id = ? AND product_id = ?
-                """, (tg_id, product_id))
+                    WHERE product_id = ? AND tg_id = ?
+                """, (product_id, tg_id))
+                conn.commit()
                 return True
-        except Exception as e:
-            print(f"Ошибка при удалении товара из корзины: {e}")
-            return False
-
-    def get_cart_items(self, tg_id: int) -> List[Dict]:
-        """Получает все товары в корзине пользователя"""
-        try:
-            with self.get_connection() as conn:
-                cursor = conn.cursor()
-                cursor.execute("""
-                    SELECT p.id, p.name, p.price, c.quantity
-                    FROM cart c
-                    JOIN products p ON c.product_id = p.id
-                    WHERE c.tg_id = ?
-                """, (tg_id,))
-                items = cursor.fetchall()
-                
-                return [{
-                    'product_id': item[0],
-                    'name': item[1],
-                    'price': item[2],
-                    'quantity': item[3]
-                } for item in items]
-        except Exception as e:
-            print(f"Ошибка при получении товаров из корзины: {e}")
-            return []
+            except Exception as e:
+                print(f"Ошибка удаления из корзины: {e}")
+                return False
 
     def update_section_order(self, section_id: int, new_order: int) -> bool:
         """Обновляет порядок секции."""
@@ -410,6 +412,38 @@ class Database:
         except Exception as e:
             print(f"Ошибка при очистке корзины: {e}")
             return False
+
+    def get_cart_items(self, tg_id):
+        """Получает все товары из корзины пользователя"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    SELECT 
+                        c.product_id,
+                        p.name,
+                        p.price,
+                        c.quantity,
+                        p.image as image_path
+                    FROM cart c
+                    JOIN products p ON c.product_id = p.id
+                    WHERE c.tg_id = ?
+                ''', (tg_id,))
+                
+                # Получаем названия столбцов
+                columns = [description[0] for description in cursor.description]
+                
+                # Преобразуем результаты в список словарей
+                items = []
+                for row in cursor.fetchall():
+                    item_dict = dict(zip(columns, row))
+                    items.append(item_dict)
+                
+                print(f"Получены товары из корзины: {items}")  # Отладочный вывод
+                return items
+        except Exception as e:
+            print(f"Ошибка при получении товаров из корзины: {e}")
+            return []
 
     def init_db(self):
         """Инициализирует базу данных"""

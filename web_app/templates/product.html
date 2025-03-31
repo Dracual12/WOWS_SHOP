@@ -29,15 +29,10 @@
         </a>
         <div class="floating-cart-product">
             <img src="/static/images/cart-icon.png" class="cart-icon-product">
-            <div class="cart-dropdown">
+            <div class="cart-dropdown-product">
                 <div class="cart-header">Корзина</div>
-                <ul class="cart-items" id="cartItems">
-                    <!-- Товары будут добавляться сюда динамически -->
-                </ul>
-                <div class="cart-total" id="cartTotal">
-                    <!-- Общая сумма будет обновляться динамически -->
-                </div>
-                <button id="checkout-button" class="checkout-button" onclick="checkout()">Оформить заказ</button>
+                <ul class="cart-items" id="cartItems"></ul>
+                <div class="cart-total" id="cartTotal"></div>
             </div>
         </div>
     </header>
@@ -96,7 +91,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Инициализация корзины
             const cartIcon = document.querySelector('.cart-icon-product');
-            const cartDropdown = document.querySelector('.cart-dropdown');
+            const cartDropdown = document.querySelector('.cart-dropdown-product');
             const cartItems = document.getElementById('cartItems');
             const cartTotal = document.getElementById('cartTotal');
 
@@ -118,6 +113,16 @@
                 return;
             }
 
+            // Функция оформления заказа
+            window.checkout = function() {
+                console.log('Функция checkout вызвана');
+                try {
+                    window.location.href = `/order?tg_id=${tgId}`;
+                } catch (error) {
+                    console.error('Ошибка при оформлении заказа:', error);
+                }
+            }
+
             // Обработчик для кнопки добавления в корзину
             const addToCartButton = document.querySelector('.add_to_cart');
             if (addToCartButton) {
@@ -136,57 +141,69 @@
             // Открытие/закрытие корзины
             cartIcon.addEventListener('click', function(event) {
                 event.stopPropagation();
-                cartDropdown.classList.toggle('active');
-            });
-
-            // Предотвращаем закрытие корзины при клике внутри неё
-            cartDropdown.addEventListener('click', function(event) {
-                event.stopPropagation();
+                cartDropdown.classList.toggle('show');
+                if (cartDropdown.classList.contains('show')) {
+                    loadCartItems();
+                }
             });
 
             // Закрытие корзины при клике вне её
             document.addEventListener('click', function(event) {
-                if (!cartDropdown.contains(event.target) && !cartIcon.contains(event.target)) {
-                    cartDropdown.classList.remove('active');
+                if (!cartDropdown.contains(event.target) && event.target !== cartIcon) {
+                    cartDropdown.classList.remove('show');
                 }
             });
 
-            // Функция оформления заказа
-            function checkout() {
-                const tg = window.Telegram.WebApp;
-                if (!tg) {
-                    console.error('Telegram WebApp не инициализирован');
-                    return;
+            // Загрузка товаров в корзину
+            window.loadCartItems = async function() {
+                try {
+                    const response = await fetch(`/api/cart/items?tg_id=${tgId}`);
+                    const data = await response.json();
+                    
+                    if (data.items && data.items.length > 0) {
+                        let total = 0;
+                        cartItems.innerHTML = data.items.map(item => {
+                            total += item.price * item.quantity;
+                            return `
+                                <li class="cart-item">
+                                    <span>${item.name}</span>
+                                    <span>${item.price} ₽ × ${item.quantity}</span>
+                                </li>
+                            `;
+                        }).join('');
+                        
+                        cartTotal.innerHTML = `
+                            <div class="total">Итого: ${total} ₽</div>
+                            <button onclick="checkout()" class="checkout-button">Оформить заказ</button>
+                        `;
+                    } else {
+                        cartItems.innerHTML = '<li class="empty-cart">Корзина пуста</li>';
+                        cartTotal.innerHTML = '';
+                    }
+                } catch (error) {
+                    console.error('Ошибка при загрузке корзины:', error);
+                    cartItems.innerHTML = '<li class="error">Ошибка загрузки</li>';
                 }
-                
-                const userId = tg.initDataUnsafe.user.id;
-                if (!userId) {
-                    console.error('Не удалось получить ID пользователя');
-                    return;
-                }
-                
-                window.location.href = `/order?tg_id=${userId}`;
-            }
+            };
 
-            // Загрузка корзины при загрузке страницы
-            window.loadCartItems();
+            // Загружаем корзину при загрузке страницы
+            loadCartItems();
         });
 
         async function addToCart(productId, tgId) {
-            console.log('Вызов функции addToCart с параметрами:', { productId, tgId });
             try {
                 const response = await fetch('/api/cart', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         product_id: productId,
-                        quantity: 1,
-                        tg_id: tgId
+                        tg_id: tgId,
+                        quantity: 1
                     })
                 });
-
+                
                 console.log('Ответ сервера:', response.status);
                 
                 if (response.ok) {
