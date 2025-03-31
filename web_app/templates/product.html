@@ -236,24 +236,37 @@
             // Загрузка товаров в корзину
             window.loadCartItems = async function() {
                 try {
-                    const response = await fetch(`/api/cart/items?tg_id=${tgId}`);
+                    const response = await fetch(`/api/cart?tg_id=${tgId}`);
                     const data = await response.json();
                     
-                    if (data.items && data.items.length > 0) {
+                    if (data && data.length > 0) {
                         let total = 0;
-                        cartItems.innerHTML = data.items.map(item => {
-                            total += item.price * item.quantity;
+                        cartItems.innerHTML = data.map(item => {
+                            const itemTotal = item.price * item.quantity;
+                            total += itemTotal;
                             return `
                                 <li class="cart-item">
-                                    <span>${item.name}</span>
-                                    <span>${item.price} ₽ × ${item.quantity}</span>
+                                    <div class="cart-item-top">
+                                        <span class="item-name">${item.name}</span>
+                                        <button class="remove-btn" onclick="removeCartItem(${item.id}, this.parentElement.parentElement)">
+                                            <img src="/static/images/delete_good.png" alt="Удалить">
+                                        </button>
+                                    </div>
+                                    <div class="item-quantity">
+                                        <button class="quantity-btn decrease" onclick="updateCartQuantity(${item.id}, ${item.quantity - 1}, this.parentElement.parentElement)">-</button>
+                                        <span class="quantity-value">${item.quantity}</span>
+                                        <button class="quantity-btn increase" onclick="updateCartQuantity(${item.id}, ${item.quantity + 1}, this.parentElement.parentElement)">+</button>
+                                    </div>
+                                    <div class="item-price">
+                                        <span class="item-total">${itemTotal.toFixed(2)} ₽</span>
+                                    </div>
                                 </li>
                             `;
                         }).join('');
                         
                         cartTotal.innerHTML = `
-                            <div class="total">Итого: ${total} ₽</div>
-                            <button onclick="checkout()" class="checkout-button">Оформить заказ</button>
+                            <div class="total">Итого: ${total.toFixed(2)} ₽</div>
+                            <button class="checkout-button">Оформить заказ</button>
                         `;
                     } else {
                         cartItems.innerHTML = '<li class="empty-cart">Корзина пуста</li>';
