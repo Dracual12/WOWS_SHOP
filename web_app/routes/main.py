@@ -111,7 +111,26 @@ def product_page(product_id):
         
         if product:
             current_app.logger.info(f'Товар найден: {product}')
-            return render_template('product.html', product=product)
+            # Получаем данные пользователя из URL
+            tg_id = request.args.get('tg_id')
+            first_name = request.args.get('first_name', '')
+            last_name = request.args.get('last_name', '')
+            username = request.args.get('username', '')
+            language_code = request.args.get('language_code', '')
+            start_param = request.args.get('start_param', '')
+            auth_date = request.args.get('auth_date')
+            hash_value = request.args.get('hash', '')
+            
+            return render_template('product.html', 
+                                 product=product,
+                                 tg_id=tg_id,
+                                 first_name=first_name,
+                                 last_name=last_name,
+                                 username=username,
+                                 language_code=language_code,
+                                 start_param=start_param,
+                                 auth_date=auth_date,
+                                 hash=hash_value)
         else:
             current_app.logger.error(f'Товар с ID {product_id} не найден')
             return render_template('product.html', product=None)

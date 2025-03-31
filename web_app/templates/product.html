@@ -75,7 +75,7 @@
             {% endif %}
 
             <button class="checkout-button" id="checkout-button">
-                <img src="/static/images/checkout.png" alt="Оформить заказ">
+                <img src="/static/images/cart-icon.png" alt="Оформить заказ">
             </button>
         {% else %}
             <div class="error-message">
@@ -95,14 +95,14 @@
             WebApp: {
                 initDataUnsafe: {
                     user: {
-                        id: {{ tg_id }},
-                        first_name: "{{ first_name }}",
-                        last_name: "{{ last_name }}",
-                        username: "{{ username }}",
-                        language_code: "{{ language_code }}",
-                        start_param: "{{ start_param }}",
-                        auth_date: {{ auth_date }},
-                        hash: "{{ hash }}"
+                        id: {% if tg_id %}{{ tg_id }}{% else %}null{% endif %},
+                        first_name: "{% if first_name %}{{ first_name }}{% endif %}",
+                        last_name: "{% if last_name %}{{ last_name }}{% endif %}",
+                        username: "{% if username %}{{ username }}{% endif %}",
+                        language_code: "{% if language_code %}{{ language_code }}{% endif %}",
+                        start_param: "{% if start_param %}{{ start_param }}{% endif %}",
+                        auth_date: {% if auth_date %}{{ auth_date }}{% else %}null{% endif %},
+                        hash: "{% if hash %}{{ hash }}{% endif %}"
                     }
                 }
             }

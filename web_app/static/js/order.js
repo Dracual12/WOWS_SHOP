@@ -5,7 +5,7 @@ Telegram.WebApp.disableClosingConfirmation();
 
 document.addEventListener("DOMContentLoaded", () => {
     const checkoutButton = document.getElementById("checkout-button");
-    const cartItemsContainer = document.getElementById("cart-items");
+    const cartItemsContainer = document.getElementById("cartItems");
 
     if (checkoutButton) {
         checkoutButton.addEventListener("click", async () => {
@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
 
                     // Закрываем окно корзины
-                    const cartDropdown = document.querySelector('.cart-dropdown');
+                    const cartDropdown = document.querySelector('.cart-dropdown-product');
                     if (cartDropdown) {
                         cartDropdown.classList.remove('active');
                     }
@@ -43,7 +43,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    const cartItems = cartItemsContainer.querySelectorAll("li");
+    if (cartItemsContainer) {
+        const cartItems = cartItemsContainer.querySelectorAll("li");
+    }
 });
 
 async function getCart(tgId) {
