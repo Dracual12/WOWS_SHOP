@@ -20,85 +20,6 @@
             border-radius: 8px;
             margin-bottom: 20px;
         }
-
-        .cart-dropdown-product {
-            display: none;
-            position: absolute;
-            top: 100%;
-            right: 0;
-            width: 300px;
-            background: #1e1e1e;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            margin-top: 10px;
-        }
-
-        .cart-dropdown-product.show {
-            display: block;
-        }
-
-        .cart-header {
-            padding: 15px;
-            border-bottom: 1px solid #2a2b2c;
-            color: #ffffff;
-            font-weight: 500;
-        }
-
-        .cart-items {
-            max-height: 300px;
-            overflow-y: auto;
-            padding: 0;
-            margin: 0;
-            list-style: none;
-        }
-
-        .cart-item {
-            padding: 15px;
-            border-bottom: 1px solid #2a2b2c;
-            color: #ffffff;
-        }
-
-        .cart-total {
-            padding: 15px;
-            background: #1d1e1f;
-            border-top: 1px solid #2a2b2c;
-        }
-
-        .total {
-            color: #ffffff;
-            font-weight: 500;
-            margin-bottom: 10px;
-        }
-
-        .checkout-button {
-            width: 100%;
-            padding: 10px;
-            background: #42a5f5;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background-color 0.2s;
-        }
-
-        .checkout-button:hover {
-            background: #1976d2;
-        }
-
-        .empty-cart {
-            padding: 15px;
-            color: #ffffff;
-            text-align: center;
-            font-style: italic;
-        }
-
-        .error {
-            padding: 15px;
-            color: #ff5252;
-            text-align: center;
-        }
     </style>
 </head>
 <body>
@@ -110,8 +31,8 @@
             <img src="/static/images/cart-icon.png" class="cart-icon-product">
             <div class="cart-dropdown-product">
                 <div class="cart-header">Корзина</div>
-                <ul class="cart-items" id="cart-items-product"></ul>
-                <div class="cart-total" id="cart-total-product"></div>
+                <ul class="cart-items" id="cartItems"></ul>
+                <div class="cart-total" id="cartTotal"></div>
             </div>
         </div>
     </header>
@@ -171,8 +92,8 @@
             // Инициализация корзины
             const cartIcon = document.querySelector('.cart-icon-product');
             const cartDropdown = document.querySelector('.cart-dropdown-product');
-            const cartItems = document.getElementById('cart-items-product');
-            const cartTotal = document.getElementById('cart-total-product');
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
 
             // Получаем tg_id из Telegram WebApp
             let tgId;
@@ -190,16 +111,6 @@
             if (!tgId) {
                 console.error('tg_id не найден');
                 return;
-            }
-
-            // Функция оформления заказа
-            window.checkout = function() {
-                console.log('Функция checkout вызвана');
-                try {
-                    window.location.href = `/order?tg_id=${tgId}`;
-                } catch (error) {
-                    console.error('Ошибка при оформлении заказа:', error);
-                }
             }
 
             // Обработчик для кнопки добавления в корзину
@@ -220,83 +131,48 @@
             // Открытие/закрытие корзины
             cartIcon.addEventListener('click', function(event) {
                 event.stopPropagation();
-                cartDropdown.classList.toggle('show');
-                if (cartDropdown.classList.contains('show')) {
-                    loadCartItems();
-                }
+                cartDropdown.classList.toggle('active');
+            });
+
+            // Предотвращаем закрытие корзины при клике внутри неё
+            cartDropdown.addEventListener('click', function(event) {
+                event.stopPropagation();
             });
 
             // Закрытие корзины при клике вне её
             document.addEventListener('click', function(event) {
-                if (!cartDropdown.contains(event.target) && event.target !== cartIcon) {
-                    cartDropdown.classList.remove('show');
+                if (!cartDropdown.contains(event.target) && !cartIcon.contains(event.target)) {
+                    cartDropdown.classList.remove('active');
                 }
             });
 
-            // Загрузка товаров в корзину
-            window.loadCartItems = async function() {
-                try {
-                    const response = await fetch(`/api/cart?tg_id=${tgId}`);
-                    const data = await response.json();
-                    
-                    if (data && data.length > 0) {
-                        let total = 0;
-                        cartItems.innerHTML = data.map(item => {
-                            const itemTotal = item.price * item.quantity;
-                            total += itemTotal;
-                            return `
-                                <li class="cart-item">
-                                    <div class="cart-item-top">
-                                        <span class="item-name">${item.name}</span>
-                                        <button class="remove-btn" onclick="removeCartItem(${item.id}, this.parentElement.parentElement)">
-                                            <img src="/static/images/delete_good.png" alt="Удалить">
-                                        </button>
-                                    </div>
-                                    <div class="item-quantity">
-                                        <button class="quantity-btn decrease" onclick="updateCartQuantity(${item.id}, ${item.quantity - 1}, this.parentElement.parentElement)">-</button>
-                                        <span class="quantity-value">${item.quantity}</span>
-                                        <button class="quantity-btn increase" onclick="updateCartQuantity(${item.id}, ${item.quantity + 1}, this.parentElement.parentElement)">+</button>
-                                    </div>
-                                    <div class="item-price">
-                                        <span class="item-total">${itemTotal.toFixed(2)} ₽</span>
-                                    </div>
-                                </li>
-                            `;
-                        }).join('');
-                        
-                        cartTotal.innerHTML = `
-                            <div class="total">Итого: ${total.toFixed(2)} ₽</div>
-                            <button class="checkout-button">Оформить заказ</button>
-                        `;
-                    } else {
-                        cartItems.innerHTML = '<li class="empty-cart">Корзина пуста</li>';
-                        cartTotal.innerHTML = '';
-                    }
-                } catch (error) {
-                    console.error('Ошибка при загрузке корзины:', error);
-                    cartItems.innerHTML = '<li class="error">Ошибка загрузки</li>';
-                    cartTotal.innerHTML = '';
+            // Функция оформления заказа
+            window.checkout = function(event) {
+                if (event) {
+                    event.stopPropagation();
                 }
+                window.location.href = `/order?tg_id=${tgId}`;
             };
 
-            // Загружаем корзину при загрузке страницы
-            loadCartItems();
+            // Загрузка корзины при загрузке страницы
+            window.loadCartItems();
         });
 
         async function addToCart(productId, tgId) {
+            console.log('Вызов функции addToCart с параметрами:', { productId, tgId });
             try {
                 const response = await fetch('/api/cart', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
                         product_id: productId,
-                        tg_id: tgId,
-                        quantity: 1
+                        quantity: 1,
+                        tg_id: tgId
                     })
                 });
-                
+
                 console.log('Ответ сервера:', response.status);
                 
                 if (response.ok) {
