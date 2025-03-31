@@ -91,6 +91,7 @@
 
     <!-- Подключаем скрипты -->
     <script>
+        // Инициализация Telegram WebApp
         window.Telegram = {
             WebApp: {
                 initDataUnsafe: {
@@ -104,9 +105,22 @@
                         auth_date: {% if auth_date %}{{ auth_date }}{% else %}null{% endif %},
                         hash: "{% if hash %}{{ hash }}{% endif %}"
                     }
+                },
+                ready: function() {
+                    console.log('Telegram WebApp готов');
+                },
+                disableClosingConfirmation: function() {
+                    console.log('Отключено подтверждение закрытия');
                 }
             }
         };
+
+        // Проверяем, что Telegram WebApp инициализирован
+        if (window.Telegram && window.Telegram.WebApp) {
+            console.log('Telegram WebApp успешно инициализирован');
+        } else {
+            console.error('Ошибка инициализации Telegram WebApp');
+        }
     </script>
     <script src="/static/js/cart2.js"></script>
     <script>

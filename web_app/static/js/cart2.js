@@ -1,10 +1,15 @@
 console.log('Загрузка cart2.js');
 
-Telegram.WebApp.ready();
-console.log('Telegram WebApp готов');
-
-// Отключаем возможность закрытия жестом "pull-to-close"
-Telegram.WebApp.disableClosingConfirmation();
+// Проверяем, что Telegram WebApp инициализирован
+if (window.Telegram && window.Telegram.WebApp) {
+    console.log('Telegram WebApp инициализирован');
+    // Отключаем возможность закрытия жестом "pull-to-close"
+    if (typeof window.Telegram.WebApp.disableClosingConfirmation === 'function') {
+        window.Telegram.WebApp.disableClosingConfirmation();
+    }
+} else {
+    console.error('Telegram WebApp не инициализирован');
+}
 
 // Функция обновления количества товара
 window.updateCartQuantity = function(productId, newQuantity, li) {
