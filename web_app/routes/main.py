@@ -183,55 +183,42 @@ def order_form():
                          cart_items=cart_items,
                          total_price=total_price)
 
-@bp.route('/api/create_order', methods=['POST'])
+@bp.route('/api/order', methods=['POST'])
 def create_order():
     """Создает новый заказ"""
     try:
         data = request.get_json()
+        required_fields = ['user_id', 'login', 'password']
         
-        # Проверяем обязательные поля
-        required_fields = ['login', 'password', 'user_id']
+        # Проверяем наличие всех необходимых полей
         for field in required_fields:
             if field not in data:
-                return jsonify({
-                    "status": "error",
-                    "message": f"Не указано поле {field}"
-                }), 400
+                return jsonify({"status": "error", "message": f"Отсутствует обязательное поле: {field}"}), 400
         
         # Получаем товары из корзины
         cart_items = db.get_cart_items(data['user_id'])
         if not cart_items:
-            return jsonify({
-                "status": "error",
-                "message": "Корзина пуста"
-            }), 400
+            return jsonify({"status": "error", "message": "Корзина пуста"}), 400
+        
+        # Вычисляем общую сумму
+        total_price = sum(item['price'] * item['quantity'] for item in cart_items)
         
         # Создаем заказ
         order_id = db.create_order(
-            user_id=data['user_id'],
-            login=data['login'],
-            password=data['password'],
-            items=cart_items,
-            total_price=sum(item['price'] * item['quantity'] for item in cart_items)
+            data['user_id'],
+            data['login'],
+            data['password'],
+            cart_items,
+            total_price
         )
         
         if order_id:
             # Очищаем корзину
             db.clear_cart(data['user_id'])
-            
-            return jsonify({
-                "status": "success",
-                "order_id": order_id
-            })
+            return jsonify({"status": "success", "order_id": order_id})
         else:
-            return jsonify({
-                "status": "error",
-                "message": "Ошибка при создании заказа"
-            }), 500
+            return jsonify({"status": "error", "message": "Ошибка при создании заказа"}), 500
             
     except Exception as e:
         current_app.logger.error(f"Ошибка при создании заказа: {str(e)}")
-        return jsonify({
-            "status": "error",
-            "message": f"Произошла ошибка при создании заказа: {str(e)}"
-        }), 500 
+        return jsonify({"status": "error", "message": str(e)}), 500 

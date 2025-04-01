@@ -67,10 +67,10 @@ class Database:
                 CREATE TABLE IF NOT EXISTS orders (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     user_id INTEGER NOT NULL,
-                    login TEXT NOT NULL,
-                    password TEXT NOT NULL,
+                    login TEXT,
+                    password TEXT,
                     total_price REAL NOT NULL,
-                    status TEXT NOT NULL,
+                    status TEXT DEFAULT 'pending',
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
@@ -382,8 +382,8 @@ class Database:
                 # Создаем заказ
                 cursor.execute('''
                     INSERT INTO orders (user_id, login, password, total_price, status)
-                    VALUES (?, ?, ?, ?, ?)
-                ''', (user_id, login, password, total_price, 'new'))
+                    VALUES (?, ?, ?, ?, 'pending')
+                ''', (user_id, login, password, total_price))
                 
                 order_id = cursor.lastrowid
                 
@@ -399,6 +399,7 @@ class Database:
                 
         except Exception as e:
             print(f"Ошибка при создании заказа: {e}")
+            conn.rollback()
             return None
             
     def clear_cart(self, tg_id: int) -> bool:
