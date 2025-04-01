@@ -282,10 +282,12 @@ function showOrderDetailsPopup(order) {
             <img src="/static/images/crest.png" alt="Закрыть">
         </button>
         <h2>Детали заказа</h2>
-        <p><strong>Номер заказа:</strong> ${order.id}</p>
-        <p><strong>Telegram ID:</strong> ${order.user_id}</p>
-        <p><strong>Корзина:</strong> ${order.cart}</p>
-        <p><strong>OTP:</strong> ${order.otp_code}</p>
+        <div class="order-details">
+            <p><strong>Номер заказа:</strong> ${order.id || 'Не указан'}</p>
+            <p><strong>Telegram ID:</strong> ${order.user_id || 'Не указан'}</p>
+            <p><strong>Статус:</strong> ${order.status || 'В обработке'}</p>
+            <p><strong>Сумма:</strong> ${order.total_price || '0'} ₽</p>
+        </div>
         <button class="confirm-btn">Подтверждаю</button>
     </div>`;
 
@@ -293,8 +295,8 @@ function showOrderDetailsPopup(order) {
 
     popup.querySelector(".order-popup-close").addEventListener("click", () => {
         popup.remove();
-        removeOverlay(); // Удаляем оверлей
-        checkoutButton.disabled = false; // Разблокируем кнопку корзины
+        removeOverlay();
+        checkoutButton.disabled = false;
     });
 
     popup.querySelector(".confirm-btn").addEventListener("click", async () => {
@@ -303,15 +305,29 @@ function showOrderDetailsPopup(order) {
             if (user && user.id) {
                 const userId = user.id;
                 try {
-                    console.log('Запрос выполнен успешно');
-                    window.Telegram.WebApp.close();
-                    const response = await fetch('/api/order/end', {
+                    const response = await fetch('/api/order', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ telegram_id: userId })
+                        body: JSON.stringify({
+                            user_id: userId,
+                            login: document.getElementById("order-input").value.split(' ')[0] || '',
+                            password: document.getElementById("order-input").value.split(' ')[1] || ''
+                        })
                     });
+
+                    if (!response.ok) {
+                        throw new Error('Ошибка при создании заказа');
+                    }
+
+                    const result = await response.json();
+                    if (result.status === 'success') {
+                        window.Telegram.WebApp.close();
+                    } else {
+                        alert('Ошибка при создании заказа: ' + result.message);
+                    }
                 } catch (error) {
                     console.error('Ошибка при отправке запроса:', error);
+                    alert('Произошла ошибка при создании заказа');
                 }
             } else {
                 console.error('Пользователь не определен в initDataUnsafe');
