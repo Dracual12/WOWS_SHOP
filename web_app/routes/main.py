@@ -188,7 +188,10 @@ def create_order():
     """Создает новый заказ"""
     try:
         data = request.get_json()
+        current_app.logger.info(f'Получены данные для создания заказа: {data}')
+        
         if not data:
+            current_app.logger.error('Не получены данные в запросе')
             return jsonify({"status": "error", "message": "Не получены данные"}), 400
             
         required_fields = ['user_id', 'login', 'password']
@@ -196,15 +199,20 @@ def create_order():
         # Проверяем наличие всех необходимых полей
         for field in required_fields:
             if field not in data:
+                current_app.logger.error(f'Отсутствует обязательное поле: {field}')
                 return jsonify({"status": "error", "message": f"Отсутствует обязательное поле: {field}"}), 400
         
         # Получаем товары из корзины
         cart_items = db.get_cart_items(data['user_id'])
+        current_app.logger.info(f'Получены товары из корзины: {cart_items}')
+        
         if not cart_items:
+            current_app.logger.error('Корзина пуста')
             return jsonify({"status": "error", "message": "Корзина пуста"}), 400
         
         # Вычисляем общую сумму
         total_price = sum(item['price'] * item['quantity'] for item in cart_items)
+        current_app.logger.info(f'Общая сумма заказа: {total_price}')
         
         # Создаем заказ
         order_id = db.create_order(
@@ -216,10 +224,12 @@ def create_order():
         )
         
         if order_id:
+            current_app.logger.info(f'Заказ успешно создан с ID: {order_id}')
             # Очищаем корзину
             db.clear_cart(data['user_id'])
             return jsonify({"status": "success", "order_id": order_id})
         else:
+            current_app.logger.error('Ошибка при создании заказа в базе данных')
             return jsonify({"status": "error", "message": "Ошибка при создании заказа"}), 500
             
     except Exception as e:

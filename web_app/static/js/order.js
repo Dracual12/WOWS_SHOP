@@ -374,13 +374,31 @@ async function submitOrder(event) {
         return;
     }
 
-    const formData = {
-        user_id: userId,
-        login: login,
-        password: password
-    };
-
     try {
+        // Получаем текущую корзину
+        const cartResponse = await fetch(`/api/cart?tg_id=${encodeURIComponent(userId)}`);
+        if (!cartResponse.ok) {
+            throw new Error('Ошибка при получении корзины');
+        }
+        const cartItems = await cartResponse.json();
+        
+        if (!cartItems || cartItems.length === 0) {
+            alert('Корзина пуста');
+            return;
+        }
+
+        // Вычисляем общую сумму
+        const totalPrice = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+        const formData = {
+            user_id: userId,
+            login: login,
+            password: password,
+            total_price: totalPrice
+        };
+
+        console.log('Отправка данных заказа:', formData);
+
         // Создаем заказ
         const response = await fetch('/api/create_order', {
             method: 'POST',
@@ -391,7 +409,8 @@ async function submitOrder(event) {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorData = await response.json();
+            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
         }
 
         const result = await response.json();
@@ -404,6 +423,6 @@ async function submitOrder(event) {
         }
     } catch (error) {
         console.error('Ошибка при создании заказа:', error);
-        alert('Произошла ошибка при оформлении заказа');
+        alert('Произошла ошибка при оформлении заказа: ' + error.message);
     }
 }

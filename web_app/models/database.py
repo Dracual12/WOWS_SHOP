@@ -381,6 +381,7 @@ class Database:
         try:
             # Преобразуем список товаров в JSON строку
             items_json = json.dumps(items, ensure_ascii=False)
+            current_app.logger.info(f'Создание заказа для пользователя {user_id}')
             
             # Создаем заказ
             with self.get_connection() as conn:
@@ -391,7 +392,9 @@ class Database:
                 """, (user_id, login, password, items_json, total_price))
                 
                 conn.commit()
-                return cursor.lastrowid
+                order_id = cursor.lastrowid
+                current_app.logger.info(f'Заказ успешно создан с ID: {order_id}')
+                return order_id
                 
         except Exception as e:
             conn.rollback()
