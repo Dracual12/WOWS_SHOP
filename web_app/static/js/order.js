@@ -305,13 +305,34 @@ function showOrderDetailsPopup(order) {
             if (user && user.id) {
                 const userId = user.id;
                 try {
+                    // Получаем данные из полей ввода
+                    const login = document.getElementById("order-input").value.split(' ')[0] || '';
+                    const password = document.getElementById("order-input").value.split(' ')[1] || '';
+                    
+                    if (!login || !password) {
+                        alert('Пожалуйста, введите логин и пароль');
+                        return;
+                    }
+
+                    // Получаем текущую корзину
+                    const cartResponse = await fetch(`/api/cart?tg_id=${encodeURIComponent(userId)}`);
+                    if (!cartResponse.ok) {
+                        throw new Error('Ошибка при получении корзины');
+                    }
+                    const cartItems = await cartResponse.json();
+                    
+                    // Вычисляем общую сумму
+                    const totalPrice = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+                    // Отправляем запрос на создание заказа
                     const response = await fetch('/api/order', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             user_id: userId,
-                            login: document.getElementById("order-input").value.split(' ')[0] || '',
-                            password: document.getElementById("order-input").value.split(' ')[1] || ''
+                            login: login,
+                            password: password,
+                            total_price: totalPrice
                         })
                     });
 

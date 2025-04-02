@@ -1,6 +1,8 @@
 import sqlite3
 from typing import List, Dict, Any, Optional
 import os
+import json
+from flask import current_app
 
 class Database:
     def __init__(self, db_path: str):
@@ -69,6 +71,7 @@ class Database:
                     user_id INTEGER NOT NULL,
                     login TEXT,
                     password TEXT,
+                    cart TEXT,
                     total_price REAL NOT NULL,
                     status TEXT DEFAULT 'pending',
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -373,33 +376,26 @@ class Database:
             if conn:
                 conn.close()
 
-    def create_order(self, user_id: int, login: str, password: str, items: List[Dict], total_price: float) -> Optional[int]:
+    def create_order(self, user_id: int, login: str, password: str, items: list, total_price: float) -> int:
         """Создает новый заказ"""
         try:
+            # Преобразуем список товаров в JSON строку
+            items_json = json.dumps(items, ensure_ascii=False)
+            
+            # Создаем заказ
             with self.get_connection() as conn:
                 cursor = conn.cursor()
-                
-                # Создаем заказ
-                cursor.execute('''
-                    INSERT INTO orders (user_id, login, password, total_price, status)
-                    VALUES (?, ?, ?, ?, 'pending')
-                ''', (user_id, login, password, total_price))
-                
-                order_id = cursor.lastrowid
-                
-                # Добавляем товары заказа
-                for item in items:
-                    cursor.execute('''
-                        INSERT INTO order_items (order_id, product_id, quantity, price)
-                        VALUES (?, ?, ?, ?)
-                    ''', (order_id, item['product_id'], item['quantity'], item['price']))
+                cursor.execute("""
+                    INSERT INTO orders (user_id, login, password, cart, total_price, status, created_at)
+                    VALUES (?, ?, ?, ?, ?, 'pending', datetime('now'))
+                """, (user_id, login, password, items_json, total_price))
                 
                 conn.commit()
-                return order_id
+                return cursor.lastrowid
                 
         except Exception as e:
-            print(f"Ошибка при создании заказа: {e}")
             conn.rollback()
+            current_app.logger.error(f"Ошибка при создании заказа: {str(e)}")
             return None
             
     def clear_cart(self, tg_id: int) -> bool:

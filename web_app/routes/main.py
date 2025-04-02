@@ -205,11 +205,11 @@ def create_order():
         
         # Создаем заказ
         order_id = db.create_order(
-            data['user_id'],
-            data['login'],
-            data['password'],
-            cart_items,
-            total_price
+            user_id=data['user_id'],
+            login=data['login'],
+            password=data['password'],
+            items=cart_items,
+            total_price=total_price
         )
         
         if order_id:
