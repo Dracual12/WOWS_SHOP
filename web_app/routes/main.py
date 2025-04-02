@@ -105,10 +105,13 @@ def product_page(product_id):
     """Страница отдельного товара"""
     try:
         # Получаем все товары
-        products = db.get_all_products()
+        products = db.get_products()
+        current_app.logger.info(f"Получены товары: {products}")
+        current_app.logger.info(f"Ищем товар с ID: {product_id}")
         
         # Находим нужный товар
         product = next((p for p in products if p['id'] == product_id), None)
+        current_app.logger.info(f"Найденный товар: {product}")
         
         if product:
             # Получаем данные пользователя из URL
