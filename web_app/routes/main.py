@@ -102,40 +102,58 @@ def get_latest_order():
 
 @bp.route('/product/<int:product_id>')
 def product_page(product_id):
-    current_app.logger.info(f'Открыта страница товара: {product_id}')
+    """Страница отдельного товара"""
     try:
         # Получаем все товары
-        products = db.get_products()
+        products = db.get_all_products()
+        
         # Находим нужный товар
         product = next((p for p in products if p['id'] == product_id), None)
         
         if product:
-            current_app.logger.info(f'Товар найден: {product}')
             # Получаем данные пользователя из URL
             tg_id = request.args.get('tg_id')
-            first_name = request.args.get('first_name', '')
-            last_name = request.args.get('last_name', '')
-            username = request.args.get('username', '')
-            language_code = request.args.get('language_code', '')
-            start_param = request.args.get('start_param', '')
+            first_name = request.args.get('first_name')
+            last_name = request.args.get('last_name')
+            username = request.args.get('username')
+            language_code = request.args.get('language_code')
+            start_param = request.args.get('start_param')
             auth_date = request.args.get('auth_date')
-            hash_value = request.args.get('hash', '')
+            hash = request.args.get('hash')
             
+            # Преобразуем tg_id в число
+            if tg_id:
+                try:
+                    tg_id = int(tg_id)
+                except ValueError:
+                    current_app.logger.error(f"Неверный формат tg_id: {tg_id}")
+                    tg_id = None
+            
+            # Преобразуем auth_date в число
+            if auth_date:
+                try:
+                    auth_date = int(auth_date)
+                except ValueError:
+                    current_app.logger.error(f"Неверный формат auth_date: {auth_date}")
+                    auth_date = None
+            
+            current_app.logger.info(f"Открыта страница товара {product_id} для пользователя {tg_id}")
             return render_template('product.html', 
-                                 product=product,
-                                 tg_id=tg_id,
-                                 first_name=first_name,
-                                 last_name=last_name,
-                                 username=username,
-                                 language_code=language_code,
-                                 start_param=start_param,
-                                 auth_date=auth_date,
-                                 hash=hash_value)
+                                product=product,
+                                tg_id=tg_id,
+                                first_name=first_name,
+                                last_name=last_name,
+                                username=username,
+                                language_code=language_code,
+                                start_param=start_param,
+                                auth_date=auth_date,
+                                hash=hash)
         else:
-            current_app.logger.error(f'Товар с ID {product_id} не найден')
+            current_app.logger.warning(f"Товар с ID {product_id} не найден")
             return render_template('product.html', product=None)
+            
     except Exception as e:
-        current_app.logger.error(f'Ошибка при получении товара: {str(e)}')
+        current_app.logger.error(f"Ошибка при открытии страницы товара: {str(e)}")
         return render_template('product.html', product=None)
 
 @bp.route('/api/cart', methods=['POST'])

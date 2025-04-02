@@ -107,15 +107,17 @@
         // Инициализация Telegram WebApp
         const dataElement = document.getElementById('telegram-data');
         const userData = {
-            id: dataElement.dataset.tgId === 'null' ? null : parseInt(dataElement.dataset.tgId),
+            id: dataElement.dataset.tgId === 'null' ? null : Number(dataElement.dataset.tgId),
             first_name: dataElement.dataset.firstName || null,
             last_name: dataElement.dataset.lastName || null,
             username: dataElement.dataset.username || null,
             language_code: dataElement.dataset.languageCode || null,
             start_param: dataElement.dataset.startParam || null,
-            auth_date: dataElement.dataset.authDate === 'null' ? null : parseInt(dataElement.dataset.authDate),
+            auth_date: dataElement.dataset.authDate === 'null' ? null : Number(dataElement.dataset.authDate),
             hash: dataElement.dataset.hash || null
         };
+
+        console.log('Инициализация Telegram WebApp с данными:', userData);
 
         window.Telegram = {
             WebApp: {
