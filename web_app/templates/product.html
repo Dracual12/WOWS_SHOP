@@ -89,22 +89,38 @@
     <!-- Контейнер для уведомлений -->
     <div id="notification-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;"></div>
 
+    <!-- Добавляем скрытый div с данными -->
+    <div id="telegram-data" 
+         data-tg-id="{{ tg_id|default('null') }}"
+         data-first-name="{{ first_name|default('') }}"
+         data-last-name="{{ last_name|default('') }}"
+         data-username="{{ username|default('') }}"
+         data-language-code="{{ language_code|default('') }}"
+         data-start-param="{{ start_param|default('') }}"
+         data-auth-date="{{ auth_date|default('null') }}"
+         data-hash="{{ hash|default('') }}"
+         style="display: none;">
+    </div>
+
     <!-- Подключаем скрипты -->
     <script>
         // Инициализация Telegram WebApp
+        const dataElement = document.getElementById('telegram-data');
+        const userData = {
+            id: dataElement.dataset.tgId === 'null' ? null : parseInt(dataElement.dataset.tgId),
+            first_name: dataElement.dataset.firstName || null,
+            last_name: dataElement.dataset.lastName || null,
+            username: dataElement.dataset.username || null,
+            language_code: dataElement.dataset.languageCode || null,
+            start_param: dataElement.dataset.startParam || null,
+            auth_date: dataElement.dataset.authDate === 'null' ? null : parseInt(dataElement.dataset.authDate),
+            hash: dataElement.dataset.hash || null
+        };
+
         window.Telegram = {
             WebApp: {
                 initDataUnsafe: {
-                    user: {
-                        id: {% if tg_id %}{{ tg_id }}{% else %}null{% endif %},
-                        first_name: "{% if first_name %}{{ first_name }}{% endif %}",
-                        last_name: "{% if last_name %}{{ last_name }}{% endif %}",
-                        username: "{% if username %}{{ username }}{% endif %}",
-                        language_code: "{% if language_code %}{{ language_code }}{% endif %}",
-                        start_param: "{% if start_param %}{{ start_param }}{% endif %}",
-                        auth_date: {% if auth_date %}{{ auth_date }}{% else %}null{% endif %},
-                        hash: "{% if hash %}{{ hash }}{% endif %}"
-                    }
+                    user: userData
                 },
                 ready: function() {
                     console.log('Telegram WebApp готов');
@@ -114,13 +130,6 @@
                 }
             }
         };
-
-        // Проверяем, что Telegram WebApp инициализирован
-        if (window.Telegram && window.Telegram.WebApp) {
-            console.log('Telegram WebApp успешно инициализирован');
-        } else {
-            console.error('Ошибка инициализации Telegram WebApp');
-        }
     </script>
     <script src="/static/js/cart2.js"></script>
     <script>
