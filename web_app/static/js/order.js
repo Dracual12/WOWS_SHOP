@@ -356,3 +356,54 @@ function showOrderDetailsPopup(order) {
         }
     });
 }
+
+async function submitOrder(event) {
+    event.preventDefault();
+    
+    if (!window.Telegram || !window.Telegram.WebApp || !window.Telegram.WebApp.initDataUnsafe.user) {
+        alert('Ошибка: Telegram Web App не инициализирован');
+        return;
+    }
+
+    const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+    const login = document.getElementById('login').value;
+    const password = document.getElementById('password').value;
+
+    if (!login || !password) {
+        alert('Пожалуйста, введите логин и пароль');
+        return;
+    }
+
+    const formData = {
+        user_id: userId,
+        login: login,
+        password: password
+    };
+
+    try {
+        // Создаем заказ
+        const response = await fetch('/api/create_order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            saveFormData();
+            window.Telegram.WebApp.close();
+        } else {
+            alert(result.message || 'Произошла ошибка при оформлении заказа');
+        }
+    } catch (error) {
+        console.error('Ошибка при создании заказа:', error);
+        alert('Произошла ошибка при оформлении заказа');
+    }
+}

@@ -183,11 +183,14 @@ def order_form():
                          cart_items=cart_items,
                          total_price=total_price)
 
-@bp.route('/api/order', methods=['POST'])
+@bp.route('/api/create_order', methods=['POST'])
 def create_order():
     """Создает новый заказ"""
     try:
         data = request.get_json()
+        if not data:
+            return jsonify({"status": "error", "message": "Не получены данные"}), 400
+            
         required_fields = ['user_id', 'login', 'password']
         
         # Проверяем наличие всех необходимых полей
