@@ -9,21 +9,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (checkoutButton) {
         checkoutButton.addEventListener("click", async () => {
-            // Проверяем, есть ли товары в корзине
-            getCart(window.Telegram.WebApp.initDataUnsafe.user.id).then(({items, count}) => {
-                if (count > 0) {
-                    if (window.Telegram && window.Telegram.WebApp) {
-                        const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
-                        // Выводим Telegram ID в консоль сервера, отправив его через fetch
-                        fetch("/save-tg-id", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({ tg_id: userId }),
-                        });
-                    }
+            // Получаем tg_id из URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const tgId = urlParams.get('tg_id');
+            
+            if (!tgId) {
+                showNotification("Ошибка: не удалось определить пользователя");
+                return;
+            }
 
+            // Проверяем, есть ли товары в корзине
+            getCart(tgId).then(({items, count}) => {
+                if (count > 0) {
                     // Закрываем окно корзины
                     const cartDropdown = document.querySelector('.cart-dropdown-product');
                     if (cartDropdown) {
@@ -300,61 +297,60 @@ function showOrderDetailsPopup(order) {
     });
 
     popup.querySelector(".confirm-btn").addEventListener("click", async () => {
-        if (window.Telegram && window.Telegram.WebApp) {
-            const user = window.Telegram.WebApp.initDataUnsafe.user;
-            if (user && user.id) {
-                const userId = user.id;
-                try {
-                    // Получаем данные из полей ввода
-                    const login = document.getElementById("order-input").value.split(' ')[0] || '';
-                    const password = document.getElementById("order-input").value.split(' ')[1] || '';
-                    
-                    if (!login || !password) {
-                        alert('Пожалуйста, введите логин и пароль');
-                        return;
-                    }
+        // Получаем tg_id из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const tgId = urlParams.get('tg_id');
+        
+        if (!tgId) {
+            alert('Ошибка: не удалось определить пользователя');
+            return;
+        }
 
-                    // Получаем текущую корзину
-                    const cartResponse = await fetch(`/api/cart?tg_id=${encodeURIComponent(userId)}`);
-                    if (!cartResponse.ok) {
-                        throw new Error('Ошибка при получении корзины');
-                    }
-                    const cartItems = await cartResponse.json();
-                    
-                    // Вычисляем общую сумму
-                    const totalPrice = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-                    // Отправляем запрос на создание заказа
-                    const response = await fetch('/api/order', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            user_id: userId,
-                            login: login,
-                            password: password,
-                            total_price: totalPrice
-                        })
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('Ошибка при создании заказа');
-                    }
-
-                    const result = await response.json();
-                    if (result.status === 'success') {
-                        window.Telegram.WebApp.close();
-                    } else {
-                        alert('Ошибка при создании заказа: ' + result.message);
-                    }
-                } catch (error) {
-                    console.error('Ошибка при отправке запроса:', error);
-                    alert('Произошла ошибка при создании заказа');
-                }
-            } else {
-                console.error('Пользователь не определен в initDataUnsafe');
+        try {
+            // Получаем данные из полей ввода
+            const login = document.getElementById("order-input").value.split(' ')[0] || '';
+            const password = document.getElementById("order-input").value.split(' ')[1] || '';
+            
+            if (!login || !password) {
+                alert('Пожалуйста, введите логин и пароль');
+                return;
             }
-        } else {
-            console.error('Telegram Web App не инициализирован');
+
+            // Получаем текущую корзину
+            const cartResponse = await fetch(`/api/cart?tg_id=${encodeURIComponent(tgId)}`);
+            if (!cartResponse.ok) {
+                throw new Error('Ошибка при получении корзины');
+            }
+            const cartItems = await cartResponse.json();
+            
+            // Вычисляем общую сумму
+            const totalPrice = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            // Отправляем запрос на создание заказа
+            const response = await fetch('/api/order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: tgId,
+                    login: login,
+                    password: password,
+                    total_price: totalPrice
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Ошибка при создании заказа');
+            }
+
+            const result = await response.json();
+            if (result.status === 'success') {
+                window.Telegram.WebApp.close();
+            } else {
+                alert('Ошибка при создании заказа: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Ошибка при отправке запроса:', error);
+            alert('Произошла ошибка при создании заказа');
         }
     });
 }
