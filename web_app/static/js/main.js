@@ -5,6 +5,15 @@ Telegram.WebApp.disableClosingConfirmation();
 
 document.addEventListener("DOMContentLoaded", () => {
     const sectionsContainer = document.getElementById("sections-container");
+    
+    // Получаем tg_id из Telegram WebApp
+    let tgId;
+    try {
+        tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
+        console.log('Получен tg_id:', tgId);
+    } catch (error) {
+        console.error('Ошибка при получении tg_id:', error);
+    }
 
     // Загружаем секции и товары
     fetch('/api/sections')
@@ -39,7 +48,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 item.addEventListener('click', () => {
                     const productId = item.dataset.productId;
                     if (productId) {
-                        window.location.href = `/product/${productId}`;
+                        // Добавляем tg_id в URL при переходе
+                        const url = `/product/${productId}${tgId ? `?tg_id=${tgId}` : ''}`;
+                        window.location.href = url;
                     } else {
                         console.error('ID товара не найден');
                     }
