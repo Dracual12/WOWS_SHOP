@@ -27,12 +27,12 @@
         <a href="/" class="return-link">
             <img src="/static/images/return.png" alt="Вернуться в магазин" class="return-btn">
         </a>
-        <div class="floating-cart-product">
-            <img src="/static/images/cart-icon.png" class="cart-icon-product">
-            <div class="cart-dropdown-product">
+        <div class="floating-cart">
+            <img src="/static/images/cart-icon.png" class="cart-icon">
+            <div class="cart-dropdown">
                 <div class="cart-header">Корзина</div>
-                <ul class="cart-items" id="cartItems"></ul>
-                <div class="cart-total" id="cartTotal"></div>
+                <ul id="cart-items"></ul>
+                <div id="cart-total"></div>
             </div>
         </div>
     </header>
@@ -133,10 +133,10 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Инициализация корзины
-            const cartIcon = document.querySelector('.cart-icon-product');
-            const cartDropdown = document.querySelector('.cart-dropdown-product');
-            const cartItems = document.getElementById('cartItems');
-            const cartTotal = document.getElementById('cartTotal');
+            const cartIcon = document.querySelector('.cart-icon');
+            const cartDropdown = document.querySelector('.cart-dropdown');
+            const cartItems = document.getElementById('cart-items');
+            const cartTotal = document.getElementById('cart-total');
 
             // Получаем tg_id из Telegram WebApp
             let tgId;
