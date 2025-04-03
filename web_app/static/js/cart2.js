@@ -162,7 +162,9 @@ window.checkout = function() {
 
 // Функция загрузки товаров корзины
 window.loadCartItems = function() {
-    const cartItemsContainer = document.getElementById('cart-items');
+
+    const cartItemsContainer = document.getElementById('cartItems');
+
     if (!cartItemsContainer) {
         console.error('Элемент корзины не найден');
         return;
@@ -302,10 +304,10 @@ function showNotification(message, type = 'success') {
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM загружен');
-    
-    const cartItemsContainer = document.getElementById('cart-items');
-    const cartDropdown = document.querySelector('.cart-dropdown');
-    const cartIcon = document.querySelector('.cart-icon');
+
+    const cartItemsContainer = document.getElementById('cartItems');
+    const cartDropdown = document.querySelector('.cart-dropdown-product');
+    const cartIcon = document.querySelector('.cart-icon-product');
     const addToCartButton = document.querySelector('.add_to_cart');
 
     if (!cartItemsContainer || !cartDropdown || !cartIcon) {
