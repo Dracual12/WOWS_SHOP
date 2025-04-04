@@ -42,7 +42,6 @@ class Database:
             # Проверяем существующие столбцы в таблице products
             cursor.execute("PRAGMA table_info(products)")
             columns = [column[1] for column in cursor.fetchall()]
-            print("Существующие столбцы в таблице products:", columns)
             
             # Добавляем отсутствующие столбцы
             if 'order_index' not in columns:
