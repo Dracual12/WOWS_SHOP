@@ -263,9 +263,9 @@
         }
         
         .floating-cart-product {
-            position: fixed;
-            top: 20px;
-            right: 20px;
+            position: absolute;
+            top: 0;
+            right: 0;
             z-index: 1000;
         }
         
@@ -331,6 +331,9 @@
         
         /* Стили для кнопки "Назад" */
         .return-link {
+            position: absolute;
+            top: 0;
+            left: 0;
             background: none;
             border: none;
             padding: 0;
@@ -420,7 +423,7 @@
     </div>
 
     <header>
-        <div class="header-container" style="position: fixed; top: 20px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 20px; z-index: 1000; height: 40px; align-items: center;">
+        <div class="header-container" style="position: fixed; top: 20px; left: 0; right: 0; height: 40px; padding: 0 20px; z-index: 1000;">
             <a href="/" class="return-link">
                 <img src="{{ url_for('static', filename='images/return.png') }}" alt="Вернуться в магазин" class="return-btn">
             </a>
