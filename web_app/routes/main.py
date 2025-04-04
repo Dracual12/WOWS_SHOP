@@ -27,7 +27,7 @@ def get_link(user, login, password):
     print(user)
     conn = get_db_connection()
     last_order = conn.execute('SELECT id FROM orders WHERE user_id = ? ORDER BY id DESC LIMIT 1', (user,)).fetchone()
-    order_id = int(dict(last_order)['id']) + 100060
+    order_id = int(dict(last_order)['id']) + 100070
     last_cart = db.get_cart_items(user)
     print(last_cart)
 
