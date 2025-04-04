@@ -33,12 +33,10 @@ def get_link(user, login, password):
     print(user)
     conn = get_db_connection()
     last_order = conn.execute('SELECT id FROM orders WHERE user_id = ? ORDER BY id DESC LIMIT 1', (user,)).fetchone()
-    order_id = int(dict(last_order)['id']) + 100070
+    order_id = int(dict(last_order)['id']) + 100075
     last_cart = db.get_cart_items(user)
-    print(last_cart)
 
     total = sum(item['price'] * item['quantity'] for item in last_cart)
-    print(total)
     conn.close()
 
     url = f"https://payment.alfabank.ru/payment/rest/register.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderNumber={order_id}&amount={int(total) * 100}&returnUrl=https://t.me/armada_gold_bot"
