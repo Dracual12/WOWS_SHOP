@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/product-cart.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <title>{% if product %}{{ product.name }}{% else %}Товар не найден{% endif %}</title>
     <style>
@@ -27,12 +28,12 @@
         <a href="/" class="return-link">
             <img src="/static/images/return.png" alt="Вернуться в магазин" class="return-btn">
         </a>
-        <div class="floating-cart">
-            <img src="/static/images/cart-icon.png" class="cart-icon">
-            <div class="cart-dropdown">
+        <div class="floating-cart-product">
+            <img src="/static/images/cart-icon.png" class="cart-icon-product">
+            <div class="cart-dropdown-product">
                 <div class="cart-header">Корзина</div>
-                <ul id="cart-items"></ul>
-                <div id="cart-total"></div>
+                <ul class="cart-items" id="cartItems"></ul>
+                <div class="cart-total" id="cartTotal"></div>
             </div>
         </div>
     </header>
@@ -99,14 +100,44 @@
     </div>
 
     <!-- Подключаем скрипты -->
+    <script>
+        // Инициализация Telegram WebApp
+        const dataElement = document.getElementById('telegram-data');
+        const userData = {
+            id: dataElement.dataset.tgId === 'null' ? null : Number(dataElement.dataset.tgId),
+            first_name: dataElement.dataset.firstName || null,
+            last_name: dataElement.dataset.lastName || null,
+            username: dataElement.dataset.username || null,
+            language_code: dataElement.dataset.languageCode || null,
+            start_param: dataElement.dataset.startParam || null,
+            auth_date: dataElement.dataset.authDate === 'null' ? null : Number(dataElement.dataset.authDate),
+            hash: dataElement.dataset.hash || null
+        };
+
+        console.log('Инициализация Telegram WebApp с данными:', userData);
+
+        window.Telegram = {
+            WebApp: {
+                initDataUnsafe: {
+                    user: userData
+                },
+                ready: function() {
+                    console.log('Telegram WebApp готов');
+                },
+                disableClosingConfirmation: function() {
+                    console.log('Отключено подтверждение закрытия');
+                }
+            }
+        };
+    </script>
     <script src="/static/js/cart2.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Инициализация корзины
-            const cartIcon = document.querySelector('.cart-icon');
-            const cartDropdown = document.querySelector('.cart-dropdown');
-            const cartItems = document.getElementById('cart-items');
-            const cartTotal = document.getElementById('cart-total');
+            const cartIcon = document.querySelector('.cart-icon-product');
+            const cartDropdown = document.querySelector('.cart-dropdown-product');
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
 
             // Получаем tg_id из Telegram WebApp
             let tgId;

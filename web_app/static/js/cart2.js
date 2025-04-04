@@ -69,6 +69,7 @@ window.updateCartQuantity = function(productId, newQuantity, li) {
                 li.querySelector('.quantity-value').textContent = newQuantity;
                 li.querySelector('.item-total').textContent = (unitPrice * newQuantity).toFixed(2) + ' рублей';
                 window.loadCartItems();
+                showNotification('Количество обновлено', 'success');
             }
         })
         .catch(error => {
@@ -162,9 +163,7 @@ window.checkout = function() {
 
 // Функция загрузки товаров корзины
 window.loadCartItems = function() {
-
     const cartItemsContainer = document.getElementById('cartItems');
-
     if (!cartItemsContainer) {
         console.error('Элемент корзины не найден');
         return;
@@ -191,12 +190,13 @@ window.loadCartItems = function() {
             let totalSum = 0;
             
             if (cartItems.length === 0) {
-                cartItemsContainer.innerHTML = '<li>Корзина пуста</li>';
+                cartItemsContainer.innerHTML = '<li class="cart-item">Корзина пуста</li>';
                 return;
             }
 
             cartItems.forEach(item => {
                 const li = document.createElement('li');
+                li.className = 'cart-item';
                 li.setAttribute('data-product-id', item.product_id);
                 
                 const unitPrice = parseFloat(item.price);
@@ -221,7 +221,7 @@ window.loadCartItems = function() {
                         <span class="quantity-value">${item.quantity}</span>
                         <button class="quantity-btn increase">+</button>
                     </div>
-                    <div class='item-price'>
+                    <div class="item-price">
                         <span class="item-total">${itemTotal.toFixed(2)} рублей</span>
                     </div>
                 `;
@@ -282,7 +282,7 @@ window.loadCartItems = function() {
         })
         .catch(error => {
             console.error('Ошибка загрузки корзины:', error);
-            cartItemsContainer.innerHTML = '<li>Ошибка загрузки корзины</li>';
+            cartItemsContainer.innerHTML = '<li class="cart-item">Ошибка загрузки корзины</li>';
             showNotification('Ошибка загрузки корзины', 'error');
         });
 };
@@ -304,7 +304,7 @@ function showNotification(message, type = 'success') {
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM загружен');
-
+    
     const cartItemsContainer = document.getElementById('cartItems');
     const cartDropdown = document.querySelector('.cart-dropdown-product');
     const cartIcon = document.querySelector('.cart-icon-product');
