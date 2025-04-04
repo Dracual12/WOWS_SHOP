@@ -424,20 +424,22 @@
     </div>
 
     <header>
-        <a href="/" class="return-link">
-            <img src="{{ url_for('static', filename='images/return.png') }}" alt="Вернуться в магазин" class="return-btn">
-        </a>
-        <div class="floating-cart-product">
-            <button class="cart-icon-product" id="cartIcon">
-                <img src="{{ url_for('static', filename='images/cart-icon.png') }}" alt="Корзина">
-            </button>
-            <div class="cart-dropdown-product" id="cartDropdown">
-                <div class="cart-header">Корзина</div>
-                <ul class="cart-items-product" id="cartItems">
-                    <!-- Здесь будут отображаться товары -->
-                </ul>
-                <div class="cart-total" id="cartTotal">
-                    <!-- Общая сумма будет обновляться динамически -->
+        <div class="header-container" style="position: fixed; top: 20px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 20px; z-index: 1000;">
+            <a href="/" class="return-link" style="position: static;">
+                <img src="{{ url_for('static', filename='images/return.png') }}" alt="Вернуться в магазин" class="return-btn">
+            </a>
+            <div class="floating-cart-product" style="position: static;">
+                <button class="cart-icon-product" id="cartIcon">
+                    <img src="{{ url_for('static', filename='images/cart-icon.png') }}" alt="Корзина">
+                </button>
+                <div class="cart-dropdown-product" id="cartDropdown">
+                    <div class="cart-header">Корзина</div>
+                    <ul class="cart-items-product" id="cartItems">
+                        <!-- Здесь будут отображаться товары -->
+                    </ul>
+                    <div class="cart-total" id="cartTotal">
+                        <!-- Общая сумма будет обновляться динамически -->
+                    </div>
                 </div>
             </div>
         </div>
