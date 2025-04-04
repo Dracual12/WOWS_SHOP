@@ -91,7 +91,7 @@ def check(orderId, user, login, password):
     if glag:
         send_telegram(Config.BOT_TOKEN, user, 'Заказ успешно оплачен!')
         cart = db.get_cart_items(user)
-        conn.execute("DELETE FROM cart WHERE user_id = ?", (user,))
+        conn.execute("DELETE FROM cart WHERE tg_id = ?", (user,))
         print(5)
         conn.commit()
         print(cart)
