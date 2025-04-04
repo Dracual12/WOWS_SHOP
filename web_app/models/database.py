@@ -338,6 +338,13 @@ class Database:
                 
                 section_name = result[0]
                 
+                # Если новое изображение не было загружено, получаем текущее
+                if image_path is None:
+                    cursor.execute('SELECT image FROM products WHERE id = ?', (product_id,))
+                    current_image = cursor.fetchone()
+                    if current_image:
+                        image_path = current_image[0]
+                
                 print(f"Обновление товара: id={product_id}, name={name}, section={section_name}, image_path={image_path}")  # Отладочный вывод
                 cursor.execute('''
                     UPDATE products 
