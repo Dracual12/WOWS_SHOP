@@ -331,10 +331,6 @@
         
         /* Стили для кнопки "Назад" */
         .return-link {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1000;
             background: none;
             border: none;
             padding: 0;
@@ -424,11 +420,11 @@
     </div>
 
     <header>
-        <div class="header-container" style="position: fixed; top: 20px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 20px; z-index: 1000;">
-            <a href="/" class="return-link" style="position: static;">
+        <div class="header-container" style="position: fixed; top: 20px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 20px; z-index: 1000; height: 40px; align-items: center;">
+            <a href="/" class="return-link">
                 <img src="{{ url_for('static', filename='images/return.png') }}" alt="Вернуться в магазин" class="return-btn">
             </a>
-            <div class="floating-cart-product" style="position: static;">
+            <div class="floating-cart-product">
                 <button class="cart-icon-product" id="cartIcon">
                     <img src="{{ url_for('static', filename='images/cart-icon.png') }}" alt="Корзина">
                 </button>
