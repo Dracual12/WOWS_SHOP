@@ -191,7 +191,7 @@ def end_order():
     if user and login and password:
         current_app.logger.info(f'Оформлен заказ от пользователя: {user}')
         # Запускаем функцию get_link в отдельном потоке
-        get_link(user)
+        get_link(user, login, password)
     else:
         current_app.logger.warning('Попытка оформить заказ с неполными данными')
         return jsonify({"status": "error"})
