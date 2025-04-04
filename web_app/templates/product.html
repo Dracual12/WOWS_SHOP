@@ -6,17 +6,13 @@
     <title>Товар</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/product-cart.css') }}">
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="{{ url_for('static', filename='js/cart2.js') }}" defer></script>
     <style>
         .product-details {
-            max-width: 800px;
-            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
             padding: 20px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
         }
         
         .product-image {
@@ -26,20 +22,21 @@
         
         .product-image img {
             width: 100%;
-            height: auto;
+            max-height: 400px;
+            object-fit: contain;
             border-radius: 10px;
         }
         
         .no-image {
             width: 100%;
             height: 300px;
-            background-color: #f8f9fa;
+            background-color: #f5f5f5;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #6c757d;
-            font-size: 1.2rem;
             border-radius: 10px;
+            color: #888;
+            font-size: 18px;
         }
         
         .product-info {
@@ -48,37 +45,245 @@
         
         .product-info h1 {
             margin-bottom: 10px;
-            color: #333;
+            font-size: 24px;
         }
         
         .price {
-            font-size: 1.5rem;
+            font-size: 20px;
             color: #8774e1;
             font-weight: bold;
             margin-bottom: 20px;
         }
         
         .add_to_cart {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            background: #8774e1;
-            color: #fff;
+            background-color: #8774e1;
+            color: white;
             border: none;
-            border-radius: 6px;
-            font-size: 1rem;
+            padding: 10px 20px;
+            border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            font-size: 16px;
+            transition: background-color 0.3s;
         }
         
         .add_to_cart:hover {
-            background: #7665d0;
+            background-color: #7665d0;
         }
         
         .error-message {
             text-align: center;
+            padding: 50px;
+            color: #ff4d4d;
+        }
+        
+        /* Стили для корзины */
+        .cart-header {
+            padding: 10px 15px;
+            border-bottom: 1px solid #2a2b2c;
+            font-weight: 500;
+            color: #ffffff;
+            background: #1d1e1f;
+        }
+        
+        .cart-total {
+            padding: 12px;
+            background: #1d1e1f;
+            border-top: 1px solid #2a2b2c;
+        }
+        
+        .cart-item {
+            display: flex;
+            flex-direction: column;
+            width: 90%;
+            padding: 8px 12px;
+            border-bottom: 1px solid #2a2b2c;
+            background: #1d1e1f;
+            transition: all 0.2s ease;
+        }
+        
+        .cart-item-details {
+            width: 100%;
+            margin-bottom: 8px;
+        }
+        
+        .cart-item-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+        
+        .cart-item-name {
+            font-size: 12px;
+            color: #ffffff;
+            flex-grow: 1;
+            padding-right: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 180px;
+        }
+        
+        .cart-item-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-top: 4px;
+        }
+        
+        .cart-item-price {
+            font-size: 13px;
+            color: #8774e1;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .cart-item-quantity button {
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            background: #2a2b2c;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease;
+        }
+        
+        .cart-item-quantity button:hover {
+            background: #3a3b3c;
+        }
+        
+        .cart-item-quantity span {
+            color: #ffffff;
+            min-width: 16px;
+            text-align: center;
+            font-size: 12px;
+        }
+        
+        .remove-item {
+            background: none;
+            border: none;
+            color: #7d7d7d;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0;
+            transition: color 0.2s ease;
+            line-height: 1;
+        }
+        
+        .remove-item:hover {
+            color: #ff4d4d;
+        }
+        
+        .total-sum {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #ffffff;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .checkout-button {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            background: #8774e1;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .checkout-button:hover {
+            background: #7665d0;
+        }
+        
+        .cart-dropdown-product {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #1d1e1f;
+            border: 1px solid #2a2b2c;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            width: 260px;
+            max-height: 400px;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .cart-dropdown-product.active {
+            display: block;
+        }
+        
+        .cart-items-product {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
+            background: #1d1e1f;
+        }
+        
+        .floating-cart-product {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            z-index: 1000;
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cart-icon-product {
+            width: 24px;
+            height: 24px;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .cart-icon-product::before {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: #8774e1;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            opacity: 0.2;
+        }
+        
+        .empty-cart {
+            text-align: center;
             padding: 20px;
-            color: #dc3545;
+            color: var(--tg-theme-hint-color);
+            font-style: italic;
         }
     </style>
 </head>
@@ -96,11 +301,13 @@
 
     <header>
         <div class="floating-cart-product">
-            <img src="{{ url_for('static', filename='images/cart.png') }}" class="cart-icon-product">
+            <button class="cart-icon-product">
+                <img src="{{ url_for('static', filename='images/cart.png') }}" alt="Корзина">
+            </button>
             <div class="cart-dropdown-product">
                 <div class="cart-header">Корзина</div>
-                <ul class="cart-items" id="cartItems">
-                    <!-- Товары будут добавляться сюда динамически -->
+                <ul class="cart-items-product" id="cartItems">
+                    <!-- Здесь будут отображаться товары -->
                 </ul>
                 <div class="cart-total" id="cartTotal">
                     <!-- Общая сумма будет обновляться динамически -->
@@ -131,5 +338,68 @@
         </div>
         {% endif %}
     </main>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Инициализация Telegram WebApp
+            Telegram.WebApp.ready();
+            Telegram.WebApp.disableClosingConfirmation();
+            
+            // Получаем данные пользователя из элемента
+            const dataElement = document.getElementById('telegram-data');
+            const userData = {
+                id: dataElement.dataset.tgId === 'null' ? null : Number(dataElement.dataset.tgId),
+                first_name: dataElement.dataset.firstName || null,
+                last_name: dataElement.dataset.lastName || null,
+                username: dataElement.dataset.username || null,
+                language_code: dataElement.dataset.languageCode || null,
+                start_param: dataElement.dataset.startParam || null,
+                auth_date: dataElement.dataset.authDate === 'null' ? null : Number(dataElement.dataset.authDate),
+                hash: dataElement.dataset.hash || null
+            };
+            
+            // Устанавливаем данные пользователя
+            window.Telegram.WebApp.initDataUnsafe.user = userData;
+            
+            // Обработчик для кнопки добавления в корзину
+            const addToCartButton = document.querySelector('.add_to_cart');
+            if (addToCartButton) {
+                addToCartButton.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const productId = this.dataset.id;
+                    console.log('Нажата кнопка добавления в корзину. ID товара:', productId);
+                    window.addToCart(productId);
+                });
+            }
+            
+            // Обработчик для корзины
+            const cartIcon = document.querySelector('.cart-icon-product');
+            const cartDropdown = document.querySelector('.cart-dropdown-product');
+            
+            if (cartIcon && cartDropdown) {
+                cartIcon.addEventListener('click', () => {
+                    cartDropdown.classList.toggle('active');
+                    if (cartDropdown.classList.contains('active')) {
+                        window.loadCartItems();
+                    }
+                });
+                
+                // Предотвращаем закрытие корзины при клике внутри неё
+                cartDropdown.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                });
+                
+                // Закрытие корзины при клике вне её
+                document.addEventListener('click', (event) => {
+                    if (!cartDropdown.contains(event.target) && !cartIcon.contains(event.target)) {
+                        cartDropdown.classList.remove('active');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
