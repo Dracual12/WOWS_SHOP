@@ -12,7 +12,7 @@ class Config:
     # Конфигурация базы данных
     DATABASE = {
         'path': DB_PATH
-    }                           
+    }
     
     # Конфигурация Telegram
     BOT_TOKEN = os.environ.get('BOT_TOKEN')
