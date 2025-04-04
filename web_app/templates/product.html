@@ -297,6 +297,9 @@
             padding: 0;
             margin: 0;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .return-btn {
@@ -318,6 +321,40 @@
             transform: translate(-50%, -50%);
             z-index: -1;
             opacity: 0.2;
+        }
+        
+        /* Стили для уведомлений */
+        .notification-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+        
+        .notification {
+            background-color: #1d1e1f;
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s, transform 0.3s;
+            max-width: 300px;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .notification.success {
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .notification.error {
+            border-left: 4px solid #f44336;
         }
     </style>
 </head>
@@ -376,6 +413,9 @@
         {% endif %}
     </main>
 
+    <!-- Контейнер для уведомлений -->
+    <div class="notification-container" id="notification-container"></div>
+
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
     <script>
@@ -399,6 +439,25 @@
             
             // Устанавливаем данные пользователя
             window.Telegram.WebApp.initDataUnsafe.user = userData;
+            
+            // Функция для показа уведомлений
+            function showNotification(message, type = 'success') {
+                const container = document.getElementById('notification-container');
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                
+                container.appendChild(notification);
+                
+                // Показываем уведомление
+                setTimeout(() => notification.classList.add('show'), 10);
+                
+                // Скрываем и удаляем уведомление через 3 секунды
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
             
             // Обработчик для кнопки добавления в корзину
             const addToCartButton = document.querySelector('.add_to_cart');
@@ -433,17 +492,17 @@
                     .then(data => {
                         if (data.status === 'success') {
                             // Показываем уведомление об успехе
-                            alert('Товар добавлен в корзину');
+                            showNotification('Товар добавлен в корзину', 'success');
                             // Обновляем корзину
                             window.loadCartItems();
                         } else {
                             console.error('Ошибка добавления товара:', data);
-                            alert('Ошибка добавления товара в корзину');
+                            showNotification('Ошибка добавления товара в корзину', 'error');
                         }
                     })
                     .catch(error => {
                         console.error('Ошибка:', error);
-                        alert('Ошибка добавления товара в корзину');
+                        showNotification('Ошибка добавления товара в корзину', 'error');
                     });
                 });
             }
