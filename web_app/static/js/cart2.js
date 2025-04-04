@@ -15,19 +15,27 @@ const userData = {
 
 console.log('Инициализация Telegram WebApp с данными:', userData);
 
-window.Telegram = {
-    WebApp: {
-        initDataUnsafe: {
-            user: userData
-        },
-        ready: function() {
-            console.log('Telegram WebApp готов');
-        },
-        disableClosingConfirmation: function() {
-            console.log('Отключено подтверждение закрытия');
+// Проверяем, что Telegram WebApp уже существует
+if (window.Telegram && window.Telegram.WebApp) {
+    console.log('Telegram WebApp уже инициализирован');
+    window.Telegram.WebApp.initDataUnsafe.user = userData;
+} else {
+    window.Telegram = {
+        WebApp: {
+            initDataUnsafe: {
+                user: userData
+            },
+            ready: function() {
+                console.log('Telegram WebApp готов');
+                // Загружаем корзину после готовности WebApp
+                window.loadCartItems();
+            },
+            disableClosingConfirmation: function() {
+                console.log('Отключено подтверждение закрытия');
+            }
         }
-    }
-};
+    };
+}
 
 // Функция обновления количества товара
 window.updateCartQuantity = function(productId, newQuantity, li) {
@@ -346,6 +354,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Загрузка корзины при загрузке страницы
-    window.loadCartItems();
+    // Загружаем корзину только если Telegram WebApp уже инициализирован
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe.user.id) {
+        window.loadCartItems();
+    }
 });
