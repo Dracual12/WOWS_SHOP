@@ -133,129 +133,84 @@ window.checkout = function() {
 }
 
 // Функция загрузки товаров корзины
-window.loadCartItems = function() {
+window.loadCartItems = async function() {
     const cartItemsContainer = document.getElementById('cartItems');
-    if (!cartItemsContainer) {
-        console.error('Элемент корзины не найден');
+    const cartTotalElement = document.getElementById('cartTotal');
+    
+    if (!cartItemsContainer || !cartTotalElement) {
+        console.error('Элементы корзины не найдены');
         return;
     }
 
-    const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
-    if (!tgId) {
-        console.error('Не удалось получить tg_id');
-        cartItemsContainer.innerHTML = '<li>Ошибка загрузки корзины</li>';
-        return;
-    }
-    
-    fetch(`/api/cart?tg_id=${tgId}`, {
-        method: "GET"
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Ошибка загрузки корзины');
-            }
-            return response.json();
-        })
-        .then(cartItems => {
+    try {
+        // Получаем tg_id из Telegram WebApp
+        let tgId;
+        try {
+            tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
+            console.log('Получен tg_id из WebApp:', tgId);
+        } catch (error) {
+            console.error('Ошибка при получении tg_id из WebApp:', error);
+            // Если не удалось получить tg_id из WebApp, пробуем получить из URL
+            const urlParams = new URLSearchParams(window.location.search);
+            tgId = urlParams.get('tg_id');
+            console.log('Получен tg_id из URL:', tgId);
+        }
+
+        if (!tgId) {
+            console.error('tg_id не найден');
+            return;
+        }
+
+        const response = await fetch(`/api/cart?tg_id=${tgId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const cartItems = data.cart_items;
+            const total = data.total;
+            
+            // Очищаем контейнер
             cartItemsContainer.innerHTML = '';
-            let totalSum = 0;
             
             if (cartItems.length === 0) {
                 cartItemsContainer.innerHTML = '<li class="cart-item">Корзина пуста</li>';
-                return;
-            }
-
-            cartItems.forEach(item => {
-                const li = document.createElement('li');
-                li.className = 'cart-item';
-                li.setAttribute('data-product-id', item.product_id);
-                
-                const unitPrice = parseFloat(item.price);
-                if (isNaN(unitPrice)) {
-                    console.error('Некорректная цена для товара:', item);
-                    return;
-                }
-                
-                li.setAttribute('data-unit-price', unitPrice);
-                const itemTotal = unitPrice * parseInt(item.quantity);
-                totalSum += itemTotal;
-
-                li.innerHTML = `
-                    <div class="cart-item-top">
-                        <span class="item-name">${item.name}</span>
-                        <button class="remove-btn">
-                            <img src="/static/images/delete_good.png" alt="Удалить">
-                        </button>
-                    </div>
-                    <div class="item-quantity">
-                        <button class="quantity-btn decrease">-</button>
-                        <span class="quantity-value">${item.quantity}</span>
-                        <button class="quantity-btn increase">+</button>
-                    </div>
-                    <div class="item-price">
-                        <span class="item-total">${itemTotal.toFixed(2)} рублей</span>
-                    </div>
-                `;
-
-                const increaseBtn = li.querySelector('.quantity-btn.increase');
-                const decreaseBtn = li.querySelector('.quantity-btn.decrease');
-                const removeBtn = li.querySelector('.remove-btn');
-
-                if (increaseBtn) {
-                    increaseBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const currentQuantity = parseInt(li.querySelector('.quantity-value').textContent);
-                        window.updateCartQuantity(item.product_id, currentQuantity + 1, li);
-                    });
-                }
-
-                if (decreaseBtn) {
-                    decreaseBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const currentQuantity = parseInt(li.querySelector('.quantity-value').textContent);
-                        if (currentQuantity > 1) {
-                            window.updateCartQuantity(item.product_id, currentQuantity - 1, li);
-                        }
-                    });
-                }
-
-                if (removeBtn) {
-                    removeBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        window.removeCartItem(item.product_id, li);
-                    });
-                }
-
-                cartItemsContainer.appendChild(li);
-            });
-
-            // Добавляем общую сумму и кнопку оформления заказа
-            const totalElement = document.createElement('li');
-            totalElement.className = 'cart-total';
-            totalElement.innerHTML = `
-                <div class="total-sum">Итого: ${totalSum.toFixed(2)} рублей</div>
-                <button class="checkout-button">Оформить заказ</button>
-            `;
-            cartItemsContainer.appendChild(totalElement);
-
-            // Добавляем обработчик для кнопки оформления заказа
-            const checkoutButton = totalElement.querySelector('.checkout-button');
-            if (checkoutButton) {
-                checkoutButton.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    checkout();
+                cartTotalElement.innerHTML = '';
+            } else {
+                // Добавляем каждый товар
+                cartItems.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'cart-item';
+                    li.innerHTML = `
+                        <div class="cart-item-content">
+                            <div class="cart-item-info">
+                                <span class="cart-item-name">${item.name}</span>
+                                <span class="cart-item-price">${item.price} ₽</span>
+                            </div>
+                            <div class="cart-item-controls">
+                                <button class="quantity-btn minus" data-id="${item.id}">-</button>
+                                <span class="quantity">${item.quantity}</span>
+                                <button class="quantity-btn plus" data-id="${item.id}">+</button>
+                                <button class="remove-btn" data-id="${item.id}">×</button>
+                            </div>
+                        </div>
+                    `;
+                    cartItemsContainer.appendChild(li);
                 });
+                
+                // Добавляем итоговую сумму
+                cartTotalElement.innerHTML = `
+                    <div class="cart-total-content">
+                        <span>Итого:</span>
+                        <span class="total-amount">${total} ₽</span>
+                    </div>
+                    <button class="checkout-btn" onclick="window.checkout()">Оформить заказ</button>
+                `;
             }
-        })
-        .catch(error => {
-            console.error('Ошибка загрузки корзины:', error);
-            cartItemsContainer.innerHTML = '<li class="cart-item">Ошибка загрузки корзины</li>';
-            showNotification('Ошибка загрузки корзины', 'error');
-        });
+        } else {
+            console.error('Ошибка при загрузке корзины:', data.error);
+        }
+    } catch (error) {
+        console.error('Ошибка при загрузке корзины:', error);
+    }
 };
 
 // Функция показа уведомлений
