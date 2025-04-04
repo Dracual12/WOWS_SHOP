@@ -2,7 +2,7 @@ import time
 
 from flask import Blueprint, render_template, request, jsonify, current_app
 from web_app import db
-from ..utils.helpers import format_order_summary, order_text
+from ..utils.helpers import format_order_summary
 from ..utils.telegram import send_telegram, edit_telegram_message
 from ..config import Config
 
@@ -34,13 +34,11 @@ def get_link(user, login, password):
     conn.execute("INSERT INTO orders (user_id) VALUES (?)", (user,))
     conn.commit()
     last_order = conn.execute('SELECT id FROM orders WHERE user_id = ? ORDER BY id DESC LIMIT 1', (user,)).fetchone()[0]
-    print(last_order)
     order_id = int(last_order) + 102075
     last_cart = db.get_cart_items(user)
 
     total = sum(item['price'] * item['quantity'] for item in last_cart)
     conn.close()
-    print(total)
     url = f"https://payment.alfabank.ru/payment/rest/register.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderNumber={order_id}&amount={int(total/10)}&returnUrl=https://t.me/armada_gold_bot"
     response = requests.get(url)
     text = response.text
@@ -88,16 +86,22 @@ def check(orderId, user, login, password):
     conn = get_db_connection()
     if glag:
         send_telegram(Config.BOT_TOKEN, user, 'Заказ успешно оплачен!')
-        data = order_text(user)
+        cart = db.get_cart_items(user)
         conn.execute("DELETE FROM cart WHERE user_id = ?", (user,))
         conn.commit()
-        print(data)
+        print(cart)
+        order_text = ''
+        i = 1
+        for e in cart:
+            order_text += f"{i}. {e['name']} - {e['quantity']} шт\n"
+            i += 1
         message = f"""
         Детали заказа:
         ———————————————
         🆔 ID заказа: {orderId}
         👤 User ID: id <a href="tg://user?id={user}">{user}</a>
-        🛒 Корзина: {data['cart']}
+        🛒 Корзина: 
+        {order_text}
         🔑 Логин;Пароль: {login}:{password}
         ———————————————
         Спасибо за ваш заказ! 😊
