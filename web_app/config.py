@@ -1,10 +1,9 @@
 import os
-
 class Config:
     # Пути
     BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
     DB_PATH = os.path.join(BASE_DIR, 'bot', 'wows_db.db')
-    
+    ADMIN_ID = 432771577
     # Конфигурация Flask
     SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key-here')
     DEBUG = os.environ.get('FLASK_DEBUG', 'True').lower() == 'true'
