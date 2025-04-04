@@ -302,7 +302,7 @@
     <header>
         <div class="floating-cart-product">
             <button class="cart-icon-product">
-                <img src="{{ url_for('static', filename='images/cart.png') }}" alt="Корзина">
+                <img src="/static/images/cart-icon.png" alt="Корзина">
             </button>
             <div class="cart-dropdown-product">
                 <div class="cart-header">Корзина</div>
@@ -320,8 +320,8 @@
         {% if product %}
         <div class="product-details">
             <div class="product-image">
-                {% if product.image_url %}
-                <img src="{{ product.image_url }}" alt="{{ product.name }}">
+                {% if product.image %}
+                <img src="/{{ product.image }}" alt="{{ product.name }}">
                 {% else %}
                 <div class="no-image">Нет изображения</div>
                 {% endif %}
@@ -371,7 +371,43 @@
                     event.stopPropagation();
                     const productId = this.dataset.id;
                     console.log('Нажата кнопка добавления в корзину. ID товара:', productId);
-                    window.addToCart(productId);
+                    
+                    // Получаем tg_id из Telegram WebApp
+                    const tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
+                    
+                    // Отправляем запрос на добавление товара в корзину
+                    fetch('/api/cart', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            product_id: productId,
+                            quantity: 1,
+                            tg_id: tgId
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Ошибка добавления товара в корзину');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Показываем уведомление об успехе
+                            alert('Товар добавлен в корзину');
+                            // Обновляем корзину
+                            window.loadCartItems();
+                        } else {
+                            console.error('Ошибка добавления товара:', data);
+                            alert('Ошибка добавления товара в корзину');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Ошибка:', error);
+                        alert('Ошибка добавления товара в корзину');
+                    });
                 });
             }
             
