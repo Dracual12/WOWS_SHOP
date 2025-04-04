@@ -44,9 +44,9 @@ def edit_telegram_message(
         return False
 
 def send_telegram(
-        text: str,
         bot_token: str,
         chat_id: str,
+        text: str,
         reply_markup: Optional[Dict[str, Any]] = None
 ) -> bool:
     """
@@ -72,7 +72,7 @@ def send_telegram(
         params["reply_markup"] = json.dumps(reply_markup)
 
     response = requests.post(url, params=params).json()
-
+    print(re)
     if response.get("ok"):
         return True
     else:

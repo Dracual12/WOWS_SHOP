@@ -30,7 +30,6 @@ def pay(link):
 
 # Получение ссылки на оплату
 def get_link(user, login, password):
-
     conn = get_db_connection()
     conn.execute("INSERT INTO orders (user_id) VALUES (?)", (user,))
     conn.commit()
@@ -53,9 +52,9 @@ def get_link(user, login, password):
     print(k)
     if 'formUrl' in k:
         a = k['formUrl']
-        k2 = send_telegram(
-            "Нажимая «Оплатить» Вы принимаете положения Политики Конфиденциальности и Пользовательского Соглашения",
-            Config.BOT_TOKEN, user, pay(a))
+        k2 = send_telegram(Config.BOT_TOKEN, user,
+                           "Нажимая «Оплатить» Вы принимаете положения Политики Конфиденциальности и Пользовательского Соглашения",
+                           pay(a))
         conn = get_db_connection()
         conn.execute('UPDATE users SET message_id = ? WHERE telegram_id = ?', (k2, user))
         conn.commit()
@@ -105,7 +104,7 @@ def check(orderId, user, login, password):
         ———————————————
         Спасибо за ваш заказ! 😊
         """
-        send_telegram(message, Config.BOT_TOKEN, Config.ADMIN_ID)
+        send_telegram( Config.BOT_TOKEN, Config.ADMIN_ID, message)
     else:
         edit_telegram_message(Config.BOT_TOKEN, user,
                               conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)).fetchone()[0],
