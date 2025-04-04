@@ -36,7 +36,7 @@ def get_link(user, login, password):
     conn.commit()
     last_order = conn.execute('SELECT id FROM orders WHERE user_id = ? ORDER BY id DESC LIMIT 1', (user,)).fetchone()[0]
     print(last_order)
-    order_id = int(dict(last_order)['id']) + 102075
+    order_id = int(last_order) + 102075
     last_cart = db.get_cart_items(user)
 
     total = sum(item['price'] * item['quantity'] for item in last_cart)
