@@ -24,6 +24,15 @@ class Database:
                 )
             ''')
             
+            # Проверяем существование колонки is_active в таблице sections
+            cursor.execute("PRAGMA table_info(sections)")
+            columns = [column[1] for column in cursor.fetchall()]
+            
+            # Добавляем колонку is_active, если она отсутствует
+            if 'is_active' not in columns:
+                cursor.execute('ALTER TABLE sections ADD COLUMN is_active BOOLEAN DEFAULT 1')
+                print("Добавлена колонка is_active в таблицу sections")
+            
             # Создаем таблицу products
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS products (
@@ -48,8 +57,6 @@ class Database:
                 cursor.execute('ALTER TABLE products ADD COLUMN order_index INTEGER DEFAULT 0')
             if 'is_active' not in columns:
                 cursor.execute('ALTER TABLE products ADD COLUMN is_active BOOLEAN DEFAULT 1')
-            if 'review_link' not in columns:
-                cursor.execute('ALTER TABLE products ADD COLUMN review_link TEXT')
             
             # Создаем таблицу cart
             cursor.execute('''
@@ -297,7 +304,13 @@ class Database:
                 cursor = conn.cursor()
                 # Получаем название секции по ID
                 cursor.execute('SELECT name FROM sections WHERE id = ?', (section_id,))
-                section_name = cursor.fetchone()[0]
+                result = cursor.fetchone()
+                
+                if not result:
+                    print(f"Ошибка: Секция с ID {section_id} не найдена")
+                    return False
+                
+                section_name = result[0]
                 
                 print(f"Добавление товара: name={name}, section={section_name}, image_path={image_path}")  # Отладочный вывод
                 cursor.execute('''
@@ -317,7 +330,13 @@ class Database:
                 cursor = conn.cursor()
                 # Получаем название секции по ID
                 cursor.execute('SELECT name FROM sections WHERE id = ?', (section_id,))
-                section_name = cursor.fetchone()[0]
+                result = cursor.fetchone()
+                
+                if not result:
+                    print(f"Ошибка: Секция с ID {section_id} не найдена")
+                    return False
+                
+                section_name = result[0]
                 
                 print(f"Обновление товара: id={product_id}, name={name}, section={section_name}, image_path={image_path}")  # Отладочный вывод
                 cursor.execute('''
@@ -356,24 +375,21 @@ class Database:
     def add_section(self, name, order_index=0, is_active=True):
         """Добавляет новый раздел"""
         try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            
-            cursor.execute('''
-                INSERT INTO sections (name, order_index, is_active)
-                VALUES (?, ?, ?)
-            ''', (name, order_index, is_active))
-            
-            conn.commit()
-            print(f"Раздел '{name}' успешно добавлен")
-            return True
-            
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                cursor.execute('''
+                    INSERT INTO sections (name, order_index, is_active)
+                    VALUES (?, ?, ?)
+                ''', (name, order_index, is_active))
+                
+                conn.commit()
+                print(f"Раздел '{name}' успешно добавлен")
+                return True
+                
         except Exception as e:
             print(f"Ошибка при добавлении раздела: {str(e)}")
             return False
-        finally:
-            if conn:
-                conn.close()
 
     def create_order(self, user_id: int, login: str, password: str, items: list, total_price: float) -> int:
         """Создает новый заказ"""
@@ -471,6 +487,15 @@ class Database:
                 )
             ''')
             
+            # Проверяем существование колонки is_active в таблице sections
+            cursor.execute("PRAGMA table_info(sections)")
+            columns = [column[1] for column in cursor.fetchall()]
+            
+            # Добавляем колонку is_active, если она отсутствует
+            if 'is_active' not in columns:
+                cursor.execute('ALTER TABLE sections ADD COLUMN is_active BOOLEAN DEFAULT 1')
+                print("Добавлена колонка is_active в таблицу sections")
+            
             # Создаем таблицу cart
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS cart (
@@ -487,4 +512,77 @@ class Database:
             return True
         except Exception as e:
             print(f"Ошибка при инициализации базы данных: {e}")
+            return False
+
+    def get_section(self, section_id: int) -> Optional[Dict[str, Any]]:
+        """Получает информацию о разделе по ID."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM sections WHERE id = ?", (section_id,))
+            row = cursor.fetchone()
+            if row:
+                columns = [description[0] for description in cursor.description]
+                return dict(zip(columns, row))
+            return None
+            
+    def get_section_name(self, section_id: int) -> Optional[str]:
+        """Получает название раздела по ID."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT name FROM sections WHERE id = ?", (section_id,))
+            result = cursor.fetchone()
+            if result:
+                return result[0]
+            return None
+
+    def update_section(self, section_id: int, name: str, order_index: int = 0, is_active: bool = True) -> bool:
+        """Обновляет раздел в базе данных"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                # Проверяем, существует ли раздел
+                cursor.execute('SELECT id FROM sections WHERE id = ?', (section_id,))
+                if not cursor.fetchone():
+                    print(f"Ошибка: Раздел с ID {section_id} не найден")
+                    return False
+                
+                print(f"Обновление раздела: id={section_id}, name={name}, order_index={order_index}, is_active={is_active}")
+                cursor.execute('''
+                    UPDATE sections 
+                    SET name = ?, order_index = ?, is_active = ?
+                    WHERE id = ?
+                ''', (name, order_index, is_active, section_id))
+                conn.commit()
+                return True
+        except Exception as e:
+            print(f"Ошибка при обновлении раздела: {e}")
+            return False
+
+    def delete_section(self, section_id: int) -> bool:
+        """Удаляет раздел из базы данных"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                # Проверяем, существует ли раздел
+                cursor.execute('SELECT id FROM sections WHERE id = ?', (section_id,))
+                if not cursor.fetchone():
+                    print(f"Ошибка: Раздел с ID {section_id} не найден")
+                    return False
+                
+                # Проверяем, есть ли товары в этом разделе
+                cursor.execute('SELECT COUNT(*) FROM products WHERE section = (SELECT name FROM sections WHERE id = ?)', (section_id,))
+                count = cursor.fetchone()[0]
+                
+                if count > 0:
+                    print(f"Ошибка: Невозможно удалить раздел с ID {section_id}, так как в нем есть товары")
+                    return False
+                
+                print(f"Удаление раздела: id={section_id}")
+                cursor.execute('DELETE FROM sections WHERE id = ?', (section_id,))
+                conn.commit()
+                return True
+        except Exception as e:
+            print(f"Ошибка при удалении раздела: {e}")
             return False 
