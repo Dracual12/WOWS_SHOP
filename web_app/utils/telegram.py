@@ -61,7 +61,6 @@ def send_telegram(
     Returns:
         bool: True если успешно, False если произошла ошибка
     """
-    print(bot_token, chat_id, text)
     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
     params = {
         "chat_id": chat_id,

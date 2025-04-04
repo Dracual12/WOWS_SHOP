@@ -8,7 +8,7 @@ class Config:
     # Конфигурация Flask
     SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key-here')
     DEBUG = os.environ.get('FLASK_DEBUG', 'True').lower() == 'true'
-    
+    BOT_TOKEN = "7574071837:AAFE0A2rW27YmxOi40AG68577fK3zluinu4"
     # Конфигурация базы данных
     DATABASE = {
         'path': DB_PATH
