@@ -55,6 +55,13 @@
             margin-bottom: 20px;
         }
         
+        .product-description {
+            margin-bottom: 20px;
+            color: #ffffff;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        
         .add_to_cart {
             background-color: #8774e1;
             color: white;
@@ -402,7 +409,12 @@
             </div>
             <div class="product-info">
                 <h1>{{ product.name }}</h1>
+                {% if product.price > 0 %}
                 <p class="price">{{ product.price }} рублей</p>
+                {% endif %}
+                {% if product.description %}
+                <div class="product-description">{{ product.description }}</div>
+                {% endif %}
                 <button class="add_to_cart" data-id="{{ product.id }}">Добавить в корзину</button>
             </div>
         </div>
