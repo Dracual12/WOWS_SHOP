@@ -133,7 +133,7 @@ window.checkout = function() {
 }
 
 // Функция загрузки товаров корзины
-function loadCartItems() {
+window.loadCartItems = function() {
     const cartItemsContainer = document.getElementById('cartItems');
     const cartTotalElement = document.getElementById('cartTotal');
     
@@ -213,7 +213,7 @@ function loadCartItems() {
     .catch(error => {
         console.error('Ошибка при загрузке корзины:', error);
     });
-}
+};
 
 // Функция показа уведомлений
 function showNotification(message, type = 'success') {
