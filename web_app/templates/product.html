@@ -282,6 +282,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+        
+        .cart-icon-product:active {
+            transform: none;
+            background: none;
         }
         
         .cart-icon-product img {
@@ -289,6 +296,7 @@
             height: 24px;
             position: relative;
             z-index: 2;
+            pointer-events: none;
         }
         
         .cart-icon-product::before {
@@ -315,8 +323,8 @@
         /* Стили для кнопки "Назад" */
         .return-link {
             position: fixed;
-            top: 10px;
-            left: 10px;
+            top: 20px;
+            left: 20px;
             z-index: 1000;
             background: none;
             border: none;
@@ -328,6 +336,8 @@
             justify-content: center;
             width: 40px;
             height: 40px;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
         }
         
         .return-btn {
@@ -335,6 +345,7 @@
             height: 24px;
             position: relative;
             z-index: 2;
+            pointer-events: none;
         }
         
         .return-btn::before {
@@ -349,6 +360,11 @@
             transform: translate(-50%, -50%);
             z-index: -1;
             opacity: 0.2;
+        }
+        
+        .return-link:active {
+            transform: none;
+            background: none;
         }
         
         /* Стили для уведомлений */
