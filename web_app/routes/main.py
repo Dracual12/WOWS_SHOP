@@ -183,18 +183,23 @@ def save_link():
 
 @bp.route('/api/order/end', methods=['POST'])
 def end_order():
-    data = request.get_json()
-    user = data.get('user_id')
-    login = data.get('login')
-    password = data.get('password')
-    print(data)
-    if user and login and password:
-        current_app.logger.info(f'Оформлен заказ от пользователя: {user}')
-        # Запускаем функцию get_link в отдельном потоке
-        get_link(user, login, password)
-    else:
-        current_app.logger.warning('Попытка оформить заказ с неполными данными')
-        return jsonify({"status": "error"})
+    try:
+        data = request.get_json()
+        user = data.get('user_id')
+        login = data.get('login')
+        password = data.get('password')
+        print(data)
+        if user and login and password:
+            current_app.logger.info(f'Оформлен заказ от пользователя: {user}')
+            # Запускаем функцию get_link в отдельном потоке
+            get_link(user, login, password)
+            return jsonify({"status": "success"})
+        else:
+            current_app.logger.warning('Попытка оформить заказ с неполными данными')
+            return jsonify({"status": "error"})
+    except Exception as e:
+        current_app.logger.error(f'Ошибка при оформлении заказа: {str(e)}')
+        return jsonify({"status": "error", "message": str(e)})
 
 
 @bp.route('/api/order/latest', methods=['POST'])
