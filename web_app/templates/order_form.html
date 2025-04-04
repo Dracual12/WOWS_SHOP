@@ -258,15 +258,7 @@
                     },
                     body: JSON.stringify(formData)
                 });
-
-                const result = await response.json();
-                
-                if (result.status === 'success') {
-                    saveFormData();
-                    tg.close();
-                } else {
-                    alert(result.message || 'Произошла ошибка при оформлении заказа');
-                }
+                tg.close()
             } catch (error) {
                 console.error('Error:', error);
                 alert('Произошла ошибка при оформлении заказа');
