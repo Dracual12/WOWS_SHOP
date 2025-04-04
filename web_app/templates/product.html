@@ -396,10 +396,10 @@
             <img src="{{ url_for('static', filename='images/return.png') }}" alt="Вернуться в магазин" class="return-btn">
         </a>
         <div class="floating-cart-product">
-            <button class="cart-icon-product">
+            <button class="cart-icon-product" id="cartIcon">
                 <img src="{{ url_for('static', filename='images/cart-icon.png') }}" alt="Корзина">
             </button>
-            <div class="cart-dropdown-product">
+            <div class="cart-dropdown-product" id="cartDropdown">
                 <div class="cart-header">Корзина</div>
                 <ul class="cart-items-product" id="cartItems">
                     <!-- Здесь будут отображаться товары -->
@@ -527,7 +527,11 @@
                             // Показываем уведомление об успехе
                             showNotification('Товар добавлен в корзину', 'success');
                             // Обновляем корзину
-                            window.loadCartItems();
+                            if (typeof window.loadCartItems === 'function') {
+                                window.loadCartItems();
+                            } else {
+                                console.error('Функция loadCartItems не найдена');
+                            }
                         } else {
                             console.error('Ошибка добавления товара:', data);
                             showNotification('Ошибка добавления товара в корзину', 'error');
@@ -541,14 +545,18 @@
             }
             
             // Обработчик для корзины
-            const cartIcon = document.querySelector('.cart-icon-product');
-            const cartDropdown = document.querySelector('.cart-dropdown-product');
+            const cartIcon = document.getElementById('cartIcon');
+            const cartDropdown = document.getElementById('cartDropdown');
             
             if (cartIcon && cartDropdown) {
                 cartIcon.addEventListener('click', () => {
                     cartDropdown.classList.toggle('active');
                     if (cartDropdown.classList.contains('active')) {
-                        window.loadCartItems();
+                        if (typeof window.loadCartItems === 'function') {
+                            window.loadCartItems();
+                        } else {
+                            console.error('Функция loadCartItems не найдена');
+                        }
                     }
                 });
                 
@@ -563,6 +571,15 @@
                         cartDropdown.classList.remove('active');
                     }
                 });
+            } else {
+                console.error('Элементы корзины не найдены:', { cartIcon, cartDropdown });
+            }
+            
+            // Инициализация корзины
+            if (typeof window.initCart === 'function') {
+                window.initCart();
+            } else {
+                console.error('Функция initCart не найдена');
             }
         });
     </script>
