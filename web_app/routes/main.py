@@ -30,8 +30,9 @@ def pay(link):
 
 # Получение ссылки на оплату
 def get_link(user, login, password):
-    print(user)
+
     conn = get_db_connection()
+    conn.execute("INSERT INTO orders (user_id) VALUES (?)", (user,))
     last_order = conn.execute('SELECT id FROM orders WHERE user_id = ? ORDER BY id DESC LIMIT 1', (user,)).fetchone()
     order_id = int(dict(last_order)['id']) + 100075
     last_cart = db.get_cart_items(user)
