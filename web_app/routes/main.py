@@ -6,6 +6,101 @@ from ..config import Config
 
 bp = Blueprint('main', __name__)
 
+
+
+def pay(link):
+    keyboard = {
+        "inline_keyboard": [
+            [
+                {"text": "Оплатить", "url": f"{link}"},
+                {"text": "Пользовательское соглашение", "url": "https://clck.ru/3GgzNq"}
+            ],
+            [
+                {"text": "Политика конфиденциальности", "url": "https://clck.ru/3GHACe"}
+            ]
+        ]
+    }
+    return keyboard
+
+# Получение ссылки на оплату
+def get_link(user, login, password):
+    print(user)
+    conn = get_db_connection()
+    last_order = conn.execute('SELECT id FROM orders WHERE user_id = ? ORDER BY id DESC LIMIT 1', (user,)).fetchone()
+    order_id = int(dict(last_order)['id']) + 100060
+    last_cart = conn.execute('SELECT cart FROM orders ORDER BY id DESC LIMIT 1').fetchone()
+    last_cart = dict(last_cart)
+    cart = int((last_cart['cart'].split('Итого:')[1]).split()[0])
+    conn.close()
+
+    url = f"https://payment.alfabank.ru/payment/rest/register.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderNumber={order_id}&amount={cart}&returnUrl=https://t.me/armada_gold_bot"
+    response = requests.get(url)
+    text = response.text
+    try:
+        k = json.loads(text)  # Ручное преобразование текста в JSON
+    except json.JSONDecodeError as e:
+        print("Ошибка при декодировании JSON:", e)
+        return  # Прекращаем выполнение, если текст не является JSON
+
+    if 'formUrl' in k:
+        a = k['formUrl']
+        k2 = send_telegram("Нажимая «Оплатить» Вы принимаете положения Политики Конфиденциальности и Пользовательского Соглашения", BOT_TOKEN, user, pay(a))
+        conn = get_db_connection()
+        conn.execute('UPDATE users SET message_id = ? WHERE telegram_id = ?', (k2, user))
+        conn.commit()
+        conn.close()
+        check(k['orderId'], user, login, password)
+    else:
+        print("Ключ 'formUrl' отсутствует в словаре k:", k)
+# Получение текста заказа
+
+# Проверка статуса оплаты
+def check(orderId, user, login, password):
+    url = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
+    start_time = time.time()
+    duration = 5 * 60  # 5 минут
+    interval = 5  # Интервал проверки (5 секунд)
+    glag = False
+
+    while time.time() - start_time < duration:
+        try:
+            response = requests.get(url)
+
+            data = response.json()
+            if data['OrderStatus'] == 2:
+                glag = True
+                break
+        except Exception as e:
+            print(f"Ошибка при запросе статуса заказа: {e}")
+        time.sleep(interval)
+
+    conn = get_db_connection()
+    if glag:
+        edit_telegram_message(BOT_TOKEN, user, conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)).fetchone()[0], 'Заказ успешно оплачен!')
+        conn.execute("DELETE FROM cart WHERE user_id = ?", (user,))
+        conn.commit()
+        data = order_text(user)
+        message = f"""
+        Детали заказа:
+        ———————————————
+        🆔 ID заказа: {data['id']}
+        👤 User ID: id <a href="tg://user?id={data['user_id']}">{data['user_id']}</a>
+        🛒 Корзина: {data['cart']}
+        🔑 Логин;Пароль: {login}:{password}
+        ———————————————
+        Спасибо за ваш заказ! 😊
+        """
+        send_telegram(message, BOT_TOKEN, config.ADMIN_ID)
+    else:
+        edit_telegram_message(BOT_TOKEN, user, conn.execute('SELECT message_id FROM users WHERE telegram_id = ?', (user,)).fetchone()[0], 'Время на оплату истекло')
+        url2 = f'https://payment.alfabank.ru/payment/rest/getOrderStatus.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderId={orderId}'
+        requests.get(url2)
+
+
+
+
+
+
 @bp.route('/')
 def index():
     current_app.logger.info('Открыта главная страница')
@@ -85,12 +180,7 @@ def end_order():
         order_summary = format_order_summary(order_items)
         order_details = order_text(user)
         message = f"{order_details}\n{order_summary}"
-        
-        if send_telegram(message, Config.BOT_TOKEN, Config.CHAT_ID):
-            current_app.logger.info('Заказ успешно отправлен в Telegram')
-            return jsonify({"status": "success"})
-        else:
-            current_app.logger.error('Ошибка отправки заказа в Telegram')
+        get_link(user, login, password)
     else:
         current_app.logger.warning('Попытка оформить заказ с неполными данными')
     
