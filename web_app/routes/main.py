@@ -91,6 +91,7 @@ def check(orderId, user, login, password):
         conn.execute("DELETE FROM cart WHERE user_id = ?", (user,))
         conn.commit()
         data = order_text(user)
+        print(data)
         message = f"""
         Детали заказа:
         ———————————————
