@@ -43,7 +43,7 @@ def get_link(user, login, password):
     except json.JSONDecodeError as e:
         print("Ошибка при декодировании JSON:", e)
         return  # Прекращаем выполнение, если текст не является JSON
-
+    print(k)
     if 'formUrl' in k:
         a = k['formUrl']
         k2 = send_telegram("Нажимая «Оплатить» Вы принимаете положения Политики Конфиденциальности и Пользовательского Соглашения", BOT_TOKEN, user, pay(a))
