@@ -1,249 +1,61 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; font-src 'self' https://cdn.ngrok.com; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://telegram.org; frame-src 'self' https://www.youtube.com;">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="/static/css/product-cart.css">
+    <title>Товар</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/product-cart.css') }}">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <title>{% if product %}{{ product.name }}{% else %}Товар не найден{% endif %}</title>
-    <style>
-        .no-image {
-            width: 100%;
-            height: 300px;
-            background-color: #f8f9fa;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #6c757d;
-            font-size: 1.2rem;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-    </style>
     <script src="{{ url_for('static', filename='js/cart2.js') }}" defer></script>
 </head>
 <body>
+    <div id="telegram-data" 
+         data-tg-id="{{ tg_id }}"
+         data-first-name="{{ first_name }}"
+         data-last-name="{{ last_name }}"
+         data-username="{{ username }}"
+         data-language-code="{{ language_code }}"
+         data-start-param="{{ start_param }}"
+         data-auth-date="{{ auth_date }}"
+         data-hash="{{ hash }}">
+    </div>
+
     <header>
-        <a href="/" class="return-link">
-            <img src="/static/images/return.png" alt="Вернуться в магазин" class="return-btn">
-        </a>
         <div class="floating-cart-product">
-            <img src="/static/images/cart-icon.png" class="cart-icon-product">
+            <img src="{{ url_for('static', filename='images/cart.png') }}" class="cart-icon-product">
             <div class="cart-dropdown-product">
                 <div class="cart-header">Корзина</div>
-                <ul class="cart-items" id="cartItems"></ul>
-                <div class="cart-total" id="cartTotal"></div>
+                <ul class="cart-items" id="cartItems">
+                    <!-- Товары будут добавляться сюда динамически -->
+                </ul>
+                <div class="cart-total" id="cartTotal">
+                    <!-- Общая сумма будет обновляться динамически -->
+                </div>
             </div>
         </div>
     </header>
 
     <main>
         {% if product %}
-            {% if product.image %}
-        <img src="/{{ product.image }}" alt="{{ product.name }}" class="product-image">
-            {% else %}
-                <div class="no-image">Нет изображения</div>
-            {% endif %}
-
         <div class="product-details">
-                <div class="product-price mb-3">
-                    {% if product.price > 0 %}
-                        <span class="h4">{{ product.price }} ₽</span>
-                    {% else %}
-                        <span class="h4 text-success">Бесплатно</span>
-                    {% endif %}
-                </div>
-
-                {% if product.price > 0 %}
-                <div class="d-grid gap-2">
-                    <button class="btn btn-primary btn-lg add_to_cart" data-id="{{ product.id }}">
-                        <i class="fas fa-shopping-cart"></i> Добавить в корзину
-                    </button>
-                </div>
+            <div class="product-image">
+                {% if product.image_url %}
+                <img src="{{ product.image_url }}" alt="{{ product.name }}">
+                {% else %}
+                <div class="no-image">Нет изображения</div>
                 {% endif %}
-
-            <p>{{ product.description }}</p>
-        </div>
-
-            {% if product.review_links %}
-        <div class="review-container">
-                <h3>Обзоры:</h3>
-                <div class="review-links">
-                    {{ product.review_links | safe }}
-                </div>
             </div>
-            {% endif %}
+            <div class="product-info">
+                <h1>{{ product.name }}</h1>
+                <p class="price">{{ product.price }} рублей</p>
+                <button class="add_to_cart" data-id="{{ product.id }}">Добавить в корзину</button>
+            </div>
+        </div>
         {% else %}
-            <div class="error-message">
-                <h2>Товар не найден</h2>
-                <p>Извините, запрашиваемый товар не существует или был удален.</p>
-                <a href="/" class="return-button">Вернуться в магазин</a>
+        <div class="error-message">
+            <p>Товар не найден</p>
         </div>
         {% endif %}
     </main>
-
-    <!-- Контейнер для уведомлений -->
-    <div id="notification-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;"></div>
-
-    <!-- Добавляем скрытый div с данными -->
-    <div id="telegram-data" 
-         data-tg-id="{{ tg_id|default('null') }}"
-         data-first-name="{{ first_name|default('') }}"
-         data-last-name="{{ last_name|default('') }}"
-         data-username="{{ username|default('') }}"
-         data-language-code="{{ language_code|default('') }}"
-         data-start-param="{{ start_param|default('') }}"
-         data-auth-date="{{ auth_date|default('null') }}"
-         data-hash="{{ hash|default('') }}"
-         style="display: none;">
-    </div>
-
-    <!-- Подключаем скрипты -->
-    <script>
-        // Инициализация Telegram WebApp
-        const dataElement = document.getElementById('telegram-data');
-        const userData = {
-            id: dataElement.dataset.tgId === 'null' ? null : Number(dataElement.dataset.tgId),
-            first_name: dataElement.dataset.firstName || null,
-            last_name: dataElement.dataset.lastName || null,
-            username: dataElement.dataset.username || null,
-            language_code: dataElement.dataset.languageCode || null,
-            start_param: dataElement.dataset.startParam || null,
-            auth_date: dataElement.dataset.authDate === 'null' ? null : Number(dataElement.dataset.authDate),
-            hash: dataElement.dataset.hash || null
-        };
-
-        console.log('Инициализация Telegram WebApp с данными:', userData);
-
-        window.Telegram = {
-            WebApp: {
-                initDataUnsafe: {
-                    user: userData
-                },
-                ready: function() {
-                    console.log('Telegram WebApp готов');
-                },
-                disableClosingConfirmation: function() {
-                    console.log('Отключено подтверждение закрытия');
-                }
-            }
-        };
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Инициализация корзины
-            const cartIcon = document.querySelector('.cart-icon-product');
-            const cartDropdown = document.querySelector('.cart-dropdown-product');
-            const cartItems = document.getElementById('cartItems');
-            const cartTotal = document.getElementById('cartTotal');
-
-            // Получаем tg_id из Telegram WebApp
-            let tgId;
-            try {
-                tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
-                console.log('Получен tg_id:', tgId);
-            } catch (error) {
-                console.error('Ошибка при получении tg_id:', error);
-                // Если не удалось получить tg_id из WebApp, пробуем получить из URL
-                const urlParams = new URLSearchParams(window.location.search);
-                tgId = urlParams.get('tg_id');
-                console.log('Получен tg_id из URL:', tgId);
-            }
-
-            if (!tgId) {
-                console.error('tg_id не найден');
-                return;
-            }
-
-            // Обработчик для кнопки добавления в корзину
-            const addToCartButton = document.querySelector('.add_to_cart');
-            if (addToCartButton) {
-                console.log('Кнопка добавления в корзину найдена');
-                addToCartButton.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    const productId = this.dataset.id;
-                    console.log('Нажата кнопка добавления в корзину. ID товара:', productId);
-                    addToCart(productId, tgId);
-                });
-            } else {
-                console.error('Кнопка добавления в корзину не найдена');
-            }
-
-            // Открытие/закрытие корзины
-            cartIcon.addEventListener('click', function(event) {
-                event.stopPropagation();
-                cartDropdown.classList.toggle('active');
-            });
-
-            // Предотвращаем закрытие корзины при клике внутри неё
-            cartDropdown.addEventListener('click', function(event) {
-                event.stopPropagation();
-            });
-
-            // Закрытие корзины при клике вне её
-            document.addEventListener('click', function(event) {
-                if (!cartDropdown.contains(event.target) && !cartIcon.contains(event.target)) {
-                    cartDropdown.classList.remove('active');
-                }
-            });
-
-            // Функция оформления заказа
-            window.checkout = function(event) {
-                if (event) {
-                    event.stopPropagation();
-                }
-                window.location.href = `/order?tg_id=${tgId}`;
-            };
-
-            // Загрузка корзины при загрузке страницы
-            window.loadCartItems();
-        });
-
-        async function addToCart(productId, tgId) {
-            console.log('Вызов функции addToCart с параметрами:', { productId, tgId });
-            try {
-                const response = await fetch('/api/cart', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        product_id: productId,
-                        quantity: 1,
-                        tg_id: tgId
-                    })
-                });
-
-                console.log('Ответ сервера:', response.status);
-                
-                if (response.ok) {
-                    // Создаем элемент уведомления
-                    const notification = document.createElement('div');
-                    notification.className = 'notification';
-                    notification.textContent = 'Товар добавлен в корзину';
-                    document.body.appendChild(notification);
-
-                    // Показываем уведомление
-                    setTimeout(() => notification.classList.add('show'), 100);
-
-                    // Скрываем и удаляем уведомление через 3 секунды
-                    setTimeout(() => {
-                        notification.classList.remove('show');
-                        setTimeout(() => notification.remove(), 300);
-                    }, 3000);
-
-                    // Обновляем корзину
-                    window.loadCartItems();
-                } else {
-                    console.error('Ошибка при добавлении товара в корзину:', response.status);
-                }
-            } catch (error) {
-                console.error('Ошибка при выполнении запроса:', error);
-            }
-        }
-    </script>
 </body>
 </html>
