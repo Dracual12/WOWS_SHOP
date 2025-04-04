@@ -133,7 +133,7 @@ window.checkout = function() {
 }
 
 // Функция загрузки товаров корзины
-window.loadCartItems = async function() {
+function loadCartItems() {
     const cartItemsContainer = document.getElementById('cartItems');
     const cartTotalElement = document.getElementById('cartTotal');
     
@@ -142,31 +142,32 @@ window.loadCartItems = async function() {
         return;
     }
 
+    // Получаем tg_id из Telegram WebApp
+    let tgId;
     try {
-        // Получаем tg_id из Telegram WebApp
-        let tgId;
-        try {
-            tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
-            console.log('Получен tg_id из WebApp:', tgId);
-        } catch (error) {
-            console.error('Ошибка при получении tg_id из WebApp:', error);
-            // Если не удалось получить tg_id из WebApp, пробуем получить из URL
-            const urlParams = new URLSearchParams(window.location.search);
-            tgId = urlParams.get('tg_id');
-            console.log('Получен tg_id из URL:', tgId);
-        }
+        tgId = window.Telegram.WebApp.initDataUnsafe.user.id;
+        console.log('Получен tg_id из WebApp:', tgId);
+    } catch (error) {
+        console.error('Ошибка при получении tg_id из WebApp:', error);
+        // Если не удалось получить tg_id из WebApp, пробуем получить из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        tgId = urlParams.get('tg_id');
+        console.log('Получен tg_id из URL:', tgId);
+    }
 
-        if (!tgId) {
-            console.error('tg_id не найден');
-            return;
-        }
+    if (!tgId) {
+        console.error('tg_id не найден');
+        return;
+    }
 
-        const response = await fetch(`/api/cart?tg_id=${tgId}`);
-        const data = await response.json();
-        
-        if (data.success) {
-            const cartItems = data.cart_items;
-            const total = data.total;
+    // Используем request вместо fetch
+    request(`/api/cart?tg_id=${tgId}`, {
+        method: 'GET'
+    })
+    .then(response => {
+        if (response.success) {
+            const cartItems = response.cart_items;
+            const total = response.total;
             
             // Очищаем контейнер
             cartItemsContainer.innerHTML = '';
@@ -202,16 +203,17 @@ window.loadCartItems = async function() {
                         <span>Итого:</span>
                         <span class="total-amount">${total} ₽</span>
                     </div>
-                    <button class="checkout-btn" onclick="window.checkout()">Оформить заказ</button>
+                    <button class="checkout-btn" onclick="checkout()">Оформить заказ</button>
                 `;
             }
         } else {
-            console.error('Ошибка при загрузке корзины:', data.error);
+            console.error('Ошибка при загрузке корзины:', response.error);
         }
-    } catch (error) {
+    })
+    .catch(error => {
         console.error('Ошибка при загрузке корзины:', error);
-    }
-};
+    });
+}
 
 // Функция показа уведомлений
 function showNotification(message, type = 'success') {
