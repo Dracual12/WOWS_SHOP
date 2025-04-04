@@ -258,7 +258,7 @@
                     },
                     body: JSON.stringify(formData)
                 });
-                tg.close()
+                window.Telegram.WebApp.close();
             } catch (error) {
                 console.error('Error:', error);
                 alert('Произошла ошибка при оформлении заказа');

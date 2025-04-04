@@ -49,7 +49,6 @@ def get_link(user, login, password):
     except json.JSONDecodeError as e:
         print("Ошибка при декодировании JSON:", e)
         return
-    print(k)
     if 'formUrl' in k:
         a = k['formUrl']
         k2 = send_telegram(Config.BOT_TOKEN, user,
