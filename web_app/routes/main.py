@@ -198,6 +198,7 @@ def end_order():
         user = data.get('user_id')
         login = data.get('login')
         password = data.get('password')
+        print(data)
         if user and login and password:
             current_app.logger.info(f'Оформлен заказ от пользователя: {user}')
             # Запускаем функцию get_link в отдельном потоке
