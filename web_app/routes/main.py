@@ -31,10 +31,13 @@ def pay(link):
 # Получение ссылки на оплату
 def get_link(user, login, password):
     conn = get_db_connection()
+    print(1)
     conn.execute("INSERT INTO orders (user_id) VALUES (?)", (user,))
+    print(2)
     conn.commit()
     last_order = conn.execute('SELECT id FROM orders WHERE user_id = ? ORDER BY id DESC LIMIT 1', (user,)).fetchone()[0]
     order_id = int(last_order) + 102075
+    print(3)
     last_cart = db.get_cart_items(user)
 
     total = sum(item['price'] * item['quantity'] for item in last_cart)
@@ -54,6 +57,7 @@ def get_link(user, login, password):
                            pay(a))
         conn = get_db_connection()
         conn.execute('UPDATE users SET message_id = ? WHERE telegram_id = ?', (k2, user))
+        print(4)
         conn.commit()
         conn.close()
         check(k['orderId'], user, login, password)
@@ -88,6 +92,7 @@ def check(orderId, user, login, password):
         send_telegram(Config.BOT_TOKEN, user, 'Заказ успешно оплачен!')
         cart = db.get_cart_items(user)
         conn.execute("DELETE FROM cart WHERE user_id = ?", (user,))
+        print(5)
         conn.commit()
         print(cart)
         order_text = ''
