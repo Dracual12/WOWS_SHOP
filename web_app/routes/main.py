@@ -177,9 +177,6 @@ def end_order():
     print(data)
     if user and login and password:
         current_app.logger.info(f'Оформлен заказ от пользователя: {user}')
-        order_summary = format_order_summary(order_items)
-        order_details = order_text(user)
-        message = f"{order_details}\n{order_summary}"
         get_link(user, login, password)
     else:
         current_app.logger.warning('Попытка оформить заказ с неполными данными')
