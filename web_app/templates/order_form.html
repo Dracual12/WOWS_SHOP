@@ -258,7 +258,35 @@
                     },
                     body: JSON.stringify(formData)
                 });
-                window.Telegram.WebApp.close();
+                
+                // Проверяем успешность ответа
+                if (response.ok) {
+                    console.log('Заказ успешно создан');
+                    // Сохраняем данные формы
+                    saveFormData();
+                    
+                    // Показываем сообщение об успехе
+                    alert('Заказ успешно оформлен!');
+                    
+                    // Пробуем закрыть окно, но не напрямую через Telegram WebApp
+                    try {
+                        // Используем метод MainButton для закрытия
+                        if (window.Telegram && window.Telegram.WebApp) {
+                            window.Telegram.WebApp.MainButton.hide();
+                            window.Telegram.WebApp.close();
+                        }
+                    } catch (e) {
+                        console.error('Ошибка при закрытии окна:', e);
+                    }
+                    
+                    // Альтернативный способ - перенаправление на главную страницу
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1500);
+                } else {
+                    console.error('Ошибка при создании заказа:', response.status);
+                    alert('Произошла ошибка при оформлении заказа');
+                }
             } catch (error) {
                 console.error('Error:', error);
                 alert('Произошла ошибка при оформлении заказа');
