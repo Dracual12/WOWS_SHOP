@@ -32,7 +32,7 @@ def get_link(user, login, password):
     print(last_cart)
 
     total = sum(item['price'] * item['quantity'] for item in last_cart)
-    
+    print(total)
     conn.close()
 
     url = f"https://payment.alfabank.ru/payment/rest/register.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderNumber={order_id}&amount={total}&returnUrl=https://t.me/armada_gold_bot"
