@@ -434,7 +434,9 @@
                     <iframe src="{{ product.review_link }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 </div>
                 {% endif %}
+                {% if product.price > 0 %}
                 <button class="add_to_cart" data-id="{{ product.id }}">Добавить в корзину</button>
+                {% endif %}
             </div>
         </div>
         {% else %}
