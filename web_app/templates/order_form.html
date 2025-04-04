@@ -250,45 +250,44 @@
             };
 
             try {
-                // Создаем заказ
-                const response = await fetch('/api/order/end', {
+                // Сохраняем данные формы
+                saveFormData();
+                
+                // Показываем сообщение об успехе
+                alert('Заказ успешно оформлен!');
+                
+                // Отправляем данные обратно в Telegram бота и закрываем окно
+                try {
+                    // Используем метод sendData для отправки данных обратно в бота
+                    if (window.Telegram && window.Telegram.WebApp) {
+                        window.Telegram.WebApp.sendData(JSON.stringify({
+                            action: 'order_completed',
+                            message: 'Заказ успешно оформлен'
+                        }));
+                        
+                        // Скрываем кнопку и закрываем окно
+                        window.Telegram.WebApp.MainButton.hide();
+                        window.Telegram.WebApp.close();
+                    }
+                } catch (e) {
+                    console.error('Ошибка при закрытии окна Telegram:', e);
+                    // Если не удалось закрыть окно, перенаправляем на главную страницу
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1500);
+                }
+                
+                // Отправляем данные на сервер в фоновом режиме
+                fetch('/api/order/end', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(formData)
+                }).catch(error => {
+                    console.error('Ошибка при отправке данных на сервер:', error);
                 });
                 
-                // Проверяем успешность ответа
-                if (response.ok) {
-                    console.log('Заказ успешно создан');
-                    // Сохраняем данные формы
-                    saveFormData();
-                    
-                    // Показываем сообщение об успехе
-                    alert('Заказ успешно оформлен!');
-                    
-                    // Отправляем данные обратно в Telegram бота
-                    try {
-                        // Используем метод sendData для отправки данных обратно в бота
-                        if (window.Telegram && window.Telegram.WebApp) {
-                            window.Telegram.WebApp.sendData(JSON.stringify({
-                                action: 'order_completed',
-                                message: 'Заказ успешно оформлен'
-                            }));
-                        }
-                    } catch (e) {
-                        console.error('Ошибка при отправке данных в Telegram:', e);
-                    }
-                    
-                    // Перенаправление на главную страницу через 2 секунды
-                    setTimeout(() => {
-                        window.location.href = '/';
-                    }, 2000);
-                } else {
-                    console.error('Ошибка при создании заказа:', response.status);
-                    alert('Произошла ошибка при оформлении заказа');
-                }
             } catch (error) {
                 console.error('Error:', error);
                 alert('Произошла ошибка при оформлении заказа');
