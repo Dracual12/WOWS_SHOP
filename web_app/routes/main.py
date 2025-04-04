@@ -5,7 +5,7 @@ from ..utils.telegram import send_telegram
 from ..config import Config
 bp = Blueprint('main', __name__)
 from bot.db import get_db_connection
-import requests
+import requests, json
 
 def pay(link):
     keyboard = {
