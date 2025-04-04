@@ -1,7 +1,10 @@
 /* Стили для корзины на странице товара */
 .floating-cart-product {
-    position: relative;
+    position: fixed;
+    top: 20px;
+    right: 20px;
     cursor: pointer;
+    z-index: 1000;
 }
 
 .cart-icon-product {
