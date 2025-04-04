@@ -88,9 +88,9 @@ def check(orderId, user, login, password):
     conn = get_db_connection()
     if glag:
         send_telegram(Config.BOT_TOKEN, user, 'Заказ успешно оплачен!')
+        data = order_text(user)
         conn.execute("DELETE FROM cart WHERE user_id = ?", (user,))
         conn.commit()
-        data = order_text(user)
         print(data)
         message = f"""
         Детали заказа:
