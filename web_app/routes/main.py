@@ -78,7 +78,7 @@ def end_order():
     data = request.get_json()
     user = data.get('user')
     order_items = data.get('items', [])
-    
+    print(data)
     if user and order_items:
         current_app.logger.info(f'Оформлен заказ от пользователя: {user.get("name")}')
         order_summary = format_order_summary(order_items)
