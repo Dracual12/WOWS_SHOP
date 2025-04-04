@@ -268,21 +268,23 @@
                     // Показываем сообщение об успехе
                     alert('Заказ успешно оформлен!');
                     
-                    // Пробуем закрыть окно, но не напрямую через Telegram WebApp
+                    // Отправляем данные обратно в Telegram бота
                     try {
-                        // Используем метод MainButton для закрытия
+                        // Используем метод sendData для отправки данных обратно в бота
                         if (window.Telegram && window.Telegram.WebApp) {
-                            window.Telegram.WebApp.MainButton.hide();
-                            window.Telegram.WebApp.close();
+                            window.Telegram.WebApp.sendData(JSON.stringify({
+                                action: 'order_completed',
+                                message: 'Заказ успешно оформлен'
+                            }));
                         }
                     } catch (e) {
-                        console.error('Ошибка при закрытии окна:', e);
+                        console.error('Ошибка при отправке данных в Telegram:', e);
                     }
                     
-                    // Альтернативный способ - перенаправление на главную страницу
+                    // Перенаправление на главную страницу через 2 секунды
                     setTimeout(() => {
                         window.location.href = '/';
-                    }, 1500);
+                    }, 2000);
                 } else {
                     console.error('Ошибка при создании заказа:', response.status);
                     alert('Произошла ошибка при оформлении заказа');
