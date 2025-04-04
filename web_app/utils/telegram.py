@@ -72,7 +72,6 @@ def send_telegram(
         params["reply_markup"] = json.dumps(reply_markup)
 
     response = requests.post(url, params=params).json()
-    print(re)
     if response.get("ok"):
         return True
     else:
