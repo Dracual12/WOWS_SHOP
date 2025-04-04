@@ -285,6 +285,40 @@
             color: var(--tg-theme-hint-color);
             font-style: italic;
         }
+        
+        /* Стили для кнопки "Назад" */
+        .return-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+            cursor: pointer;
+        }
+        
+        .return-btn {
+            width: 24px;
+            height: 24px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .return-btn::before {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: #8774e1;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            opacity: 0.2;
+        }
     </style>
 </head>
 <body>
@@ -300,9 +334,12 @@
     </div>
 
     <header>
+        <a href="/" class="return-link">
+            <img src="{{ url_for('static', filename='images/return.png') }}" alt="Вернуться в магазин" class="return-btn">
+        </a>
         <div class="floating-cart-product">
             <button class="cart-icon-product">
-                <img src="/static/images/cart-icon.png" alt="Корзина">
+                <img src="{{ url_for('static', filename='images/cart-icon.png') }}" alt="Корзина">
             </button>
             <div class="cart-dropdown-product">
                 <div class="cart-header">Корзина</div>
