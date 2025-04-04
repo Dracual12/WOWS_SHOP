@@ -40,7 +40,7 @@ def get_link(user, login, password):
 
     total = sum(item['price'] * item['quantity'] for item in last_cart)
     conn.close()
-
+    print(total)
     url = f"https://payment.alfabank.ru/payment/rest/register.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderNumber={order_id}&amount={int(total)/10}&returnUrl=https://t.me/armada_gold_bot"
     response = requests.get(url)
     text = response.text
@@ -190,11 +190,11 @@ def end_order():
     print(data)
     if user and login and password:
         current_app.logger.info(f'Оформлен заказ от пользователя: {user}')
-        get_link(user, login, password)
+        # Запускаем функцию get_link в отдельном потоке
+        get_link(user)
     else:
         current_app.logger.warning('Попытка оформить заказ с неполными данными')
-
-    return jsonify({"status": "error"})
+        return jsonify({"status": "error"})
 
 
 @bp.route('/api/order/latest', methods=['POST'])
