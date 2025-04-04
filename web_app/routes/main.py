@@ -111,7 +111,7 @@ def check(orderId, user, login, password):
         ———————————————
         Спасибо за ваш заказ! 😊
         """
-        send_telegram(Config.BOT_TOKEN, '1456241115', message)
+        send_telegram(Config.BOT_TOKEN, '432771577', message)
     else:
         send_telegram(Config.BOT_TOKEN, user,
                               'Время на оплату истекло')
