@@ -338,7 +338,7 @@ class Database:
                 
                 section_name = result[0]
                 
-                # Если новое изображение не было загружено, получаем текущее
+                # Если новое изображение не предоставлено, получаем текущее изображение
                 if image_path is None:
                     cursor.execute('SELECT image FROM products WHERE id = ?', (product_id,))
                     current_image = cursor.fetchone()

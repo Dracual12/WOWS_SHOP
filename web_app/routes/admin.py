@@ -123,30 +123,30 @@ def add_product():
     sections = db.get_sections()
     return render_template('admin/add_product.html', sections=sections)
 
-@bp.route('/edit_product/<int:product_id>', methods=['GET', 'POST'])
+@bp.route('/products/edit/<int:product_id>', methods=['GET', 'POST'])
 @admin_required
 def edit_product(product_id):
     if request.method == 'POST':
         try:
             name = request.form.get('name')
             description = request.form.get('description')
-            price = float(request.form.get('price'))
-            section_id = int(request.form.get('section_id'))
-            order_index = int(request.form.get('order_index', 0))
-            is_active = request.form.get('is_active') == 'on'
+            section_id = request.form.get('section_id')
             review_link = request.form.get('review_link')
+            order_index = request.form.get('order_index', 0)
+            is_active = 'is_active' in request.form
+            is_free = 'is_free' in request.form
             
-            # Получаем текущий товар для сохранения пути к изображению
-            current_product = db.get_product(product_id)
-            if not current_product:
-                flash('Товар не найден', 'error')
-                return redirect(url_for('admin.products'))
+            # Обработка цены
+            if is_free:
+                price = 0
+            else:
+                price = float(request.form.get('price', 0))
             
-            # Обрабатываем загрузку нового изображения
-            image_path = current_product['image']  # Используем текущий путь к изображению по умолчанию
-            if 'image' in request.files:
+            # Обработка изображения
+            image_path = None
+            if 'image' in request.files and request.files['image'].filename:
                 file = request.files['image']
-                if file and file.filename and allowed_file(file.filename):
+                if file and allowed_file(file.filename):
                     filename = secure_filename(file.filename)
                     # Создаем директорию, если она не существует
                     upload_dir = os.path.join(current_app.root_path, 'static', 'images', 'products')
