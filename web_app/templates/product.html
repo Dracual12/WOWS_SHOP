@@ -287,14 +287,14 @@
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
+            overflow: visible;
         }
         
-        .cart-icon-product:active {
+        .cart-icon-product:active,
+        .cart-icon-product:focus,
+        .cart-icon-product:hover {
             transform: none;
             background: none;
-        }
-        
-        .cart-icon-product:focus {
             outline: none;
             box-shadow: none;
         }
@@ -319,6 +319,7 @@
             transform: translate(-50%, -50%);
             z-index: -1;
             opacity: 0.2;
+            pointer-events: none;
         }
         
         .empty-cart {
