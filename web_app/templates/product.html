@@ -284,11 +284,21 @@
             justify-content: center;
             -webkit-tap-highlight-color: transparent;
             outline: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            border-radius: 50%;
         }
         
         .cart-icon-product:active {
             transform: none;
             background: none;
+            border-radius: 50%;
+        }
+        
+        .cart-icon-product:focus {
+            outline: none;
+            box-shadow: none;
         }
         
         .cart-icon-product img {
