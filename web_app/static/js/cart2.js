@@ -160,14 +160,20 @@ function loadCartItems() {
         return;
     }
 
-    // Используем request вместо fetch
-    request(`/api/cart?tg_id=${tgId}`, {
+    // Используем fetch вместо request
+    fetch(`/api/cart?tg_id=${tgId}`, {
         method: 'GET'
     })
     .then(response => {
-        if (response.success) {
-            const cartItems = response.cart_items;
-            const total = response.total;
+        if (!response.ok) {
+            throw new Error('Ошибка загрузки корзины');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            const cartItems = data.cart_items;
+            const total = data.total;
             
             // Очищаем контейнер
             cartItemsContainer.innerHTML = '';
@@ -207,7 +213,7 @@ function loadCartItems() {
                 `;
             }
         } else {
-            console.error('Ошибка при загрузке корзины:', response.error);
+            console.error('Ошибка при загрузке корзины:', data.error);
         }
     })
     .catch(error => {
