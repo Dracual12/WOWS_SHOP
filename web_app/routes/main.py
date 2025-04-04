@@ -95,8 +95,8 @@ def check(orderId, user, login, password):
         message = f"""
         Детали заказа:
         ———————————————
-        🆔 ID заказа: {data['id']}
-        👤 User ID: id <a href="tg://user?id={data['user_id']}">{data['user_id']}</a>
+        🆔 ID заказа: {orderId}
+        👤 User ID: id <a href="tg://user?id={user}">{user}</a>
         🛒 Корзина: {data['cart']}
         🔑 Логин;Пароль: {login}:{password}
         ———————————————
