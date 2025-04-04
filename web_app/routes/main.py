@@ -35,6 +35,7 @@ def get_link(user, login, password):
     conn.execute("INSERT INTO orders (user_id) VALUES (?)", (user,))
     conn.commit()
     last_order = conn.execute('SELECT id FROM orders WHERE user_id = ? ORDER BY id DESC LIMIT 1', (user,)).fetchone()
+    print(last_order)
     order_id = int(dict(last_order)['id']) + 100075
     last_cart = db.get_cart_items(user)
 
