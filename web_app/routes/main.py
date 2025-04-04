@@ -42,27 +42,27 @@ def get_link(user, login, password):
     total = sum(item['price'] * item['quantity'] for item in last_cart)
     conn.close()
 
-    url = f"https://payment.alfabank.ru/payment/rest/register.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderNumber={order_id}&amount={int(total) * 100}&returnUrl=https://t.me/armada_gold_bot"
-    response = requests.get(url)
-    text = response.text
-    try:
-        k = json.loads(text)  # Ручное преобразование текста в JSON
-    except json.JSONDecodeError as e:
-        print("Ошибка при декодировании JSON:", e)
-        return
-    print(k)
-    if 'formUrl' in k:
-        a = k['formUrl']
-        k2 = send_telegram(
-            "Нажимая «Оплатить» Вы принимаете положения Политики Конфиденциальности и Пользовательского Соглашения",
-            Config.BOT_TOKEN, user, pay(a))
-        conn = get_db_connection()
-        conn.execute('UPDATE users SET message_id = ? WHERE telegram_id = ?', (k2, user))
-        conn.commit()
-        conn.close()
-        check(k['orderId'], user, login, password)
-    else:
-        print("Ключ 'formUrl' отсутствует в словаре k:", k)
+    #url = f"https://payment.alfabank.ru/payment/rest/register.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderNumber={order_id}&amount={int(total) * 100}&returnUrl=https://t.me/armada_gold_bot"
+    #response = requests.get(url)
+    #text = response.text
+   # try:
+   #     k = json.loads(text)  # Ручное преобразование текста в JSON
+   # except json.JSONDecodeError as e:
+   #     print("Ошибка при декодировании JSON:", e)
+   #     return
+   # print(k)
+   # if 'formUrl' in k:
+   #     a = k['formUrl']
+   #     k2 = send_telegram(
+   #         "Нажимая «Оплатить» Вы принимаете положения Политики Конфиденциальности и Пользовательского Соглашения",
+   #         Config.BOT_TOKEN, user, pay(a))
+    #    conn = get_db_connection()
+    #    conn.execute('UPDATE users SET message_id = ? WHERE telegram_id = ?', (k2, user))
+    #    conn.commit()
+     #   conn.close()
+     #   check(k['orderId'], user, login, password)
+   # else:
+    #    print("Ключ 'formUrl' отсутствует в словаре k:", k)
 
 
 # Получение текста заказа
