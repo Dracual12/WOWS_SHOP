@@ -42,7 +42,7 @@ def get_link(user, login, password):
 
     total = sum(item['price'] * item['quantity'] for item in last_cart)
     conn.close()
-    url = f"https://payment.alfabank.ru/payment/rest/register.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderNumber={order_id}&amount={int(total/10)}&returnUrl=https://t.me/armada_gold_bot"
+    url = f"https://payment.alfabank.ru/payment/rest/register.do?token=oj5skop8tcf9a8mmoh9ssb31ei&orderNumber={order_id}&amount={int(total)}&returnUrl=https://t.me/armada_gold_bot"
     response = requests.get(url)
     text = response.text
     try:
@@ -91,6 +91,7 @@ def check(orderId, user, login, password):
     if glag:
         send_telegram(Config.BOT_TOKEN, user, 'Заказ успешно оплачен!')
         cart = db.get_cart_items(user)
+        print(user)
         conn.execute("DELETE FROM cart WHERE tg_id = ?", (user,))
         print(5)
         conn.commit()
