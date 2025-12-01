@@ -63,7 +63,7 @@ def send_telegram(text: str, BOT_TOKEN: str, CHAT_ID: str, reply_markup=None):
         return None
 
 
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo, FSInputFile
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 # Клавиатура для оплаты
 def pay(link):
     keyboard = {

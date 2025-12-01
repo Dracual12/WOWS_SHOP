@@ -53,20 +53,44 @@ def init_db():
     );
     ''')
     
+    # Создаем таблицу blacklist
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS blacklist (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        telegram_id INTEGER UNIQUE NOT NULL,
+        blocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    ''')
+    
     conn.commit()
     conn.close()
 
 def add_user(telegram_id, username):
+    """Добавляет пользователя или обновляет его username, если он изменился."""
     conn = get_db_connection()
-    user = conn.execute('SELECT * FROM users WHERE telegram_id = ?', (telegram_id,)).fetchone()
-    if not user:
-        conn.execute(
-            'INSERT INTO users (telegram_id, username) VALUES (?, ?)',
-            (telegram_id, username)
-        )
-        conn.commit()
+    try:
+        user = conn.execute(
+            'SELECT username FROM users WHERE telegram_id = ?',
+            (telegram_id,)
+        ).fetchone()
 
-    conn.close()
+        if not user:
+            # Новый пользователь
+            conn.execute(
+                'INSERT INTO users (telegram_id, username) VALUES (?, ?)',
+                (telegram_id, username)
+            )
+        else:
+            # Пользователь уже есть — обновляем username, если он изменился
+            current_username = user['username'] if isinstance(user, sqlite3.Row) else user[0]
+            if username and username != current_username:
+                conn.execute(
+                    'UPDATE users SET username = ? WHERE telegram_id = ?',
+                    (username, telegram_id)
+                )
+        conn.commit()
+    finally:
+        conn.close()
 
 def add_order_id(order_id, user_id):
     conn = get_db_connection()
@@ -179,5 +203,75 @@ def reorder_products(product_ids):
     except sqlite3.Error as e:
         print(f"Ошибка при обновлении порядка товаров: {e}")
         return False
+    finally:
+        conn.close()
+
+def ensure_blacklist_table():
+    """Убеждается, что таблица blacklist существует"""
+    conn = get_db_connection()
+    try:
+        conn.execute('''
+        CREATE TABLE IF NOT EXISTS blacklist (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            telegram_id INTEGER UNIQUE NOT NULL,
+            blocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        ''')
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Ошибка при создании таблицы blacklist: {e}")
+    finally:
+        conn.close()
+
+def block_user(telegram_id):
+    """Добавляет пользователя в блэклист"""
+    ensure_blacklist_table()
+    conn = get_db_connection()
+    try:
+        conn.execute(
+            'INSERT OR IGNORE INTO blacklist (telegram_id) VALUES (?)',
+            (telegram_id,)
+        )
+        conn.commit()
+        return True
+    except sqlite3.Error as e:
+        print(f"Ошибка при добавлении в блэклист: {e}")
+        return False
+    finally:
+        conn.close()
+
+def unblock_user(telegram_id):
+    """Удаляет пользователя из блэклиста"""
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute('DELETE FROM blacklist WHERE telegram_id = ?', (telegram_id,))
+        conn.commit()
+        return cursor.rowcount > 0
+    except sqlite3.Error as e:
+        print(f"Ошибка при удалении из блэклиста: {e}")
+        return False
+    finally:
+        conn.close()
+
+def is_blocked(telegram_id):
+    """Проверяет, заблокирован ли пользователь"""
+    ensure_blacklist_table()
+    conn = get_db_connection()
+    try:
+        blocked = conn.execute(
+            'SELECT * FROM blacklist WHERE telegram_id = ?',
+            (telegram_id,)
+        ).fetchone()
+        return blocked is not None
+    finally:
+        conn.close()
+
+def get_all_users():
+    """Получает всех пользователей из БД для рассылки"""
+    conn = get_db_connection()
+    try:
+        users = conn.execute('SELECT telegram_id FROM users').fetchall()
+        return [user['telegram_id'] for user in users]
     finally:
         conn.close()
