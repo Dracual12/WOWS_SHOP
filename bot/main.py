@@ -44,7 +44,7 @@ except Exception as e:
     logger.error(f"Не удалось проверить/добавить колонку username в таблицу users: {e}")
 
 # Инициализация бота и диспетчера
-bot = Bot(token=config.BOT_TOKEN, parse_mode=ParseMode.HTML)
+bot = Bot(token=config.BOT_TOKEN)
 storage = MemoryStorage()
 dp = Dispatcher(storage=storage)
 
