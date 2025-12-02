@@ -142,6 +142,7 @@ async def send_welcome(message: Message):
             '• Оценить бои от участников нашего канала\n\n'
             '<b>Чтобы начать, нажмите «Открыть магазин»</b> 👇',
             reply_markup=main_menu(),
+            parse_mode=ParseMode.HTML,
         )
         return
     
@@ -157,6 +158,7 @@ async def send_welcome(message: Message):
             '<b>Чтобы начать, нажмите «Открыть магазин»</b> 👇'
         ),
         reply_markup=main_menu(),
+        parse_mode=ParseMode.HTML,
     )
 
 
@@ -296,12 +298,14 @@ async def process_push_broadcast(message: Message, state: FSMContext):
                     photo=photo_id,
                     caption=text,
                     reply_markup=keyboard,
+                    parse_mode=ParseMode.HTML,
                 )
             else:
                 await bot.send_message(
                     chat_id=user_id,
                     text=text,
                     reply_markup=keyboard,
+                    parse_mode=ParseMode.HTML,
                 )
             success_count += 1
             await asyncio.sleep(0.05)
