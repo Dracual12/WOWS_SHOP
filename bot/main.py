@@ -129,7 +129,22 @@ async def send_welcome(message: Message):
     username = message.from_user.username
     add_user(telegram_id, username)
 
-    photo_path = os.path.join(os.getcwd(), "assets", "welcome.jpeg")
+    # Путь к файлу относительно директории bot/
+    bot_dir = os.path.dirname(os.path.abspath(__file__))
+    photo_path = os.path.join(bot_dir, "assets", "welcome.jpeg")
+    
+    if not os.path.exists(photo_path):
+        logger.error(f"Файл фото не найден: {photo_path}")
+        await message.answer(
+            '⚡️<b>«Армада Голд» представляет первый большой проект - «Армада Голд Бот». Здесь Вы можете:</b>\n\n'
+            '• Приобрести дублоны и другие наборы на аккаунт любого региона и платформы;\n'
+            '• Просмотреть видеообзоры на разные корабли;\n'
+            '• Оценить бои от участников нашего канала\n\n'
+            '<b>Чтобы начать, нажмите «Открыть магазин»</b> 👇',
+            reply_markup=main_menu(),
+        )
+        return
+    
     photo = FSInputFile(photo_path)
 
     await message.answer_photo(
