@@ -10,7 +10,6 @@ if project_root not in sys.path:
 
 from aiogram import Bot, Dispatcher, BaseMiddleware
 from aiogram.enums import ParseMode
-from aiogram.exceptions import CancelHandler
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -113,10 +112,10 @@ class BlacklistMiddleware(BaseMiddleware):
 
                 if is_admin_command and telegram_id != config.ADMIN_ID:
                     await event.answer("У вас нет прав для выполнения этой команды.")
-                    raise CancelHandler()
+                    return  # Прерываем обработку, не вызывая handler
 
             if is_blocked(telegram_id):
-                raise CancelHandler()
+                return  # Прерываем обработку, не вызывая handler
 
         return await handler(event, data)
 
